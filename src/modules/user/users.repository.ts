@@ -5,7 +5,7 @@ import { UserSerializer } from './serializers/user.serializer';
 import { ModelRepository } from '../shared/model.repository';
 
 @Injectable()
-export class UserRepository extends ModelRepository<User, UserSerializer> {
+export class UsersRepository extends ModelRepository<User, UserSerializer> {
     constructor(private dataSource : DataSource) {
         super(User, dataSource.createEntityManager());
     }

@@ -1,5 +1,5 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import Joi from 'joi';
+import * as Joi from 'joi';
 import { AppConfigService } from './app-config.service';
 import { Module } from '@nestjs/common';
 import { AppConfig } from './app.config';
