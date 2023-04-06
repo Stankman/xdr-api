@@ -2,7 +2,9 @@ import { Controller, Get, HttpException, Param } from '@nestjs/common';
 import { CustomResponseService } from 'nestjs-custom-response';
 import { UsersService } from './services/users.service';
 import { I18n, I18nContext } from 'nestjs-i18n-2';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
     
