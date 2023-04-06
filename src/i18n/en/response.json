@@ -1,0 +1,15 @@
+{
+    "message": {
+        "inputInvalid":"Invalid input",
+        "error": "An error occurred",
+        "ok": "ok",
+        "successful": "Successful",
+        "successfully": "Successful",
+        "connectionLimit": "Connection reach limit",
+        "tokenInvalid": "Token invalid",
+        "requestTimeout": "Request timeout",
+        "unauthorized": "Unauthorized",
+        "forbidden": "Forbidden",
+        "entityNotFound": "User not found"
+    }
+}

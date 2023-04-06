@@ -1,8 +1,4 @@
-/*
-https://docs.nestjs.com/controllers#controllers
-*/
-
 import { Controller } from '@nestjs/common';
 
-@Controller()
+@Controller('user')
 export class UserController {}

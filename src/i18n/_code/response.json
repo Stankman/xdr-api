@@ -1,0 +1,15 @@
+{
+    "message": {
+        "inputInvalid":"400",
+        "error": "500",
+        "ok": "200",
+        "successful": "200",
+        "successfully": "200",
+        "connectionLimit": "429",
+        "tokenInvalid": "401",
+        "requestTimeout": "408",
+        "unauthorized": "401",
+        "forbidden": "403",
+        "entityNotFound": "450"
+    }
+}
