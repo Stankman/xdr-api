@@ -9,7 +9,6 @@
         "watchAssets": true,
         "outDir": "dist/apps/api"
       }
-    ],
-    "deleteOutDir": true
+    ]
   }
 }

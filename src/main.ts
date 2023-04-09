@@ -9,13 +9,6 @@ import { AppConfigService } from './config/app/app-config.service';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      exceptionFactory: i18nValidationErrorFactory,
-      transform: true,
-    })
-  );
-
   const appConfig : AppConfigService = app.get<AppConfigService>(AppConfigService);
 
   const swaggerOptions = new DocumentBuilder()
@@ -29,6 +22,13 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, swaggerDocument);
 
   app.enableCors();
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      exceptionFactory: i18nValidationErrorFactory,
+      transform: true,
+    }),
+  );
 
   await app.listen(appConfig.port);
 }

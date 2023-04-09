@@ -11,17 +11,20 @@ import { UserModule } from "./modules/user/user.module";
 @Module({
   imports: [
     I18nModule.forRoot({
-      fallbackLanguage: 'en',
+      fallbackLanguage: 'en', // set a default language,
       loaderOptions: {
         path: path.join(__dirname, '/i18n/'),
         watch: true,
       },
-      resolvers: [QueryResolver, AcceptLanguageResolver],
+      resolvers: [
+        { use: QueryResolver, options: ['lang'] },
+        AcceptLanguageResolver,
+      ]
     }),
 
     AppConfigModule, 
     MySQLConfigModule,
-
+    
     MySQLProviderModule,
 
     UserModule
