@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule, TypeOrmModuleAsyncOptions } from "@nestjs/typeorm";
+import { join } from "path";
 import { MySQLConfigModule } from "src/config/mysql/mysql-config.module";
 import { MySQLConfigService } from "src/config/mysql/mysql-config.service";
 import { DatabaseType } from "typeorm";
@@ -15,7 +16,7 @@ import { DatabaseType } from "typeorm";
                 database: mySQLConfigService.database,
                 username: mySQLConfigService.username,
                 password: mySQLConfigService.password,
-                entities: [__dirname + '/../../../**/*.entity{.ts,.js}']
+                autoLoadEntities: true
             }),
             inject: [MySQLConfigService]
         } as TypeOrmModuleAsyncOptions)

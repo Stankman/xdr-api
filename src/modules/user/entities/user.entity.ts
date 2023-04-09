@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { IUser } from "../interfaces/user.interface";
 
 @Entity({ name: 'users'})
@@ -15,6 +15,12 @@ export class User implements IUser {
 
     @Column()
     password: string;
+
+    @Column()
+    ip_current: string;
+    
+    @Column()
+    ip_register: string;
     
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;

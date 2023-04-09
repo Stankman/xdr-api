@@ -1,4 +1,4 @@
 export class ModelEntitySerializer {
-    id: number;
+    id: string|number;
     [key: string]: any;
 }

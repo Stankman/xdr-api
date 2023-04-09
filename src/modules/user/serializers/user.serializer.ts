@@ -1,23 +1,35 @@
-import { Expose } from 'class-transformer';
-import { IUser } from '../interfaces/user.interface';
-import { ModelEntitySerializer } from 'src/common/serializers/model.serializer';
+import { Expose } from "class-transformer";
+import { IUser } from "../interfaces/user.interface";
+import { ModelEntitySerializer } from "src/common/serializers/model.serializer";
 
+export const defaultUserGroupsForSerializing: string[] = ['user.timestamps'];
+
+export const extendedUserGroupsForSerializing: string[] = [
+  ...defaultUserGroupsForSerializing,
+];
+
+export const allUserGroupsForSerializing: string[] = [
+  ...extendedUserGroupsForSerializing,
+  'user.password',
+];
 export class UserSerializer extends ModelEntitySerializer implements IUser {
-  @Expose()
+  
   id: number;
+  
+  username : string;
 
-  @Expose()
-  username: string;
-
-  @Expose()
   email: string;
-
-  @Expose({ groups: ['private'] })
+  
+  @Expose({ groups: ['user.password'] })
   password: string;
 
-  @Expose()
-  createdAt: Date;
+  ip_current: string;
+  
+  ip_register: string;
 
-  @Expose()
+  @Expose({ groups: ['user.timestamps'] })
+  createdAt: Date;
+  
+  @Expose({ groups: ['user.timestamps'] })
   updatedAt: Date;
 }
