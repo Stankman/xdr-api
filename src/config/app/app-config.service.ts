@@ -27,4 +27,8 @@ export class AppConfigService {
     public get port() : number {
         return this.configService.get<number>('app.port');
     }
+
+    public get fullUrl() : string {
+        return this.url + ':' + this.port;
+    }
 }
