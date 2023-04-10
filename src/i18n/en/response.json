@@ -9,7 +9,7 @@
         "tokenInvalid": "Token invalid",
         "requestTimeout": "Request timeout",
         "unauthorized": {
-            "banned": "This account is banned",
+            "banned": "Account banned",
             "no_permission": "Unauthorized"
         },
         "forbidden": "Forbidden",

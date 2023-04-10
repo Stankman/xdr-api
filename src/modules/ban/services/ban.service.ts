@@ -17,8 +17,6 @@ export class BanService {
     public async getBan(value : string | number) : Promise<Ban | null> {
         const currentTimestamp = Math.floor(new Date().getTime() / 1000);
 
-      console.log(currentTimestamp);
-
         const whereOptions: FindOptionsWhere<Ban>[] = [
             { 
               ban_expire: MoreThan(currentTimestamp),
