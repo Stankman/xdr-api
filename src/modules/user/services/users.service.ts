@@ -12,12 +12,6 @@ export class UsersService {
       private readonly repository : UsersRepository
   ) {}
 
-  public async getUser(customResponse : CustomResponseService, id : number | string): Promise<CustomResponseService> {
-    let whereOptions : FindOptionsWhere<User> | FindOptionsWhere<User>[] = [{ username: String(id) }, { id: Number(id) }];
-    
-    return this.repository.getOneBy(customResponse, whereOptions);
-  }
-
   public async paginateUsers(customResponse : CustomResponseService, options : IPaginationOptions) : Promise<CustomResponseService> {
     return this.repository.paginate(customResponse, options);
   }
@@ -29,7 +23,9 @@ export class UsersService {
     return this.repository.findOne({where: whereOptions});
   }
 
-  public async updateUser(customResponse : CustomResponseService, userId : number, partialEntity: QueryDeepPartialEntity<User>) : Promise<CustomResponseService> {
-    return this.repository.updateEntity(customResponse, userId, partialEntity);
-  }
+  // public async updateUser(userId : number, partialEntity: QueryDeepPartialEntity<User>) : Promise<User> {
+  //   return this.repository.update(userId, partialEntity).then((entity : User)=> {
+  //     return entity;
+  //   });
+  // }
 }

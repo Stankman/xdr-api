@@ -8,8 +8,13 @@
         "connectionLimit": "429",
         "tokenInvalid": "401",
         "requestTimeout": "408",
-        "unauthorized": "401",
+        "unauthorized": {
+            "banned": "4030",
+            "no_permission": "4031"
+        },
         "forbidden": "403",
-        "entityNotFound": "450"
+        "entityNotFound": {
+            "user": "4040"
+        }
     }
 }

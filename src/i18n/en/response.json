@@ -8,8 +8,13 @@
         "connectionLimit": "Connection reach limit",
         "tokenInvalid": "Token invalid",
         "requestTimeout": "Request timeout",
-        "unauthorized": "Unauthorized",
+        "unauthorized": {
+            "banned": "This account is banned",
+            "no_permission": "Unauthorized"
+        },
         "forbidden": "Forbidden",
-        "entityNotFound": "User not found"
+        "entityNotFound": {
+            "user": "User Not Found"
+        }
     }
 }
