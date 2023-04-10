@@ -33,7 +33,6 @@
     "class-validator": "^0.13.2",
     "joi": "^17.9.1",
     "mysql2": "^3.2.0",
-    "nestjs-custom-response": "^1.0.2",
     "nestjs-i18n-2": "^9.1.8",
     "nestjs-typeorm-paginate": "^4.0.3",
     "passport": "^0.6.0",

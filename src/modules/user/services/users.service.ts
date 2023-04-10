@@ -1,8 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { FindOptionsWhere } from 'typeorm';
-import { CustomResponseService } from 'nestjs-custom-response';
 import { IPaginationMeta, IPaginationOptions, Pagination } from "nestjs-typeorm-paginate";
-import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { User } from "../entities/user.entity";
 import { UsersRepository } from "../users.repository";
 
