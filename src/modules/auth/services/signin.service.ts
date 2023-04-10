@@ -20,13 +20,7 @@ export class SignInService {
         private readonly jwtService : JwtService
     ) {}
 
-    public async signIn(signInDTO : SignInDTO, currentIp : string): Promise<any> {
-        
-        let customResponse = new CustomResponse();
-
-        customResponse.setCode(404);
-        customResponse.setStatus('ok');
-
+    public async signIn(signInDTO : SignInDTO, currentIp : string) : Promise<any> {
         let user : User = await this.userService.findUser(signInDTO.identification);
 
         if(!user || user.password !== signInDTO.password) {

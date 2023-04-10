@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { CustomResponseService } from "nestjs-custom-response";
-import { IPaginationOptions } from "nestjs-typeorm-paginate";
-import { FindOptionsWhere, LessThan, MoreThan } from "typeorm";
+import { IPaginationMeta, IPaginationOptions, Pagination } from "nestjs-typeorm-paginate";
+import { FindOptionsWhere, MoreThan } from "typeorm";
 import { BanRepository } from "../ban.repository";
 import { Ban } from "../entities/ban.entity";
 
@@ -10,8 +9,8 @@ export class BanService {
     constructor(private readonly repository : BanRepository) {}
 
 
-    public async paginateBans(customResponse : CustomResponseService, options : IPaginationOptions) : Promise<CustomResponseService> {
-        return this.repository.paginate(customResponse, options);
+    public async paginateBans(options : IPaginationOptions) : Promise<Pagination<Ban, IPaginationMeta>> {
+        return this.repository.paginate(options);
     }
 
     public async getBan(value : string | number) : Promise<Ban | null> {

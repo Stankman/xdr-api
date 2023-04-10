@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { FindOptionsWhere } from 'typeorm';
 import { CustomResponseService } from 'nestjs-custom-response';
-import { IPaginationOptions } from "nestjs-typeorm-paginate";
+import { IPaginationMeta, IPaginationOptions, Pagination } from "nestjs-typeorm-paginate";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { User } from "../entities/user.entity";
 import { UsersRepository } from "../users.repository";
@@ -12,8 +12,8 @@ export class UsersService {
       private readonly repository : UsersRepository
   ) {}
 
-  public async paginateUsers(customResponse : CustomResponseService, options : IPaginationOptions) : Promise<CustomResponseService> {
-    return this.repository.paginate(customResponse, options);
+  public async paginateUsers(options : IPaginationOptions) : Promise<Pagination<User, IPaginationMeta>> {
+    return this.repository.paginate(options);
   }
 
   public async findUser(identification : string) : Promise<User> {

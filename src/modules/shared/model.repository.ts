@@ -1,7 +1,7 @@
 import { plainToClass } from "class-transformer";
 import { FindOptionsWhere, ObjectID, Repository } from "typeorm";
 import { CustomResponseService } from 'nestjs-custom-response';
-import { IPaginationOptions, paginate } from 'nestjs-typeorm-paginate';
+import { IPaginationMeta, IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { ModelEntitySerializer } from "src/common/serializers/model.serializer";
 
@@ -32,9 +32,9 @@ export class ModelRepository<T, K extends ModelEntitySerializer> extends Reposit
     )
   }
 
-  public async paginate(customResponse : CustomResponseService, options : IPaginationOptions) : Promise<CustomResponseService> {
+  public async paginate(options : IPaginationOptions) : Promise<Pagination<T, IPaginationMeta>> {
     return paginate<T>(this, options).then(pagination => {
-      return customResponse.makeResponseResponse("response.message.successfully", 200, pagination);
+      return pagination;
     });
   }
 

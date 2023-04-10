@@ -5,10 +5,12 @@ import { UsersController } from './users.controller';
 import { UserController } from './user.controller';
 import { UsersRepository } from './users.repository';
 import { UsersService } from './services/users.service';
+import { AppConfigModule } from 'src/config/app/app-config.module';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([User]),
+        AppConfigModule
     ],
     controllers: [
         UsersController,

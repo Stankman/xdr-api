@@ -8,7 +8,11 @@ export class ResponseInterceptor implements NestInterceptor {
     
     return next.handle().pipe(
       map((data) => {
-        return data;
+        if(data instanceof CustomResponse) {
+          return data.setCode(200).getJSON();
+        } else {
+          return new CustomResponse().setCode(200).setData(data).getJSON();
+        }
       })
     );
   }
