@@ -4,6 +4,7 @@ import { IPaginationMeta, IPaginationOptions, Pagination, paginate } from 'nestj
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { ModelEntitySerializer } from "src/common/serializers/model.serializer";
 import { BanException } from "../auth/exceptions/ban.exception";
+import { NoSuchEntityException } from "src/common/exceptions/nosuchentity.exception";
 
 export class ModelRepository<T, K extends ModelEntitySerializer> extends Repository<T> {
     
@@ -13,8 +14,7 @@ export class ModelRepository<T, K extends ModelEntitySerializer> extends Reposit
       relations: relations
     }).then(entity => {
       if(!entity && throwsException) {
-        //TODO CHANGE THIS EXCEPTION!!
-        throw new BanException();
+        throw new NoSuchEntityException();
       }
 
       return entity ? this.transform(entity) : null;
@@ -25,9 +25,7 @@ export class ModelRepository<T, K extends ModelEntitySerializer> extends Reposit
     return this.update(criteria, partialEntity).then(
       entity => {
         if(!entity && throwsException) {
-//TODO CHANGE THIS EXCEPTION!
-
-          throw new BanException();
+          throw new NoSuchEntityException();
         }
   
         return entity ?? null

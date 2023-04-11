@@ -14,7 +14,8 @@
         },
         "forbidden": "Forbidden",
         "entityNotFound": {
-            "user": "User Not Found"
+            "any": "Entity not found",
+            "user": "User not found"
         }
     }
 }

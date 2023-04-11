@@ -6,7 +6,6 @@ import { UserModule } from '../user/user.module';
 import { AuthenticationController } from './authentication.controller';
 import { SignInService } from './services/signin.service';
 import { BanModule } from '../ban/ban.module';
-import { ResponseHelper } from 'src/common/helpers/response.helper';
 
 @Module({
   imports: [
@@ -28,8 +27,7 @@ import { ResponseHelper } from 'src/common/helpers/response.helper';
     AuthenticationController
   ],
   providers: [
-    SignInService,
-    ResponseHelper
+    SignInService
   ],
 })
 export class AuthenticationModule {}
