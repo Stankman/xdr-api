@@ -18,7 +18,7 @@ export class UsersService {
             
     let whereOptions : FindOptionsWhere<User> | FindOptionsWhere<User>[] = [{ username: identification }, {email: identification}];
 
-    return this.repository.findOne({where: whereOptions});
+    return this.repository.getOneBy(whereOptions, [], true);
   }
 
   // public async updateUser(userId : number, partialEntity: QueryDeepPartialEntity<User>) : Promise<User> {

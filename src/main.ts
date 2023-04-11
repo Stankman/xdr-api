@@ -2,7 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder } from '@nestjs/swagger';
 import { SwaggerModule } from '@nestjs/swagger/dist';
-import { i18nValidationErrorFactory } from 'nestjs-i18n-2';
+import { i18nValidationErrorFactory } from 'nestjs-i18n';
 import { AppModule } from './app.module';
 import { AppConfigService } from './config/app/app-config.service';
 

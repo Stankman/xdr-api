@@ -1,6 +1,5 @@
 import { Controller, Get, Query, DefaultValuePipe, ParseIntPipe, Param, HttpException, UseInterceptors } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
-import { I18n, I18nContext } from "nestjs-i18n-2";
 import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
 import { AppConfigService } from "src/config/app/app-config.service";
 import { User } from "./entities/user.entity";

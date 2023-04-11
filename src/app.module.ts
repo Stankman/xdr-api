@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import {I18nModule, QueryResolver, AcceptLanguageResolver} from 'nestjs-i18n-2';
+import {I18nModule, QueryResolver, AcceptLanguageResolver} from 'nestjs-i18n';
 import * as path from 'path';
 
 import { AppConfigModule } from './config/app/app-config.module';
@@ -11,6 +11,9 @@ import { MySQLProviderModule } from './providers/database/mysql/mysql-provider.m
 import { AuthenticationModule } from './modules/auth/authentication.module';
 import { BanModule } from './modules/ban/ban.module';
 import { UserModule } from './modules/user/user.module';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { AllExceptionsFilter } from './common/exceptions/exception.filter';
+import { ResponseInterceptor } from './interceptors/response.interceptor';
 
 @Module({
   imports: [
@@ -33,5 +36,15 @@ import { UserModule } from './modules/user/user.module';
     BanModule,
     UserModule,
   ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+  ]
 })
 export class AppModule {}

@@ -1,21 +1,21 @@
 {
     "message": {
-        "inputInvalid":"400",
-        "error": "500",
-        "ok": "200",
-        "successful": "200",
-        "successfully": "200",
-        "connectionLimit": "429",
-        "tokenInvalid": "401",
-        "requestTimeout": "408",
+        "inputInvalid":400,
+        "error": 500,
+        "ok": 200,
+        "successful": 200,
+        "successfully": 200,
+        "connectionLimit": 429,
+        "tokenInvalid": 401,
+        "requestTimeout": 408,
         "unauthorized": {
-            "banned": "4030",
-            "no_permission": "4031"
+            "login": 4030,
+            "banned": 4031,
+            "no_permission": 4032
         },
-        "forbidden": "403",
+        "forbidden": 403,
         "entityNotFound": {
-            "any": "4040",
-            "user": "4041"
+            "user": 4041
         }
     }
 }
