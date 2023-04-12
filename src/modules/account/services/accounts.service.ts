@@ -10,7 +10,8 @@ export class AccountsService {
       private readonly repository : AccountsRepository
   ) {}
 
-  public async createAccount(account : Account) : Promise<Account> {
+  public async save(account : Account) : Promise<Account> {
+    account = this.repository.create(account);
     return this.repository.save(account);
   }
 
@@ -34,10 +35,4 @@ export class AccountsService {
     
     return this.repository.getOneBy(whereOptions, [], false);
   }
-
-  // public async updateUser(userId : number, partialEntity: QueryDeepPartialEntity<User>) : Promise<User> {
-  //   return this.repository.update(userId, partialEntity).then((entity : User)=> {
-  //     return entity;
-  //   });
-  // }
 }

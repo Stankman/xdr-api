@@ -15,11 +15,13 @@ export class AuthenticationController {
 
     @Post('signin')
     public async signIn(@Body() signInDTO : SignInDTO, @Ip() currentIp) : Promise<Response> {
-        return this.signInService.signIn(signInDTO, currentIp);
+        signInDTO.ip = currentIp;
+        return this.signInService.signIn(signInDTO);
     }
 
     @Post('signUp')
     public async signUp(@Body() signUpDTO : SignUpDTO, @Ip() currentIp) : Promise<Response> {
-        return this.signUpService.signUp(signUpDTO, currentIp);
+        signUpDTO.ip = currentIp;
+        return this.signUpService.signUp(signUpDTO);
     }
 }

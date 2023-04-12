@@ -8,11 +8,6 @@ export class SignUpDTO {
     @Matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/)
     password : string;
 
-    @IsString()
-    @IsIn(['M', 'F'])
-    gender : string = 'M';
-
-    @IsString()
     @IsOptional()
-    look : string;
+    ip : string;
 }

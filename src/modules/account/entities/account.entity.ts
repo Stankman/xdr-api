@@ -14,13 +14,16 @@ export class Account implements IAccount {
     password: string;
 
     @Column()
+    last_login : number;
+
+    @Column()
     ip_current: string;
     
     @Column()
     ip_register: string;
     
-    @CreateDateColumn({ type: 'timestamp' })
-    created_at?: Date;
+    @CreateDateColumn()
+    created_at: Date;
     
     @UpdateDateColumn()
     updated_at: Date;

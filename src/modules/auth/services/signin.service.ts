@@ -16,8 +16,8 @@ export class SignInService {
         private readonly tokenService : TokenService
     ) {}
 
-    public async signIn(signInDTO : SignInDTO, currentIp : string) : Promise<any> {
-        let account : Account = await this.accountsService.findAccount(signInDTO.identification);
+    public async signIn(signInDTO : SignInDTO) : Promise<any> {
+        let account : Account = await this.accountsService.accountExists(signInDTO.identification);
 
         if(!account || account.password !== signInDTO.password) {
             throw new LoginException();
@@ -29,7 +29,10 @@ export class SignInService {
             throw new BanException();
         }
 
-        account.ip_current = currentIp;
+        account.ip_current = signInDTO.ip;
+        account.last_login = Math.floor(Date.now() / 1000);
+
+        this.accountsService.save(account);
 
         const token = await this.tokenService.execute(account.id);
 
