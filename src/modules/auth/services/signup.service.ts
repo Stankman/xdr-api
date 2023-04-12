@@ -4,12 +4,13 @@ import { AccountsService } from "src/modules/account/services/accounts.service";
 import { SignUpDTO } from "../dtos/signup.dto";
 import { DuplicateException } from "../exceptions/duplicate.exception";
 import { TokenService } from "./token.service";
-import { SignInDTO } from '../dtos/signin.dto';
+import { HashService } from "./hash.service";
 
 @Injectable()
 export class SignUpService {
     constructor(
         private readonly accountsService : AccountsService,
+        private readonly hashService : HashService,
         private readonly tokenService : TokenService
     ) {}
 
@@ -20,7 +21,7 @@ export class SignUpService {
             throw new DuplicateException();
         }
         
-        let account = await this.accountsService.save(this.getNewUser(signUpDTO));
+        let account = await this.accountsService.save(await this.getNewAccount(signUpDTO));
 
         const token = await this.tokenService.execute(account.id);
 
@@ -29,11 +30,11 @@ export class SignUpService {
         return access_token;
     }
 
-    private getNewUser(signUpDTO : SignUpDTO) : Account {
+    private async getNewAccount(signUpDTO : SignUpDTO) : Promise<Account> {
         let account : Account = new Account();
 
         account.email = signUpDTO.email;
-        account.password = signUpDTO.password;
+        account.password = await this.hashService.hash(signUpDTO.password);
         account.last_login = Math.floor(Date.now() / 1000);
         account.ip_current = signUpDTO.ip;
         account.ip_register = signUpDTO.ip;

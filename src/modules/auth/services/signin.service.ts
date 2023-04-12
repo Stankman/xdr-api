@@ -7,6 +7,7 @@ import { SignInDTO } from "../dtos/signin.dto";
 import { BanException } from "../exceptions/ban.exception";
 import { LoginException } from "../exceptions/login.exception";
 import { TokenService } from "./token.service";
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class SignInService {
@@ -19,7 +20,7 @@ export class SignInService {
     public async signIn(signInDTO : SignInDTO) : Promise<any> {
         let account : Account = await this.accountsService.accountExists(signInDTO.identification);
 
-        if(!account || account.password !== signInDTO.password) {
+        if(!account || !(await argon2.verify(account.password, signInDTO.password))) {
             throw new LoginException();
         }
 

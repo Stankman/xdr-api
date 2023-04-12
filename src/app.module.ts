@@ -3,6 +3,7 @@ import { I18nModule, QueryResolver, AcceptLanguageResolver } from 'nestjs-i18n';
 import * as path from 'path';
 
 import { AppConfigModule } from './config/app/app-config.module';
+import { Argon2ConfigModule } from './config/argon2/argon2-config.module';
 import { MySQLConfigModule } from './config/mysql/mysql-config.module';
 import { TokenConfigModule } from './config/token/token-config.module';
 
@@ -27,6 +28,7 @@ import { ResponseInterceptor } from './interceptors/response.interceptor';
     }),
 
     AppConfigModule,
+    Argon2ConfigModule,
     MySQLConfigModule,
     TokenConfigModule,
 
