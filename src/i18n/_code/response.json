@@ -13,8 +13,11 @@
             "banned": 4031,
             "no_permission": 4032
         },
-        "forbidden": 403,
+        "forbidden": {
+            "duplicate": 4030
+        },
         "entityNotFound": {
+            "any": 404,
             "user": 4041
         }
     }

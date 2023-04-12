@@ -1,14 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
-import { IUser } from "../interfaces/user.interface";
+import { IAccount } from "../interfaces/account.interface";
 
-@Entity({ name: 'users'})
-export class User implements IUser {
+@Entity({ name: 'accounts'})
+export class Account implements IAccount {
     
     @PrimaryGeneratedColumn('uuid')
     id: number;
-
-    @Column()
-    username: string;
 
     @Column()
     email: string;
@@ -22,9 +19,9 @@ export class User implements IUser {
     @Column()
     ip_register: string;
     
-    @CreateDateColumn({ name: 'created_at' })
-    createdAt: Date;
+    @CreateDateColumn({ type: 'timestamp' })
+    created_at?: Date;
     
-    @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
-    updatedAt: Date;
+    @UpdateDateColumn()
+    updated_at: Date;
 }

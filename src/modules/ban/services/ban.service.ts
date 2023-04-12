@@ -13,7 +13,7 @@ export class BanService {
         return this.repository.paginate(options);
     }
 
-    public async getBan(value : string | number) : Promise<Ban | null> {
+    public async getBan(value : string | number, throwException : boolean = false) : Promise<Ban | null> {
         const currentTimestamp = Math.floor(new Date().getTime() / 1000);
 
         const whereOptions: FindOptionsWhere<Ban>[] = [
@@ -31,10 +31,6 @@ export class BanService {
             }
         ];
 
-        return this.repository.findOne({
-            where: whereOptions
-        }).then(entity => {
-            return entity ?? null;
-        });
+        return this.repository.getOneBy(whereOptions, [], throwException);
     }
 }

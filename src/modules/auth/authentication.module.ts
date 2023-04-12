@@ -2,14 +2,16 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TokenConfigModule } from 'src/config/token/token-config.module';
 import { TokenConfigService } from 'src/config/token/token-config.service';
-import { UserModule } from '../user/user.module';
+import { BanModule } from '../ban/ban.module';
+import { AccountModule } from '../account/account.module';
 import { AuthenticationController } from './authentication.controller';
 import { SignInService } from './services/signin.service';
-import { BanModule } from '../ban/ban.module';
+import { SignUpService } from './services/signup.service';
+import { TokenService } from './services/token.service';
 
 @Module({
   imports: [
-    UserModule,
+    AccountModule,
     BanModule,
     JwtModule.registerAsync({
       imports: [TokenConfigModule],
@@ -27,7 +29,9 @@ import { BanModule } from '../ban/ban.module';
     AuthenticationController
   ],
   providers: [
-    SignInService
+    SignInService,
+    SignUpService,
+    TokenService
   ],
 })
 export class AuthenticationModule {}

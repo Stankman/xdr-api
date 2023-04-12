@@ -3,7 +3,6 @@ import { FindOptionsWhere, ObjectID, Repository, UpdateResult } from "typeorm";
 import { IPaginationMeta, IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { ModelEntitySerializer } from "src/common/serializers/model.serializer";
-import { BanException } from "../auth/exceptions/ban.exception";
 import { NoSuchEntityException } from "src/common/exceptions/nosuchentity.exception";
 
 export class ModelRepository<T, K extends ModelEntitySerializer> extends Repository<T> {

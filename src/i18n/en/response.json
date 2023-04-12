@@ -13,7 +13,9 @@
             "banned": "Account banned",
             "no_permission": "Unauthorized"
         },
-        "forbidden": "Forbidden",
+        "forbidden": {
+            "duplicate": "Duplicated input"
+        },
         "entityNotFound": {
             "any": "Entity not found",
             "user": "User not found"
