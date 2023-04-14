@@ -6,6 +6,7 @@ import { AuthGuard } from '../../common/guards/auth.guard';
 import { AccountsService } from './services/accounts.service';
 
 @ApiTags('Account')
+@UseGuards(AuthGuard)
 @Controller('account')
 export class AccountController {
 
@@ -13,7 +14,6 @@ export class AccountController {
         private readonly accountsService : AccountsService
     ) {}
 
-    @UseGuards(AuthGuard)
     @Get()
     public async getLoggedUser(@Req() req : Request) : Promise<Account> {
         return await this.accountsService.getLoggedAccount(req);

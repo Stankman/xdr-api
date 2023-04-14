@@ -15,7 +15,7 @@ export class AccountsController {
     ) {}
 
     @Get('all')
-    public async paginateBans(
+    public async paginateAccounts(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page : number = 1, 
         @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit : number = 10
     ) : Promise<Pagination<Account, IPaginationMeta>> {
@@ -32,6 +32,6 @@ export class AccountsController {
     public async getAccount(
         @Query('value', new DefaultValuePipe('0')) value : string = '0'
     ) : Promise<Account> {
-        return await this.accountsService.findAccount(value);
+        return await this.accountsService.getAccountById(value);
     }
 }

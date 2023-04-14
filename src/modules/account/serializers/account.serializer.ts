@@ -34,6 +34,6 @@ export class AccountSerializer extends ModelEntitySerializer implements IAccount
   @Expose({ groups: ['account.timestamps'] })
   created_at: Date;
   
-  @Expose({ groups: ['account.timestamps'] })
+  @Exclude()
   updated_at: Date;
 }

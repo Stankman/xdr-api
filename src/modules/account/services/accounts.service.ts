@@ -18,13 +18,7 @@ export class AccountsService {
       return null;
     }
 
-    let account = this.findAccount(authAccount);
-
-    if(!account) {
-      return null;
-    }
-
-    return account;
+    return await this.repository.getAccount(authAccount) ?? null;
   }
 
   public async save(account : Account) : Promise<Account> {
@@ -35,20 +29,11 @@ export class AccountsService {
     return this.repository.paginate(options);
   }
 
-  public async findAccount(value : string | number) : Promise<Account> {
-    let whereOptions : FindOptionsWhere<Account> | FindOptionsWhere<Account>[] = [
-      { id: !isNaN(Number(value)) ? Number(value) : 0 },
-      { email: String(value) }
-    ];
-
-    return this.repository.getOneBy(whereOptions);
+  public async getAccountById(id : number|string) : Promise<Account> {
+    return await this.repository.getAccount(id) ?? null;
   }
 
   public async accountExists(email : string = '') : Promise<Account> {
-    let whereOptions : FindOptionsWhere<Account> | FindOptionsWhere<Account>[] = [
-      { email: email }
-    ];
-    
-    return this.repository.getOneBy(whereOptions, [], false);
+    return await this.repository.getAccount(email, 'email') ?? null;
   }
 }
