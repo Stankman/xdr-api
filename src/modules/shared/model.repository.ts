@@ -1,5 +1,5 @@
 import { plainToInstance } from "class-transformer";
-import { FindOptionsWhere, ObjectID, Repository, UpdateResult } from "typeorm";
+import { FindManyOptions, FindOptionsWhere, ObjectID, Repository, UpdateResult } from "typeorm";
 import { IPaginationMeta, IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { ModelEntitySerializer } from "src/common/serializers/model.serializer";
@@ -20,8 +20,8 @@ export class ModelRepository<T, K extends ModelEntitySerializer> extends Reposit
     });
   }
 
-  public async paginate(options : IPaginationOptions) : Promise<Pagination<K, IPaginationMeta>> {
-    return paginate<T>(this, options).then(pagination => {
+  public async paginate(options : IPaginationOptions, searchOptions?: FindOptionsWhere<T> | FindManyOptions<T>) : Promise<Pagination<K, IPaginationMeta>> {
+    return paginate<T>(this, options, searchOptions).then(pagination => {
       const items = this.transformMany(pagination.items);
 
       let _pagination = new Pagination<K, IPaginationMeta>(items, pagination.meta, pagination.links);
