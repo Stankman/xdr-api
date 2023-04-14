@@ -1,9 +1,12 @@
-import { Controller, Get, Query, DefaultValuePipe, ParseIntPipe } from "@nestjs/common";
+import { Controller, Get, Query, DefaultValuePipe, ParseIntPipe, UseGuards } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
 import { AppConfigService } from "src/config/app/app-config.service";
 import { Account } from "./entities/account.entity";
 import { AccountsService } from "./services/accounts.service";
+import { Roles } from "src/common/decorators/roles.decorator";
+import { RolesGuard } from "../../common/guards/roles.guard";
+import { AuthGuard } from '../../common/guards/auth.guard';
 
 @ApiTags('Accounts')
 @Controller('accounts')
@@ -14,6 +17,8 @@ export class AccountsController {
         private readonly appConfigService : AppConfigService
     ) {}
 
+    @Roles('view-all-users')
+    @UseGuards(AuthGuard, RolesGuard)
     @Get('all')
     public async paginateAccounts(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page : number = 1, 

@@ -5,7 +5,7 @@ import { ApiProperty } from "@nestjs/swagger";
 @Entity({ name: 'bans' })
 export class Ban implements IBan {
     @ApiProperty({ example: 1, description: 'The ban ID' })
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn()
     id: number;
 
     @ApiProperty({ example: 1, description: 'The user ID of the banned user'})

@@ -3,8 +3,7 @@ import { IAccount } from "../interfaces/account.interface";
 
 @Entity({ name: 'accounts'})
 export class Account implements IAccount {
-    
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
