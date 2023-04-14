@@ -7,7 +7,7 @@ import { HashService } from 'src/modules/auth/services/hash.service';
 import { InvalidPasswordException } from '../exceptions/invalid-password.exception';
 import { SamePasswordException } from '../exceptions/same-password.exception';
 import { ChangeEmailDTO } from '../dtos/change-email.dto';
-import { DuplicateException } from 'src/modules/auth/exceptions/duplicate.exception';
+import { EmailTakenException } from 'src/modules/auth/exceptions/email-taken.exception';
 
 @Injectable()
 export class AccountSettingsService {
@@ -42,7 +42,7 @@ export class AccountSettingsService {
         let existingAccount : Account = await this.repository.getAccount(changeEmailDTO.email, 'email', false);
 
         if(existingAccount) {
-            throw new DuplicateException();
+            throw new EmailTakenException();
         }
 
         loggedAccount.email = changeEmailDTO.email;

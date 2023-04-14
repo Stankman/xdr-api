@@ -2,9 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { Account } from "src/modules/account/entities/account.entity";
 import { AccountsService } from "src/modules/account/services/accounts.service";
 import { SignUpDTO } from "../dtos/signup.dto";
-import { DuplicateException } from "../exceptions/duplicate.exception";
 import { TokenService } from "./token.service";
 import { HashService } from "./hash.service";
+import { EmailTakenException } from "../exceptions/email-taken.exception";
 
 @Injectable()
 export class SignUpService {
@@ -18,7 +18,7 @@ export class SignUpService {
         let existingAccount : Account = await this.accountsService.accountExists(signUpDTO.email);
 
         if(existingAccount) {
-            throw new DuplicateException();
+            throw new EmailTakenException();
         }
 
         //TODO Check If IP is not banned or max accounts per IP
