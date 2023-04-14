@@ -3,6 +3,7 @@ import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-
 import { FindOptionsWhere } from "typeorm";
 import { AccountsRepository } from "../accounts.repository";
 import { Account } from "../entities/account.entity";
+import { Request } from "express";
 
 @Injectable()
 export class AccountsService {
@@ -10,8 +11,23 @@ export class AccountsService {
       private readonly repository : AccountsRepository
   ) {}
 
+  public async getLoggedAccount(request : Request) : Promise<Account> {
+    let authAccount = request['xdr_uid'];
+
+    if(!authAccount) {
+      return null;
+    }
+
+    let account = this.findAccount(authAccount);
+
+    if(!account) {
+      return null;
+    }
+
+    return account;
+  }
+
   public async save(account : Account) : Promise<Account> {
-    account = this.repository.create(account);
     return this.repository.save(account);
   }
 

@@ -6,10 +6,13 @@ import { AccountsController } from './accounts.controller';
 import { AccountsRepository } from './accounts.repository';
 import { Account } from './entities/account.entity';
 import { AccountsService } from './services/accounts.service';
+import { TokenConfigModule } from 'src/config/token/token-config.module';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Account]),
+        TokenConfigModule,
         AppConfigModule
     ],
     controllers: [
@@ -18,7 +21,8 @@ import { AccountsService } from './services/accounts.service';
     ],
     providers: [
         AccountsRepository,
-        AccountsService
+        AccountsService,
+        JwtService
     ],
     exports: [
         AccountsService

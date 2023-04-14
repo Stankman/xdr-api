@@ -1,6 +1,6 @@
 import {Injectable, NestInterceptor, ExecutionContext, CallHandler} from '@nestjs/common';
 import { Observable, map } from 'rxjs';
-import { CustomResponse } from '../common/models/custom-response.model';
+import { CustomResponse } from '../models/custom-response.model';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {

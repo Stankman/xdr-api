@@ -14,7 +14,7 @@ import { BanModule } from './modules/ban/ban.module';
 import { AccountModule } from './modules/account/account.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/exceptions/exception.filter';
-import { ResponseInterceptor } from './interceptors/response.interceptor';
+import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
 @Module({
   imports: [
