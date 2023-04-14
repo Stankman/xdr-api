@@ -16,7 +16,7 @@
             "jwt": "Invalid JWT token"
         },
         "forbidden": {
-            "duplicate": "Duplicated input",
+            "email_in_use": "Email is in use",
             "duplicate_password": "New password is the same as your old password"
         },
         "entityNotFound": {

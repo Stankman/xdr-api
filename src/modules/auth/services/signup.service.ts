@@ -20,6 +20,8 @@ export class SignUpService {
         if(existingAccount) {
             throw new DuplicateException();
         }
+
+        //TODO Check If IP is not banned or max accounts per IP
         
         let account = await this.accountsService.save(await this.getNewAccount(signUpDTO));
 

@@ -6,6 +6,7 @@ import { AuthGuard } from '../../common/guards/auth.guard';
 import { AccountsService } from './services/accounts.service';
 import { ChangePasswordDTO } from './dtos/change-password.dto';
 import { AccountSettingsService } from './services/account-settings.service';
+import { ChangeEmailDTO } from './dtos/change-email.dto';
 
 @ApiTags('Account')
 @UseGuards(AuthGuard)
@@ -28,5 +29,13 @@ export class AccountController {
         let account : Account = await this.accountsService.getLoggedAccount(req);
 
         return await this.accountSettingsService.changePassword(account, changePassword);
+    }
+
+    @ApiBody({ type: [ChangeEmailDTO] })
+    @Put('/settings/change-email')
+    public async changeEmail(@Req() req : Request, @Body() changeEmail : ChangeEmailDTO) {
+        let account : Account = await this.accountsService.getLoggedAccount(req);
+
+        return await this.accountSettingsService.changeEmail(account, changeEmail);
     }
 }

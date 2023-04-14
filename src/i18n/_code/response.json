@@ -16,7 +16,7 @@
             "jwt": 4034
         },
         "forbidden": {
-            "duplicate": 4030,
+            "email_in_use": 4030,
             "duplicate_password": 4031
         },
         "entityNotFound": {
