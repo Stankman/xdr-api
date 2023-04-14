@@ -12,7 +12,7 @@ export class TokenService {
 
     public async execute(userId : number) : Promise<string> {
         const payload : IPayload = {
-            iat: Date.now(),
+            iat: Math.floor(Date.now() / 1000),
             uid: userId,
             iss: this.tokenConfig.issuer
         }

@@ -11,19 +11,15 @@ export class AccountsRepository extends ModelRepository<Account, AccountSerializ
         super(Account, dataSource.createEntityManager());
     }
 
-    public async getAccount(value : any, column : string = 'id', throwsException : boolean = true) : Promise<AccountSerializer> {
-        return this.getOneBy({[column]: value}, [], throwsException);
+    public async getAccount(value : any, column : string = 'id', throwsException : boolean = true, transformOptions? : any) : Promise<AccountSerializer> {
+        return this.getOneBy({[column]: value}, [], throwsException, transformOptions);
     }
 
-    public transform(model: Account): AccountSerializer {
-        const tranformOptions = {
-          groups: defaultAccountGroupsForSerializing
-        };
-
-        return plainToInstance(AccountSerializer, instanceToPlain(model, tranformOptions), tranformOptions);
+    public transform(model: Account, transformOptions : any = { groups: defaultAccountGroupsForSerializing }): AccountSerializer {
+        return plainToInstance(AccountSerializer, instanceToPlain(model, transformOptions), transformOptions);
     }
 
-    public transformMany(models: Account[]): AccountSerializer[] {
-        return models.map(model => this.transform(model));
+    public transformMany(models: Account[], transformOptions : any = { groups: defaultAccountGroupsForSerializing }): AccountSerializer[] {
+        return models.map(model => this.transform(model, transformOptions));
     }
 }

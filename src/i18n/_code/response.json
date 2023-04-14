@@ -11,10 +11,13 @@
         "unauthorized": {
             "login": 4030,
             "banned": 4031,
-            "no_permission": 4032
+            "no_permission": 4032,
+            "password": 4033,
+            "jwt": 4034
         },
         "forbidden": {
-            "duplicate": 4030
+            "duplicate": 4030,
+            "duplicate_password": 4031
         },
         "entityNotFound": {
             "any": 404,

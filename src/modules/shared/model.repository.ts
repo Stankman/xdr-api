@@ -7,7 +7,7 @@ import { NoSuchEntityException } from "src/common/exceptions/nosuchentity.except
 
 export class ModelRepository<T, K extends ModelEntitySerializer> extends Repository<T> {
     
-  public async getOneBy(whereOptions: FindOptionsWhere<T> | FindOptionsWhere<T>[], relations : string[] = [], throwsException : boolean = true): Promise<K> {
+  public async getOneBy(whereOptions: FindOptionsWhere<T> | FindOptionsWhere<T>[], relations : string[] = [], throwsException : boolean = true,  transformOptions? : any): Promise<K> {
     return this.findOne({
       where: whereOptions,
       relations
@@ -16,22 +16,8 @@ export class ModelRepository<T, K extends ModelEntitySerializer> extends Reposit
         throw new NoSuchEntityException();
       }
 
-      return entity ? this.transform(entity) : null;
+      return entity ? this.transform(entity, transformOptions) : null;
     });
-  }
-
-  public async updateEntity(criteria: string | string[] | number | number[] | Date | Date[] | ObjectID | ObjectID[] | FindOptionsWhere<T>, partialEntity: QueryDeepPartialEntity<T>, relations: string[] = [], throwsException : boolean = true) {
-    return this.update(criteria, partialEntity).then(
-      entity => {
-        if(!entity && throwsException) {
-          throw new NoSuchEntityException();
-        }
-
-        console.log(entity);
-
-        return null;
-      }
-    )
   }
 
   public async paginate(options : IPaginationOptions) : Promise<Pagination<K, IPaginationMeta>> {

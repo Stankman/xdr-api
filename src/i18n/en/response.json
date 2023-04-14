@@ -9,12 +9,15 @@
         "tokenInvalid": "Token invalid",
         "requestTimeout": "Request timeout",
         "unauthorized": {
-            "login": "Invalid Credentials",
+            "login": "Invalid credentials",
             "banned": "Account banned",
-            "no_permission": "Unauthorized"
+            "no_permission": "Unauthorized",
+            "password": "Invalid password",
+            "jwt": "Invalid JWT token"
         },
         "forbidden": {
-            "duplicate": "Duplicated input"
+            "duplicate": "Duplicated input",
+            "duplicate_password": "New password is the same as your old password"
         },
         "entityNotFound": {
             "any": "Entity not found",

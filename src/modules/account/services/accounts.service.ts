@@ -33,7 +33,7 @@ export class AccountsService {
     return await this.repository.getAccount(id) ?? null;
   }
 
-  public async accountExists(email : string = '') : Promise<Account> {
-    return await this.repository.getAccount(email, 'email') ?? null;
+  public async accountExists(email : string = '', transformOptions : any = {}) : Promise<Account> {
+    return await this.repository.getAccount(email, 'email', true, transformOptions) ?? null;
   }
 }

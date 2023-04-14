@@ -8,12 +8,16 @@ import { Account } from './entities/account.entity';
 import { AccountsService } from './services/accounts.service';
 import { TokenConfigModule } from 'src/config/token/token-config.module';
 import { JwtService } from '@nestjs/jwt';
+import { AccountSettingsService } from './services/account-settings.service';
+import { HashService } from '../auth/services/hash.service';
+import { Argon2ConfigModule } from 'src/config/argon2/argon2-config.module';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Account]),
         TokenConfigModule,
-        AppConfigModule
+        AppConfigModule,
+        Argon2ConfigModule
     ],
     controllers: [
         AccountsController,
@@ -22,6 +26,8 @@ import { JwtService } from '@nestjs/jwt';
     providers: [
         AccountsRepository,
         AccountsService,
+        AccountSettingsService,
+        HashService,
         JwtService
     ],
     exports: [
