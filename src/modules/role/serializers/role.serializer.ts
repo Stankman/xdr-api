@@ -3,7 +3,7 @@ import { IRole } from "../interfaces/role.interface";
 import { Expose } from "class-transformer";
 
 export const defaultRoleGroupsForSerializing: string[] = [
-    'account.timestamps'
+    'role.timestamps'
 ];
 
 export class RoleSerializer extends ModelEntitySerializer implements IRole {
@@ -13,9 +13,9 @@ export class RoleSerializer extends ModelEntitySerializer implements IRole {
 
     description: string;
 
-    @Expose({ groups: ['account.timestamps'] })
+    @Expose({ groups: ['role.timestamps'] })
     created_at: Date;
 
-    @Expose({ groups: ['account.timestamps'] })
+    @Expose({ groups: ['role.timestamps'] })
     updated_at: Date;
 }
