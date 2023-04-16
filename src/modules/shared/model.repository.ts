@@ -1,7 +1,6 @@
 import { plainToInstance } from "class-transformer";
-import { FindManyOptions, FindOptionsWhere, ObjectID, Repository, UpdateResult } from "typeorm";
+import { FindManyOptions, FindOptionsWhere, Repository } from "typeorm";
 import { IPaginationMeta, IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
-import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 import { ModelEntitySerializer } from "src/common/serializers/model.serializer";
 import { NoSuchEntityException } from "src/common/exceptions/nosuchentity.exception";
 

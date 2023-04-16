@@ -4,15 +4,21 @@ import { Observable } from 'rxjs';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { AccountsService } from 'src/modules/account/services/accounts.service';
 import { Account } from 'src/modules/account/entities/account.entity';
+import { AppConfigService } from 'src/config/app/app-config.service';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
+    private readonly appConfig : AppConfigService,
     private readonly reflector : Reflector,
     private readonly accountsService : AccountsService
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
+    if(this.appConfig.env === 'development') {
+      return true;
+    }
+
     const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass()

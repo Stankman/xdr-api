@@ -15,6 +15,16 @@ export class RolePermissionsService {
         return this.repository.getRolePermission(rolePermissionId);
     }
 
+    public async checkPermission(rolePermissionId : number) : Promise<boolean> {
+        let rolePermission = this.repository.getRolePermission(rolePermissionId, 'id', false);
+
+        if(rolePermission) {
+            return true;
+        }
+
+        return false;
+    }
+
     public async createRolePermission(newRoleDTO : NewRolePermissionDTO) : Promise<RolePermission> {
         return this.repository.save(this.getNewRolePermission(newRoleDTO));
     }

@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { plainToInstance, instanceToPlain } from "class-transformer";
 import { DataSource } from "typeorm";
-import { RoleSerializer, defaultRoleGroupsForSerializing } from "../role/serializers/role.serializer";
 import { ModelRepository } from "../shared/model.repository";
 import { RolePermission } from "./entities/role-permission.entity";
 import { RolePermissionSerializer, defaultRolePermissionGroupsForSerializing } from "./serializers/role-permission.serializer";
@@ -17,10 +16,10 @@ export class RolePermissionsRepository extends ModelRepository<RolePermission, R
     }
 
     public transform(model: RolePermission, transformOptions : any = { groups: defaultRolePermissionGroupsForSerializing }): RolePermissionSerializer {
-        return plainToInstance(RoleSerializer, instanceToPlain(model, transformOptions), transformOptions);
+        return plainToInstance(RolePermissionSerializer, instanceToPlain(model, transformOptions), transformOptions);
     }
 
-    public transformMany(models: RolePermission[], transformOptions : any = { groups: defaultRoleGroupsForSerializing }): RolePermissionSerializer[] {
+    public transformMany(models: RolePermission[], transformOptions : any = { groups: defaultRolePermissionGroupsForSerializing }): RolePermissionSerializer[] {
         return models.map(model => this.transform(model, transformOptions));
     }
 }

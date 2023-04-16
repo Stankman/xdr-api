@@ -9,12 +9,16 @@ import { RolesService } from './services/roles.service';
 import { NewRoleDTO } from './dtos/new-role.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { EditRoleDTO } from './dtos/edit-role.dto';
+import { TogglePermissionDTO } from './dtos/toggle-permission.dto';
+import { RolePermission } from './entities/role-permission.entity';
+import { RolesPermissionsService } from './services/roles-permissions.service';
 
 @ApiTags('Roles')
 @Controller('roles')
 export class RolesController {
     constructor(
         private readonly rolesService : RolesService,
+        private readonly rolesPermissionsService : RolesPermissionsService,
         private readonly appConfigService : AppConfigService
     ) {}
 
@@ -53,5 +57,19 @@ export class RolesController {
     @Put(':id')
     public async editRole(@Body() editRoleDTO : EditRoleDTO) : Promise<Role> {
         return await this.rolesService.editRole(editRoleDTO);
+    }
+
+    @Roles('manage-roles')
+    @UseGuards(AuthGuard, RolesGuard)    
+    @Put(':id/toggle-permission')
+    public async togglePermission(@Body() togglePermissionDTO : TogglePermissionDTO) : Promise<RolePermission> {
+        return await this.rolesPermissionsService.togglePermission(togglePermissionDTO);
+    }
+
+    @Roles('manage-roles')
+    @UseGuards(AuthGuard, RolesGuard)    
+    @Put(':id/clear-permissions')
+    public async clearPermissions(@Param() params : any) : Promise<RolePermission> {
+        return await this.rolesPermissionsService.clearPermissions(params.id);
     }
 }

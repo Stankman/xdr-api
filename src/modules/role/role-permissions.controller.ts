@@ -11,7 +11,7 @@ import { RolePermission } from "./entities/role-permission.entity";
 import { RolePermissionsService } from "./services/role-permissions.service";
 
 @ApiTags('Role Permissions')
-@Controller('role-permissions')
+@Controller('roles/permissions')
 export class RolePermissionsController {
     constructor(
         private readonly rolePermissionsService : RolePermissionsService,

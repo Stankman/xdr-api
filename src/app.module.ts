@@ -17,7 +17,6 @@ import { RolesModule } from './modules/role/roles.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/exceptions/exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
-import { RolePermissionsModule } from './modules/role-permission/role-permissions.module';
 
 @Module({
   imports: [
@@ -41,7 +40,6 @@ import { RolePermissionsModule } from './modules/role-permission/role-permission
     AuthenticationModule,
     BanModule,
     RolesModule,
-    RolePermissionsModule,
   ],
   providers: [
     {
