@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany } from "typeorm";
 import { IRolePermission } from "../interfaces/role-permission.interface";
+import { Role } from "./role.entity";
 
 @Entity({ name: 'role_permissions' })
 export class RolePermission implements IRolePermission {
@@ -21,4 +22,10 @@ export class RolePermission implements IRolePermission {
     
     @UpdateDateColumn()
     updated_at: Date;
+
+    @ManyToMany(
+        () => Role,
+        role => role.permissions
+    )
+    roles : Role[];
 }
