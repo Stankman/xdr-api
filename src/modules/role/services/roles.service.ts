@@ -4,6 +4,7 @@ import { Role } from '../entities/role.entity';
 import { RolesRepository } from '../roles.repository';
 import { NewRoleDTO } from '../dtos/new-role.dto';
 import { EditRoleDTO } from '../dtos/edit-role.dto';
+import { RolePermission } from '../entities/role-permission.entity';
 
 @Injectable()
 export class RolesService {
@@ -11,8 +12,18 @@ export class RolesService {
         private readonly repository : RolesRepository
     ) {}
 
-    public async getRole(roleId : number) : Promise<Role> {
-        return this.repository.getRole(roleId);
+    public async getRole(roleId : number, withPermissions : boolean = false, withAccounts : boolean = false) : Promise<Role> {
+        let relations : string[] = [];
+
+        if(withPermissions) {
+            relations.push('permissions');
+        }
+
+        if(withAccounts) {
+            relations.push('accounts');
+        }
+        
+        return this.repository.getRole(roleId, 'id', relations);
     }
 
     public async createRole(newRoleDTO : NewRoleDTO) : Promise<Role> {
@@ -27,6 +38,16 @@ export class RolesService {
 
     public async paginateRoles(options : IPaginationOptions) : Promise<Pagination<Role, IPaginationMeta>> {
         return this.repository.paginate(options);
+    }
+
+    public async hasPermission(roleId : number, permissionName : string) {
+        let role : Role = await this.getRole(roleId);
+
+        let rolePermission : RolePermission = role.permissions.find((permission : RolePermission) => {
+            permission.name === permissionName;
+        });
+
+        return !!rolePermission; 
     }
 
     private getNewRole(newRoleDTO : NewRoleDTO) : Role {

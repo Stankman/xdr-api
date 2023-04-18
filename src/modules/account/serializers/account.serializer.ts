@@ -1,9 +1,10 @@
 import { Exclude, Expose } from "class-transformer";
 import { ModelEntitySerializer } from "src/common/serializers/model.serializer";
 import { IAccount } from "../interfaces/account.interface";
+import { Role } from "src/modules/role/entities/role.entity";
 
 export const defaultAccountGroupsForSerializing: string[] = [
-  'account.timestamps'
+  'account.timestamps', 'roles'
 ];
 
 export const extendedAccountGroupsForSerializing: string[] = [
@@ -36,4 +37,6 @@ export class AccountSerializer extends ModelEntitySerializer implements IAccount
   
   @Exclude()
   updated_at: Date;
+
+  roles : Role[];
 }

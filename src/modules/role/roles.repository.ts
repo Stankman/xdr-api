@@ -11,8 +11,8 @@ export class RolesRepository extends ModelRepository<Role, RoleSerializer> {
         super(Role, dataSource.createEntityManager());
     }
 
-    public async getRole(value : any, column : string = 'id', throwsException : boolean = true, transformOptions? : any) : Promise<RoleSerializer> {
-        return this.getOneBy({[column]: value}, [], throwsException, transformOptions);
+    public async getRole(value : any, column : string = 'id', relations : string[] = [], throwsException : boolean = true, transformOptions? : any) : Promise<RoleSerializer> {
+        return this.getOneBy({[column]: value}, relations, throwsException, transformOptions);
     }
 
     public transform(model: Role, transformOptions : any = { groups: defaultRoleGroupsForSerializing }): RoleSerializer {

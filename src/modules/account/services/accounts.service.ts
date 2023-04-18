@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
-import { FindOptionsWhere } from "typeorm";
+import { FindOptionsWhere, In } from "typeorm";
 import { AccountsRepository } from "../accounts.repository";
 import { Account } from "../entities/account.entity";
 import { Request } from "express";
@@ -29,11 +29,23 @@ export class AccountsService {
     return this.repository.paginate(options);
   }
 
-  public async getAccountById(id : number|string) : Promise<Account> {
-    return await this.repository.getAccount(id) ?? null;
+  public async getAccountById(id : number|string, withRoles : boolean = false) : Promise<Account> {
+    let relations : string[] = [];
+
+    if(withRoles) {
+      relations.push('roles');
+    }
+    
+    return await this.repository.getAccount(id, 'id', relations) ?? null;
+  }
+
+  public async getAccountsByIds(ids : number[]) : Promise<Account[]> {
+    return await this.repository.findBy({
+        id: In(ids)
+    });
   }
 
   public async accountExists(email : string = '', transformOptions : any = {}) : Promise<Account> {
-    return await this.repository.getAccount(email, 'email', true, transformOptions) ?? null;
+    return await this.repository.getAccount(email, 'email', [], true, transformOptions) ?? null;
   }
 }

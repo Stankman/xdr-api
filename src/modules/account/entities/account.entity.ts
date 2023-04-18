@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinTable, ManyToMany, OneToMany, ManyToOne } from 'typeorm';
 import { IAccount } from "../interfaces/account.interface";
+import { Role } from 'src/modules/role/entities/role.entity';
 
 @Entity({ name: 'accounts'})
 export class Account implements IAccount {
@@ -26,4 +27,10 @@ export class Account implements IAccount {
     
     @UpdateDateColumn()
     updated_at: Date;
+
+    @ManyToMany(
+        () => Role,
+        role => role.accounts
+    )
+    roles : Role[]
 }

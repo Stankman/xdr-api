@@ -9,7 +9,7 @@ export class ModelRepository<T, K extends ModelEntitySerializer> extends Reposit
   public async getOneBy(whereOptions: FindOptionsWhere<T> | FindOptionsWhere<T>[], relations : string[] = [], throwsException : boolean = true,  transformOptions? : any): Promise<K> {
     return this.findOne({
       where: whereOptions,
-      relations
+      relations: relations
     }).then(entity => {
       if(!entity && throwsException) {
         throw new NoSuchEntityException();

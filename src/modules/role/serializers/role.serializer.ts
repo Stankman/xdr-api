@@ -2,6 +2,7 @@ import { ModelEntitySerializer } from "src/common/serializers/model.serializer";
 import { IRole } from "../interfaces/role.interface";
 import { Expose } from "class-transformer";
 import { RolePermission } from "../entities/role-permission.entity";
+import { Account } from "src/modules/account/entities/account.entity";
 
 export const defaultRoleGroupsForSerializing: string[] = [
     'role.timestamps'
@@ -21,4 +22,6 @@ export class RoleSerializer extends ModelEntitySerializer implements IRole {
     updated_at: Date;
 
     permissions: RolePermission[];
+
+    accounts : Account[];
 }

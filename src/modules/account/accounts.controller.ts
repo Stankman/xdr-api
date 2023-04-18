@@ -1,4 +1,4 @@
-import { Controller, Get, Query, DefaultValuePipe, ParseIntPipe, UseGuards } from "@nestjs/common";
+import { Controller, Get, Query, DefaultValuePipe, ParseIntPipe, UseGuards, Body, Post, Req } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
 import { AppConfigService } from "src/config/app/app-config.service";
@@ -7,6 +7,8 @@ import { AccountsService } from "./services/accounts.service";
 import { Roles } from "src/common/decorators/roles.decorator";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { AuthGuard } from '../../common/guards/auth.guard';
+import { AccountsRolesService } from "./services/accounts-roles.service";
+import { AssignRoleDTO } from "./dtos/assign-role.dto";
 
 @ApiTags('Accounts')
 @Controller('accounts')
@@ -14,6 +16,7 @@ export class AccountsController {
     
     constructor(
         private readonly accountsService : AccountsService,
+        private readonly accountsRolesService : AccountsRolesService,
         private readonly appConfigService : AppConfigService
     ) {}
 
@@ -38,5 +41,10 @@ export class AccountsController {
         @Query('value', new DefaultValuePipe('0')) value : string = '0'
     ) : Promise<Account> {
         return await this.accountsService.getAccountById(value);
+    }
+
+    @Post('/assign/role')
+    public async assignRole(@Req() req : Request, @Body() assignRoleDTO : AssignRoleDTO) {
+        return await this.accountsRolesService.assignRole(assignRoleDTO);
     }
 }

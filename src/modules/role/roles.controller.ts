@@ -42,7 +42,7 @@ export class RolesController {
     @UseGuards(AuthGuard, RolesGuard)
     @Get(':id')
     public async getRole(@Param() params : any) : Promise<Role> {
-        return await this.rolesService.getRole(params.id);
+        return await this.rolesService.getRole(params.id, false, true);
     }
 
     @Roles('manage-roles')

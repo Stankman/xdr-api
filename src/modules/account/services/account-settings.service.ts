@@ -17,7 +17,7 @@ export class AccountSettingsService {
     ) {}
 
     public async changePassword(account : Account, changePasswordDTO : ChangePasswordDTO) : Promise<Account> {
-        let currentPassword = (await this.repository.getAccount(account.id, 'id', true, { groups: ['account.privacy'] })).password;
+        let currentPassword = (await this.repository.getAccount(account.id, 'id', [], true, { groups: ['account.privacy'] })).password;
 
         if(!(await argon2.verify(currentPassword, changePasswordDTO.oldPassword))) {
             throw new InvalidPasswordException();
@@ -33,13 +33,13 @@ export class AccountSettingsService {
     }
 
     public async changeEmail(account : Account, changeEmailDTO : ChangeEmailDTO) : Promise<Account> {
-        let loggedAccount = await this.repository.getAccount(account.id, 'id', true, { groups: ['account.privacy'] });
+        let loggedAccount = await this.repository.getAccount(account.id, 'id', [], true, { groups: ['account.privacy'] });
 
         if(!(await argon2.verify(loggedAccount.password, changeEmailDTO.password))) {
             throw new InvalidPasswordException();
         }
         
-        let existingAccount : Account = await this.repository.getAccount(changeEmailDTO.email, 'email', false);
+        let existingAccount : Account = await this.repository.getAccount(changeEmailDTO.email, 'email', [], false);
 
         if(existingAccount) {
             throw new EmailTakenException();
