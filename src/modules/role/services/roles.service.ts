@@ -12,14 +12,14 @@ export class RolesService {
         private readonly repository : RolesRepository
     ) {}
 
-    public async getRole(roleId : number, withPermissions : boolean = false, withAccounts : boolean = false) : Promise<Role> {
+    public async getRole(roleId : number, includePermissions : boolean = false, includeAccounts : boolean = false) : Promise<Role> {
         let relations : string[] = [];
 
-        if(withPermissions) {
+        if(includePermissions) {
             relations.push('permissions');
         }
 
-        if(withAccounts) {
+        if(includeAccounts) {
             relations.push('accounts');
         }
         
