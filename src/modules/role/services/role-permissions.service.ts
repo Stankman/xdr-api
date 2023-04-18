@@ -4,6 +4,7 @@ import { EditRolePermissionDTO } from '../dtos/edit-role-permission.dto';
 import { NewRolePermissionDTO } from '../dtos/new-role-permission.dto';
 import { RolePermission } from '../entities/role-permission.entity';
 import { RolePermissionsRepository } from '../role-permissions.repository';
+import { In } from 'typeorm';
 
 @Injectable()
 export class RolePermissionsService {
@@ -11,8 +12,18 @@ export class RolePermissionsService {
         private readonly repository : RolePermissionsRepository
     ) {}
 
-    public async getRolePermission(rolePermissionId : number) : Promise<RolePermission> {
+    public async getRolePermissionById(rolePermissionId : number) : Promise<RolePermission> {
         return this.repository.getRolePermission(rolePermissionId);
+    }
+
+    public async getRolePermissionByName(rolePermissionName : string) : Promise<RolePermission> {
+        return this.repository.getRolePermission(rolePermissionName, 'name');
+    }
+
+    public async getRolePermissionsByNames(rolePermissionNames : string[]) : Promise<RolePermission[]> {        
+        return this.repository.findBy({
+            name: In(rolePermissionNames)
+        });
     }
 
     public async checkPermission(rolePermissionId : number) : Promise<boolean> {

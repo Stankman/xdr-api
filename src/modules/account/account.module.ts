@@ -16,6 +16,10 @@ import { AccountsRolesService } from './services/accounts-roles.service';
 import { RolesService } from '../role/services/roles.service';
 import { AccountsRolesRepository } from './accounts-roles.repository';
 import { RolesRepository } from '../role/roles.repository';
+import { RolePermissionsService } from '../role/services/role-permissions.service';
+import { RolePermissionsRepository } from '../role/role-permissions.repository';
+import { RolesPermissionsRepository } from '../role/roles-permissions.repository';
+import { RolesPermissionsService } from '../role/services/roles-permissions.service';
 
 @Module({
     imports: [
@@ -31,12 +35,16 @@ import { RolesRepository } from '../role/roles.repository';
     providers: [
         AccountsRepository,
         AccountsRolesRepository,
-        
+        RolesRepository,
+        RolePermissionsRepository,
+        RolesPermissionsRepository,
+
         AccountsService,
         AccountSettingsService,
         AccountsRolesService,
         RolesService,
-        RolesRepository,
+        RolePermissionsService,
+        RolesPermissionsService,
         HashService,
         JwtService
     ],

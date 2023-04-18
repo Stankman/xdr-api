@@ -4,7 +4,7 @@ import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-
 import { AppConfigService } from "src/config/app/app-config.service";
 import { Account } from "./entities/account.entity";
 import { AccountsService } from "./services/accounts.service";
-import { Roles } from "src/common/decorators/roles.decorator";
+import { Permission } from "src/common/decorators/permission.decorator";
 import { RolesGuard } from "../../common/guards/roles.guard";
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { AccountsRolesService } from "./services/accounts-roles.service";
@@ -20,7 +20,7 @@ export class AccountsController {
         private readonly appConfigService : AppConfigService
     ) {}
 
-    @Roles('view-all-users')
+    @Permission('view-accounts')
     @UseGuards(AuthGuard, RolesGuard)
     @Get('all')
     public async paginateAccounts(

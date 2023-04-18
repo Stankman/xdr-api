@@ -1,40 +1,50 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Observable } from 'rxjs';
-import { ROLES_KEY } from '../decorators/roles.decorator';
+import { PERMISSION_KEY } from '../decorators/permission.decorator';
 import { AccountsService } from 'src/modules/account/services/accounts.service';
 import { Account } from 'src/modules/account/entities/account.entity';
-import { AppConfigService } from 'src/config/app/app-config.service';
+import { Role } from 'src/modules/role/entities/role.entity';
+import { RolePermissionsService } from 'src/modules/role/services/role-permissions.service';
+import { RolePermission } from 'src/modules/role/entities/role-permission.entity';
+import { RolesPermissionsService } from 'src/modules/role/services/roles-permissions.service';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
-    private readonly appConfig : AppConfigService,
     private readonly reflector : Reflector,
-    private readonly accountsService : AccountsService
+    private readonly accountsService : AccountsService,
+    private readonly rolePermissionsService : RolePermissionsService,
+    private readonly rolesPermissionsService : RolesPermissionsService
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
-    if(this.appConfig.env === 'development') {
-      return true;
-    }
-
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
+    const requiredPermission = this.reflector.getAllAndOverride<string>(PERMISSION_KEY, [
       context.getHandler(),
       context.getClass()
     ]);
 
-    if(!requiredRoles) {
+    if(!requiredPermission) {
       return true;
     }
-    
+
+    const requiredRolePermission : RolePermission = await this.rolePermissionsService.getRolePermissionByName(requiredPermission);
+
+    if(!requiredRolePermission) {
+      return true;
+    }
+
     const request = context.switchToHttp().getRequest();
 
     const loggedAccount : Account = await this.accountsService.getLoggedAccount(request);
 
     if(loggedAccount) {
-      //If logged Account has Permission return true, otherwise return false
-      return true;
+      let roles : Role[] = loggedAccount.roles;
+
+      for (const role of roles) {
+        if(await this.rolesPermissionsService.hasPermission(role.id, requiredRolePermission.id)) {
+          return true;
+        }
+      }
     }
 
     return false;

@@ -18,7 +18,7 @@ export class AccountsService {
       return null;
     }
 
-    return await this.repository.getAccount(authAccount) ?? null;
+    return await this.getAccountById(authAccount, true) ?? null;
   }
 
   public async save(account : Account) : Promise<Account> {

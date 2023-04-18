@@ -16,10 +16,23 @@ export class RolesPermissionsService {
         private readonly rolePermissionsService : RolePermissionsService
     ) {}
 
+    public async hasPermission(roleId : number, permissionId : number) : Promise<boolean> {
+        let role : Role = await this.rolesService.getRole(roleId);
+
+        let permission : RolePermission = await this.rolePermissionsService.getRolePermissionById(permissionId);
+
+        let rolePermission : RolesPermissions = await this.repository.findOneBy({
+            role_id: role.id,
+            permission_id: permission.id
+        });
+
+        return !!rolePermission;
+    }
+
     public async togglePermission(togglePermissionDTO : TogglePermissionDTO) : Promise<any> {
         let role : Role = await this.rolesService.getRole(togglePermissionDTO.role_id);
 
-        let permission : RolePermission = await this.rolePermissionsService.getRolePermission(togglePermissionDTO.permission_id);
+        let permission : RolePermission = await this.rolePermissionsService.getRolePermissionById(togglePermissionDTO.permission_id);
 
         let whereOptions = {
             role_id: role.id,
