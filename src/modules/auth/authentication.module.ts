@@ -6,7 +6,7 @@ import { TokenConfigService } from "src/config/token/token-config.service";
 import { AccountModule } from "../account/account.module";
 import { BanModule } from "../ban/ban.module";
 
-import { AuthenticationController } from "./authentication.controller";
+import { AuthenticationController } from "./controllers/authentication.controller";
 
 import { HashService } from "./services/hash.service";
 import { SignInService } from "./services/signin.service";

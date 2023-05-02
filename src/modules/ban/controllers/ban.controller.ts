@@ -1,8 +1,8 @@
 import { Controller, UseInterceptors, Get, Query, DefaultValuePipe, ParseIntPipe } from "@nestjs/common";
 import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
 import { AppConfigService } from "src/config/app/app-config.service";
-import { Ban } from "./entities/ban.entity";
-import { BanService } from "./services/ban.service";
+import { Ban } from "../entities/ban.entity";
+import { BanService } from "../services/ban.service";
 import { ApiTags } from "@nestjs/swagger";
 
 @ApiTags('Bans')

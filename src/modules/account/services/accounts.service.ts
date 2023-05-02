@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
 import { FindOptionsWhere, In } from "typeorm";
-import { AccountsRepository } from "../accounts.repository";
+import { AccountsRepository } from "../repositories/accounts.repository";
 import { Account } from "../entities/account.entity";
 import { Request } from "express";
 

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { IPaginationMeta, IPaginationOptions, Pagination } from "nestjs-typeorm-paginate";
 import { FindOptionsWhere, MoreThan } from "typeorm";
-import { BanRepository } from "../ban.repository";
+import { BanRepository } from "../repositories/ban.repository";
 import { Ban } from "../entities/ban.entity";
 
 @Injectable()
@@ -27,7 +27,7 @@ export class BanService {
             },
             { 
               ban_expire: MoreThan(currentTimestamp),
-              machine_id: String(value),
+              machine_id: String(value)
             }
         ];
 

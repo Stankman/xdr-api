@@ -2,13 +2,13 @@ import { Controller, Get, Query, DefaultValuePipe, ParseIntPipe, UseGuards, Body
 import { ApiTags } from "@nestjs/swagger";
 import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
 import { AppConfigService } from "src/config/app/app-config.service";
-import { Account } from "./entities/account.entity";
-import { AccountsService } from "./services/accounts.service";
+import { Account } from "../entities/account.entity";
+import { AccountsService } from "../services/accounts.service";
 import { Permission } from "src/common/decorators/permission.decorator";
-import { RolesGuard } from "../../common/guards/roles.guard";
-import { AuthGuard } from '../../common/guards/auth.guard';
-import { AccountsRolesService } from "./services/accounts-roles.service";
-import { AssignRoleDTO } from "./dtos/assign-role.dto";
+import { RolesGuard } from "../../../common/guards/roles.guard";
+import { AuthGuard } from '../../../common/guards/auth.guard';
+import { AccountsRolesService } from "../services/accounts-roles.service";
+import { AssignRoleDTO } from "../dtos/assign-role.dto";
 
 @ApiTags('Accounts')
 @Controller('accounts')

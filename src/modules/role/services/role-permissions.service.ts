@@ -3,7 +3,7 @@ import { IPaginationOptions, Pagination, IPaginationMeta } from 'nestjs-typeorm-
 import { EditRolePermissionDTO } from '../dtos/edit-role-permission.dto';
 import { NewRolePermissionDTO } from '../dtos/new-role-permission.dto';
 import { RolePermission } from '../entities/role-permission.entity';
-import { RolePermissionsRepository } from '../role-permissions.repository';
+import { RolePermissionsRepository } from '../repositories/role-permissions.repository';
 import { In } from 'typeorm';
 
 @Injectable()

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { RolesPermissionsRepository } from '../roles-permissions.repository';
+import { RolesPermissionsRepository } from '../repositories/roles-permissions.repository';
 import { TogglePermissionDTO } from '../dtos/toggle-permission.dto';
 import { RolePermissionsService } from './role-permissions.service';
 import { RolesService } from './roles.service';

@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { plainToInstance, instanceToPlain } from "class-transformer";
 import { DataSource } from "typeorm";
-import { ModelRepository } from "../shared/model.repository";
-import { Role } from "./entities/role.entity";
-import { RoleSerializer, defaultRoleGroupsForSerializing } from "./serializers/role.serializer";
+import { ModelRepository } from "../../shared/model.repository";
+import { Role } from "../entities/role.entity";
+import { RoleSerializer, defaultRoleGroupsForSerializing } from "../serializers/role.serializer";
 
 @Injectable()
 export class RolesRepository extends ModelRepository<Role, RoleSerializer> {

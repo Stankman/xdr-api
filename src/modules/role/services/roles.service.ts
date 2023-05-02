@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { IPaginationOptions, Pagination, IPaginationMeta } from 'nestjs-typeorm-paginate';
 import { Role } from '../entities/role.entity';
-import { RolesRepository } from '../roles.repository';
+import { RolesRepository } from '../repositories/roles.repository';
 import { NewRoleDTO } from '../dtos/new-role.dto';
 import { EditRoleDTO } from '../dtos/edit-role.dto';
 import { RolePermission } from '../entities/role-permission.entity';

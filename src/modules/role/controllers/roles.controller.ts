@@ -1,17 +1,17 @@
 import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { Pagination, IPaginationMeta, IPaginationOptions } from 'nestjs-typeorm-paginate';
 import { Permission } from 'src/common/decorators/permission.decorator';
-import { AuthGuard } from '../../common/guards/auth.guard';
+import { AuthGuard } from '../../../common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { AppConfigService } from 'src/config/app/app-config.service';
-import { Role } from './entities/role.entity';
-import { RolesService } from './services/roles.service';
-import { NewRoleDTO } from './dtos/new-role.dto';
+import { Role } from '../entities/role.entity';
+import { RolesService } from '../services/roles.service';
+import { NewRoleDTO } from '../dtos/new-role.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { EditRoleDTO } from './dtos/edit-role.dto';
-import { TogglePermissionDTO } from './dtos/toggle-permission.dto';
-import { RolePermission } from './entities/role-permission.entity';
-import { RolesPermissionsService } from './services/roles-permissions.service';
+import { EditRoleDTO } from '../dtos/edit-role.dto';
+import { TogglePermissionDTO } from '../dtos/toggle-permission.dto';
+import { RolePermission } from '../entities/role-permission.entity';
+import { RolesPermissionsService } from '../services/roles-permissions.service';
 
 @ApiTags('Roles')
 @Controller('roles')

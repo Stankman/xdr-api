@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { Account } from './entities/account.entity';
+import { Account } from '../entities/account.entity';
 import { Request } from 'express';
-import { AuthGuard } from '../../common/guards/auth.guard';
-import { AccountsService } from './services/accounts.service';
-import { ChangePasswordDTO } from './dtos/change-password.dto';
-import { AccountSettingsService } from './services/account-settings.service';
-import { ChangeEmailDTO } from './dtos/change-email.dto';
+import { AuthGuard } from '../../../common/guards/auth.guard';
+import { AccountsService } from '../services/accounts.service';
+import { ChangePasswordDTO } from '../dtos/change-password.dto';
+import { AccountSettingsService } from '../services/account-settings.service';
+import { ChangeEmailDTO } from '../dtos/change-email.dto';
 
 @ApiTags('Account')
 @UseGuards(AuthGuard)
@@ -19,7 +19,7 @@ export class AccountController {
     ) {}
 
     @Get()
-    public async getLoggedUser(@Req() req : Request) : Promise<Account> {
+    public async getLoggedAccount(@Req() req : Request) : Promise<Account> {
         return await this.accountsService.getLoggedAccount(req);
     }
 

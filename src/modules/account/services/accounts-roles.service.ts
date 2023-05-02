@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { AccountsRolesRepository } from '../accounts-roles.repository';
+import { AccountsRolesRepository } from '../repositories/accounts-roles.repository';
 import { RolesService } from '../../role/services/roles.service';
 import { Role } from 'src/modules/role/entities/role.entity';
 import { AccountsRoles } from '../entities/accounts-roles.entity';

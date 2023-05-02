@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AccountsRepository } from '../accounts.repository';
+import { AccountsRepository } from '../repositories/accounts.repository';
 import { Account } from '../entities/account.entity';
 import { ChangePasswordDTO } from '../dtos/change-password.dto';
 import * as argon2 from 'argon2';

@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { DataSource } from "typeorm";
-import { ModelRepository } from "../shared/model.repository";
-import { AccountsRoles } from "./entities/accounts-roles.entity";
-import { AccountsRolesSerializer } from "./serializers/accounts-roles.serializer";
+import { ModelRepository } from "../../shared/model.repository";
+import { AccountsRoles } from "../entities/accounts-roles.entity";
+import { AccountsRolesSerializer } from "../serializers/accounts-roles.serializer";
 
 @Injectable()
 export class AccountsRolesRepository extends ModelRepository<AccountsRoles, AccountsRolesSerializer> {

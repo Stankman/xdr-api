@@ -5,10 +5,10 @@ import { Permission } from "src/common/decorators/permission.decorator";
 import { AuthGuard } from "src/common/guards/auth.guard";
 import { RolesGuard } from "src/common/guards/roles.guard";
 import { AppConfigService } from "src/config/app/app-config.service";
-import { EditRolePermissionDTO } from "./dtos/edit-role-permission.dto";
-import { NewRolePermissionDTO } from "./dtos/new-role-permission.dto";
-import { RolePermission } from "./entities/role-permission.entity";
-import { RolePermissionsService } from "./services/role-permissions.service";
+import { EditRolePermissionDTO } from "../dtos/edit-role-permission.dto";
+import { NewRolePermissionDTO } from "../dtos/new-role-permission.dto";
+import { RolePermission } from "../entities/role-permission.entity";
+import { RolePermissionsService } from "../services/role-permissions.service";
 
 @ApiTags('Role Permissions')
 @Controller('roles/permissions')
