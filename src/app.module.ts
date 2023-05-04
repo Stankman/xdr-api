@@ -12,12 +12,8 @@ import { MySQLProviderModule } from './providers/database/mysql/mysql-provider.m
 import { AccountModule } from './modules/account/account.module';
 import { ArticleModule } from './modules/article/article.module';
 import { AuthenticationModule } from './modules/auth/authentication.module';
-import { CustomerModule } from './modules/customer/customer.module';
-import { EmployeeModule } from './modules/employee/employee.module';
 import { BanModule } from './modules/ban/ban.module';
 import { RolesModule } from './modules/role/roles.module';
-import { TripModule } from './modules/trip/trip.module';
-import { VehicleModule } from './modules/vehicle/vehicle.module';
 
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/exceptions/exception.filter';
@@ -44,12 +40,8 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     AccountModule,
     ArticleModule,
     AuthenticationModule,
-    CustomerModule,
-    EmployeeModule,
     BanModule,
-    RolesModule,
-    TripModule,
-    VehicleModule
+    RolesModule
   ],
   providers: [
     {
