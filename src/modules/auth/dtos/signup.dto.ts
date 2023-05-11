@@ -9,7 +9,7 @@ export class SignUpDTO {
     @ApiProperty()
     @IsString()
     @MinLength(6)
-    @Matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,}$/)
+    @Matches(/^(?=.*[0-9-=?!@:.])(?=.*[a-zA-Z]).{6,}$/)
     password : string;
 
     @IsOptional()
