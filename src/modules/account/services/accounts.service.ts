@@ -45,7 +45,7 @@ export class AccountsService {
     });
   }
 
-  public async accountExists(email : string = '', transformOptions : any = {}) : Promise<Account> {
-    return await this.repository.getAccount(email, 'email', [], true, transformOptions) ?? null;
+  public async accountExists(email : string = '', transformOptions : any = {}, throwErrors : boolean = false) : Promise<Account> {
+    return await this.repository.getAccount(email, 'email', [], throwErrors, transformOptions) ?? null;
   }
 }
