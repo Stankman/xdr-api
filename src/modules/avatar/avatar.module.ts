@@ -7,6 +7,7 @@ import { AvatarService } from './services/avatar.service';
 import { AvatarsRepository } from "./repositories/avatars.repository";
 import { AvatarSettings } from "./entities/avatar-settings.entity";
 import { AvatarsSettingsRepository } from "./repositories/avatars-settings.repository";
+import { AvatarSettingsService } from "./services/avatar-settings.service";
 
 @Module({
     imports: [
@@ -19,11 +20,13 @@ import { AvatarsSettingsRepository } from "./repositories/avatars-settings.repos
     providers: [
         AvatarService,
         AvatarsRepository,
+        AvatarSettingsService,
         AvatarsSettingsRepository
     ],
     exports: [
         AvatarService,
         AvatarsRepository,
+        AvatarSettingsService,
         AvatarsSettingsRepository
     ]
 })

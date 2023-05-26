@@ -5,8 +5,6 @@ import { Avatar } from "../entities/avatar.entity";
 export class AvatarSettingsSerializer extends ModelEntitySerializer implements IAvatarSettings {
     id: number;
     avatar: Avatar;
-    daily_respect_points: number;
-    daily_pet_respect_points: number;
     respects_given: number;
     respects_received: number;
     can_trade: boolean;

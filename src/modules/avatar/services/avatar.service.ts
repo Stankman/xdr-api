@@ -5,11 +5,13 @@ import { Avatar } from "../entities/avatar.entity";
 import { AvatarsRepository } from "../repositories/avatars.repository";
 import { NewAvatarDTO } from "../dtos/new-avatar.dto";
 import { Account } from "src/modules/account/entities/account.entity";
+import { AvatarSettingsService } from "./avatar-settings.service";
 
 @Injectable()
 export class AvatarService {
     constructor(
-        private readonly repository : AvatarsRepository
+        private readonly repository : AvatarsRepository,
+        private readonly avatarSettingsService : AvatarSettingsService
     ) {}
 
     public async paginateAvatars(options : IPaginationOptions, searchOptions? : FindOptionsWhere<Avatar> | FindManyOptions<Avatar>) : Promise<Pagination<Avatar, IPaginationMeta>> {
@@ -25,7 +27,11 @@ export class AvatarService {
     }
 
     public async createAvatar(newAvatarDTO : NewAvatarDTO) : Promise<Avatar> {
-        return this.saveAvatar(await this.getNewAvatar(newAvatarDTO));
+        let avatar : Avatar = await this.getNewAvatar(newAvatarDTO);
+
+        avatar.settings = await this.avatarSettingsService.createAvatarSettings(avatar);
+        
+        return this.saveAvatar(avatar);
     }
 
     public async saveAvatar(avatar : Avatar) : Promise<Avatar> {
@@ -62,7 +68,7 @@ export class AvatarService {
         return newUsername;
     }
 
-    public async getNewAvatar(newAvatarDTO? : NewAvatarDTO, account? : Account) : Promise<Avatar> {
+    private async getNewAvatar(newAvatarDTO? : NewAvatarDTO, account? : Account) : Promise<Avatar> {
         const avatar : Avatar = new Avatar();
 
         if(!newAvatarDTO && !account) {

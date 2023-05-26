@@ -8,12 +8,6 @@ export class AvatarSettings implements IAvatarSettings {
     id: number;
 
     @Column()
-    daily_respect_points: number;
-    
-    @Column()
-    daily_pet_respect_points: number;
-    
-    @Column()
     respects_given: number;
     
     @Column()
