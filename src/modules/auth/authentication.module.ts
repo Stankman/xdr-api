@@ -8,7 +8,7 @@ import { BanModule } from "../ban/ban.module";
 
 import { AuthenticationController } from "./controllers/authentication.controller";
 
-import { HashService } from "./services/hash.service";
+import { HashService } from "../shared/services/hash.service";
 import { SignInService } from "./services/signin.service";
 import { SignUpService } from "./services/signup.service";
 import { TokenService } from "./services/token.service";

@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { IRolePermission } from "../interfaces/role-permission.interface";
 import { Role } from "./role.entity";
 
-@Entity({ name: 'role_permissions' })
+@Entity({ name: 'xdr_role_permissions' })
 export class RolePermission implements IRolePermission {
     @ApiProperty({ example: 1, description: 'The role permission ID' })
     @PrimaryGeneratedColumn()

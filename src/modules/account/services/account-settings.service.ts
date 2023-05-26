@@ -3,7 +3,7 @@ import { AccountsRepository } from '../repositories/accounts.repository';
 import { Account } from '../entities/account.entity';
 import { ChangePasswordDTO } from '../dtos/change-password.dto';
 import * as argon2 from 'argon2';
-import { HashService } from 'src/modules/auth/services/hash.service';
+import { HashService } from 'src/modules/shared/services/hash.service';
 import { InvalidPasswordException } from '../exceptions/invalid-password.exception';
 import { SamePasswordException } from '../exceptions/same-password.exception';
 import { ChangeEmailDTO } from '../dtos/change-email.dto';

@@ -1,3 +1,4 @@
+import { Avatar } from "src/modules/avatar/entities/avatar.entity";
 import { Role } from "src/modules/role/entities/role.entity";
 
 export interface IAccount {
@@ -8,4 +9,6 @@ export interface IAccount {
     created_at: Date;
     updated_at: Date;
     roles : Role[];
+    avatars: Avatar[];
+    active_avatar: Avatar;
 }

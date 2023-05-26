@@ -3,7 +3,7 @@ import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { Account } from '../entities/account.entity';
 import { Request } from 'express';
 import { AuthGuard } from '../../../common/guards/auth.guard';
-import { AccountsService } from '../services/accounts.service';
+import { AccountService } from '../services/accounts.service';
 import { ChangePasswordDTO } from '../dtos/change-password.dto';
 import { AccountSettingsService } from '../services/account-settings.service';
 import { ChangeEmailDTO } from '../dtos/change-email.dto';
@@ -14,7 +14,7 @@ import { ChangeEmailDTO } from '../dtos/change-email.dto';
 export class AccountController {
 
     constructor(
-        private readonly accountsService : AccountsService,
+        private readonly accountsService : AccountService,
         private readonly accountSettingsService : AccountSettingsService
     ) {}
 

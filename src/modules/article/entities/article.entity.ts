@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { IArticle } from "../interfaces/article.interface";
 
-@Entity({ name: 'articles'})
+@Entity({ name: 'xdr_articles'})
 export class Article implements IArticle {
     @PrimaryGeneratedColumn()
     id: number;

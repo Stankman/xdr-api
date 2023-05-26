@@ -4,7 +4,7 @@ import { Account } from "./account.entity";
 import { ApiProperty } from "@nestjs/swagger";
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToOne, JoinColumn, OneToMany, ManyToOne, ManyToMany } from "typeorm";
 
-@Entity({ name: 'accounts_roles' })
+@Entity({ name: 'xdr_accounts_roles' })
 export class AccountsRoles implements IAccountsRoles {
     @ApiProperty({ example: 1, description: 'The accounts roles ID' })
     @PrimaryGeneratedColumn()

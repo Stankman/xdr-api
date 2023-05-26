@@ -4,7 +4,7 @@ import { IRole } from "../interfaces/role.interface";
 import { RolePermission } from "./role-permission.entity";
 import { Account } from "src/modules/account/entities/account.entity";
 
-@Entity({ name: 'roles' })
+@Entity({ name: 'xdr_roles' })
 export class Role implements IRole {
     @ApiProperty({ example: 1, description: 'The role ID' })
     @PrimaryGeneratedColumn()

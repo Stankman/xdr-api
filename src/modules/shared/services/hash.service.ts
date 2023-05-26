@@ -6,9 +6,7 @@ import { Argon2ConfigService } from 'src/config/argon2/argon2-config.service';
 export class HashService {
     constructor(
         private readonly argon2Config : Argon2ConfigService
-    ) {
-
-    }
+    ) {}
 
     public async hash(password : string) : Promise<string> {
         return await argon2.hash(
@@ -19,5 +17,9 @@ export class HashService {
                 parallelism: this.argon2Config.threads
             }
         );
+    }
+
+    public async verify(hash : string, plain : string) : Promise<boolean> {
+        return await argon2.verify(hash, plain);
     }
 }

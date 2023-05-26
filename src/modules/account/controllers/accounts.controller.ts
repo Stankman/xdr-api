@@ -3,7 +3,7 @@ import { ApiTags } from "@nestjs/swagger";
 import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
 import { AppConfigService } from "src/config/app/app-config.service";
 import { Account } from "../entities/account.entity";
-import { AccountsService } from "../services/accounts.service";
+import { AccountService } from "../services/accounts.service";
 import { Permission } from "src/common/decorators/permission.decorator";
 import { RolesGuard } from "../../../common/guards/roles.guard";
 import { AuthGuard } from '../../../common/guards/auth.guard';
@@ -15,7 +15,7 @@ import { AssignRoleDTO } from "../dtos/assign-role.dto";
 export class AccountsController {
     
     constructor(
-        private readonly accountsService : AccountsService,
+        private readonly accountsService : AccountService,
         private readonly accountsRolesService : AccountsRolesService,
         private readonly appConfigService : AppConfigService
     ) {}

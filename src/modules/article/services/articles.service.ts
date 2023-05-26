@@ -10,7 +10,7 @@ export class ArticlesService {
         private readonly repository : ArticlesRepository
     ) {}
 
-    public async paginateArticles(options : IPaginationOptions, searchOptions?: FindOptionsWhere<Article> | FindOptionsWhere<Article>[]) {
+    public async paginateArticles(options : IPaginationOptions, searchOptions?: FindOptionsWhere<Article> | FindManyOptions<Article>) {
         return this.repository.paginate(options, searchOptions);
     }
 }

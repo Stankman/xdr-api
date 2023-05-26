@@ -3,7 +3,7 @@ import { SignInService } from '../services/signin.service';
 import { SignInDTO } from '../dtos/signin.dto';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SignUpService } from '../services/signup.service';
-import { SignUpDTO } from '../dtos/signup.dto';
+import { NewAccountDTO } from 'src/modules/account/dtos/new-account.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -20,10 +20,15 @@ export class AuthenticationController {
         return this.signInService.signIn(signInDTO);
     }
 
-    @ApiBody({ type: [SignUpDTO] })
+    @ApiBody({ type: [NewAccountDTO] })
     @Post('signUp')
-    public async signUp(@Body() signUpDTO : SignUpDTO, @Ip() currentIp) : Promise<Response> {
-        signUpDTO.ip = currentIp;
-        return this.signUpService.signUp(signUpDTO);
+    public async signUp(@Body() newAccountDTO : NewAccountDTO, @Ip() currentIp) : Promise<Response> {
+        newAccountDTO.ip = currentIp;
+        return this.signUpService.signUp(newAccountDTO);
+    }
+
+    @Post('signOut')
+    public async signOut() : Promise<Response> {
+        return;
     }
 }

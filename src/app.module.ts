@@ -12,6 +12,7 @@ import { MySQLProviderModule } from './providers/database/mysql/mysql-provider.m
 import { AccountModule } from './modules/account/account.module';
 import { ArticleModule } from './modules/article/article.module';
 import { AuthenticationModule } from './modules/auth/authentication.module';
+import { AvatarModule } from './modules/avatar/avatar.module';
 import { BanModule } from './modules/ban/ban.module';
 import { RolesModule } from './modules/role/roles.module';
 
@@ -40,6 +41,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     AccountModule,
     ArticleModule,
     AuthenticationModule,
+    AvatarModule,
     BanModule,
     RolesModule
   ],

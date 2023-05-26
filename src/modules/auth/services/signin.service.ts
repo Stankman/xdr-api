@@ -1,21 +1,22 @@
 import { Injectable } from "@nestjs/common";
 import { Account } from "src/modules/account/entities/account.entity";
-import { AccountsService } from "src/modules/account/services/accounts.service";
+import { AccountService } from "src/modules/account/services/accounts.service";
 import { Ban } from "src/modules/ban/entities/ban.entity";
 import { BanService } from "src/modules/ban/services/ban.service";
 import { SignInDTO } from "../dtos/signin.dto";
 import { BanException } from "../exceptions/ban.exception";
 import { LoginException } from "../exceptions/login.exception";
 import { TokenService } from "./token.service";
-import * as argon2 from 'argon2';
 import { allAccountGroupsForSerializing } from "src/modules/account/serializers/account.serializer";
+import { HashService } from "src/modules/shared/services/hash.service";
 
 @Injectable()
 export class SignInService {
     constructor(
-        private readonly accountsService : AccountsService,
+        private readonly accountsService : AccountService,
         private readonly banService : BanService,
-        private readonly tokenService : TokenService
+        private readonly tokenService : TokenService,
+        private readonly hashService : HashService
     ) {}
 
     public async signIn(signInDTO : SignInDTO) : Promise<any> {
@@ -26,7 +27,7 @@ export class SignInService {
             }
         );
 
-        if(!account || !(await argon2.verify(account.password, signInDTO.password))) {
+        if(!account || !(await this.hashService.verify(account.password, signInDTO.password))) {
             throw new LoginException();
         }
 
@@ -39,7 +40,7 @@ export class SignInService {
         account.ip_current = signInDTO.ip;
         account.last_login = Math.floor(Date.now() / 1000);
 
-        this.accountsService.save(account);
+        this.accountsService.saveAccount(account);
 
         const token = await this.tokenService.execute(account.id);
 

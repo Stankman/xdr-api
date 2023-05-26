@@ -5,11 +5,11 @@ import { AccountController } from './controllers/account.controller';
 import { AccountsController } from './controllers/accounts.controller';
 import { AccountsRepository } from './repositories/accounts.repository';
 import { Account } from './entities/account.entity';
-import { AccountsService } from './services/accounts.service';
+import { AccountService } from './services/accounts.service';
 import { TokenConfigModule } from 'src/config/token/token-config.module';
 import { JwtService } from '@nestjs/jwt';
 import { AccountSettingsService } from './services/account-settings.service';
-import { HashService } from '../auth/services/hash.service';
+import { HashService } from '../shared/services/hash.service';
 import { Argon2ConfigModule } from 'src/config/argon2/argon2-config.module';
 import { AccountsRoles } from './entities/accounts-roles.entity';
 import { AccountsRolesService } from './services/accounts-roles.service';
@@ -20,13 +20,15 @@ import { RolePermissionsService } from '../role/services/role-permissions.servic
 import { RolePermissionsRepository } from '../role/repositories/role-permissions.repository';
 import { RolesPermissionsRepository } from '../role/repositories/roles-permissions.repository';
 import { RolesPermissionsService } from '../role/services/roles-permissions.service';
+import { AvatarModule } from '../avatar/avatar.module';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Account, AccountsRoles]),
         TokenConfigModule,
         AppConfigModule,
-        Argon2ConfigModule
+        Argon2ConfigModule,
+        AvatarModule
     ],
     controllers: [
         AccountsController,
@@ -39,7 +41,7 @@ import { RolesPermissionsService } from '../role/services/roles-permissions.serv
         RolePermissionsRepository,
         RolesPermissionsRepository,
 
-        AccountsService,
+        AccountService,
         AccountSettingsService,
         AccountsRolesService,
         RolesService,
@@ -49,7 +51,7 @@ import { RolesPermissionsService } from '../role/services/roles-permissions.serv
         JwtService
     ],
     exports: [
-        AccountsService,
+        AccountService,
         AccountSettingsService,
         AccountsRolesService
     ]

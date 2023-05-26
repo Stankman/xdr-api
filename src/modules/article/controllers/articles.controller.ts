@@ -45,11 +45,9 @@ export class ArticlesController {
         };
 
         
-        let searchOptions : FindOptionsWhere<Article>[] = [
-            {
+        let searchOptions : FindOptionsWhere<Article> = {
                 hidden: 0
-            }
-        ]
+        };
 
         return await this.articlesService.paginateArticles(options, searchOptions);
     }

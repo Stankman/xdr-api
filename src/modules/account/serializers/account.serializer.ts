@@ -2,6 +2,7 @@ import { Exclude, Expose } from "class-transformer";
 import { ModelEntitySerializer } from "src/common/serializers/model.serializer";
 import { IAccount } from "../interfaces/account.interface";
 import { Role } from "src/modules/role/entities/role.entity";
+import { Avatar } from "src/modules/avatar/entities/avatar.entity";
 
 export const defaultAccountGroupsForSerializing: string[] = [
   'account.timestamps', 'roles'
@@ -39,4 +40,8 @@ export class AccountSerializer extends ModelEntitySerializer implements IAccount
   updated_at: Date;
 
   roles : Role[];
+
+  avatars: Avatar[];
+
+  active_avatar: Avatar;
 }

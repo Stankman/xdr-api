@@ -19,12 +19,10 @@ export class ModelRepository<T, K extends ModelEntitySerializer> extends Reposit
     });
   }
 
-  public async paginate(options : IPaginationOptions, searchOptions?: FindOptionsWhere<T> | FindOptionsWhere<T>[]) : Promise<Pagination<K, IPaginationMeta>> {
-    return paginate<T>(this, options, { where: searchOptions }).then(pagination => {
+  public async paginate(options : IPaginationOptions, searchOptions?: FindOptionsWhere<T> | FindManyOptions<T>) : Promise<Pagination<K, IPaginationMeta>> {
+    return paginate<T>(this, options, searchOptions).then(pagination => {
       const items = this.transformMany(pagination.items);
-
       let _pagination = new Pagination<K, IPaginationMeta>(items, pagination.meta, pagination.links);
-
       return _pagination;
     });
   }

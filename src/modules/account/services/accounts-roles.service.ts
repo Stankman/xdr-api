@@ -3,7 +3,7 @@ import { AccountsRolesRepository } from '../repositories/accounts-roles.reposito
 import { RolesService } from '../../role/services/roles.service';
 import { Role } from 'src/modules/role/entities/role.entity';
 import { AccountsRoles } from '../entities/accounts-roles.entity';
-import { AccountsService } from './accounts.service';
+import { AccountService } from './accounts.service';
 import { AssignRoleDTO } from '../dtos/assign-role.dto';
 import { Account } from '../entities/account.entity';
 
@@ -12,7 +12,7 @@ export class AccountsRolesService {
     constructor(
         private readonly repository : AccountsRolesRepository,
         private readonly rolesService : RolesService,
-        private readonly accountsService : AccountsService
+        private readonly accountsService : AccountService
 
     ) {}
 

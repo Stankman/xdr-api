@@ -1,0 +1,16 @@
+import { ModelEntitySerializer } from "src/common/serializers/model.serializer";
+import { IAvatar } from "../interfaces/avatar.interface";
+import { Account } from "src/modules/account/entities/account.entity";
+
+export class AvatarSerializer extends ModelEntitySerializer implements IAvatar {
+    id: number;
+    username: string;
+    motto: string;
+    look: string;
+    gender: string;
+    rank: number;
+    online: boolean;
+    auth_ticket: string;
+    last_online: number;
+    account: Account;
+}
