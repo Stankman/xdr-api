@@ -1,7 +1,8 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { IAvatar } from "../interfaces/avatar.interface";
 import { Account } from "src/modules/account/entities/account.entity";
 import { AvatarSettings } from "./avatar-settings.entity";
+import { AvatarCurrency } from "./avatar-currency.entity";
 
 @Entity({ name: 'users'})
 export class Avatar implements IAvatar {
@@ -44,4 +45,10 @@ export class Avatar implements IAvatar {
     )
     @JoinColumn({ name: 'account_id'})
     account: Account;
+
+    @OneToMany(
+        () => AvatarCurrency,
+        currency => currency.avatar
+    )
+    currencies: AvatarCurrency[];
 }

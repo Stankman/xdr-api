@@ -1,5 +1,6 @@
 import { Account } from "src/modules/account/entities/account.entity";
 import { AvatarSettings } from "../entities/avatar-settings.entity";
+import { AvatarCurrency } from "../entities/avatar-currency.entity";
 
 export interface IAvatar {
     id: number;
@@ -12,5 +13,6 @@ export interface IAvatar {
     auth_ticket: string;
     last_online: number;
     settings: AvatarSettings;
+    currencies : AvatarCurrency[];
     account: Account;
 }

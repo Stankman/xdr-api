@@ -8,10 +8,11 @@ import { AvatarsRepository } from "./repositories/avatars.repository";
 import { AvatarSettings } from "./entities/avatar-settings.entity";
 import { AvatarsSettingsRepository } from "./repositories/avatars-settings.repository";
 import { AvatarSettingsService } from "./services/avatar-settings.service";
+import { AvatarCurrency } from "./entities/avatar-currency.entity";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Avatar, AvatarSettings]),
+        TypeOrmModule.forFeature([Avatar, AvatarSettings, AvatarCurrency]),
         AppConfigModule
     ],
     controllers: [
