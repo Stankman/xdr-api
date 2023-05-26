@@ -16,6 +16,10 @@ export class AvatarService {
         return this.repository.paginate(options, searchOptions);
     }
 
+    public async getAvatarById(id : number|string) : Promise<Avatar> {
+        return this.repository.getAvatar(id, 'id', ['settings']);
+    }
+
     public async generateAvatar(account : Account) : Promise<Avatar> {
         return this.saveAvatar(await this.getNewAvatar(null, account));
     }
@@ -32,7 +36,6 @@ export class AvatarService {
         return !!this.repository.getAvatar(username, 'username', [], false);
     }
 
-    /**TODO MAKE THIS PRIVATE */
     private async generateRandomUsername(username : string, randomize : boolean = false) : Promise<string> {
         let newUsername : string;
         

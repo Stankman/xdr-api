@@ -1,6 +1,7 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { IAvatar } from "../interfaces/avatar.interface";
 import { Account } from "src/modules/account/entities/account.entity";
+import { AvatarSettings } from "./avatar-settings.entity";
 
 @Entity({ name: 'users'})
 export class Avatar implements IAvatar {
@@ -30,6 +31,12 @@ export class Avatar implements IAvatar {
     
     @Column()
     last_online: number;
+
+    @OneToOne(
+        () => AvatarSettings,
+        avatarSettings => avatarSettings.avatar
+    )
+    settings: AvatarSettings;
 
     @ManyToOne(
         () => Account,

@@ -5,10 +5,12 @@ import { AppConfigModule } from "src/config/app/app-config.module";
 import { AvatarsController } from "./controllers/avatars.controller";
 import { AvatarService } from './services/avatar.service';
 import { AvatarsRepository } from "./repositories/avatars.repository";
+import { AvatarSettings } from "./entities/avatar-settings.entity";
+import { AvatarsSettingsRepository } from "./repositories/avatars-settings.repository";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Avatar]),
+        TypeOrmModule.forFeature([Avatar, AvatarSettings]),
         AppConfigModule
     ],
     controllers: [
@@ -16,11 +18,13 @@ import { AvatarsRepository } from "./repositories/avatars.repository";
     ],
     providers: [
         AvatarService,
-        AvatarsRepository
+        AvatarsRepository,
+        AvatarsSettingsRepository
     ],
     exports: [
         AvatarService,
-        AvatarsRepository
+        AvatarsRepository,
+        AvatarsSettingsRepository
     ]
 })
 export class AvatarModule {}

@@ -1,4 +1,4 @@
-import { Controller, DefaultValuePipe, Get, ParseIntPipe, Query } from "@nestjs/common";
+import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Query } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
 import { Avatar } from "../entities/avatar.entity";
@@ -30,7 +30,10 @@ export class AvatarsController {
         return await this.avatarService.paginateAvatars(options, searchOptions);
     }
 
-    @Get('')
-    public async test() {
+    @Get(':id')
+    public async getAvatar(
+        @Param() params : any
+    ) : Promise<Avatar> {
+        return await this.avatarService.getAvatarById(params.id);
     }
 }

@@ -1,4 +1,5 @@
 import { Account } from "src/modules/account/entities/account.entity";
+import { AvatarSettings } from "../entities/avatar-settings.entity";
 
 export interface IAvatar {
     id: number;
@@ -10,5 +11,6 @@ export interface IAvatar {
     online: boolean;
     auth_ticket: string;
     last_online: number;
+    settings: AvatarSettings;
     account: Account;
 }
