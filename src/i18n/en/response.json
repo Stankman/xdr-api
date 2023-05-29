@@ -22,6 +22,11 @@
         "entityNotFound": {
             "any": "Entity not found",
             "user": "User not found"
+        },
+        "invalid": {
+            "avatar": {
+                "creation": "Oops an error ocurred while creating an avatar."
+            }
         }
     }
 }

@@ -15,6 +15,7 @@ import { AuthenticationModule } from './modules/auth/authentication.module';
 import { AvatarModule } from './modules/avatar/avatar.module';
 import { BanModule } from './modules/ban/ban.module';
 import { RolesModule } from './modules/role/roles.module';
+import { SettingModule } from './modules/setting/setting.module';
 
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/exceptions/exception.filter';
@@ -43,7 +44,8 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     AuthenticationModule,
     AvatarModule,
     BanModule,
-    RolesModule
+    RolesModule,
+    SettingModule
   ],
   providers: [
     {

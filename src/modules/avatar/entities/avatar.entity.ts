@@ -33,6 +33,9 @@ export class Avatar implements IAvatar {
     @Column()
     last_online: number;
 
+    @Column()
+    credits: number;
+
     @OneToOne(
         () => AvatarSettings,
         avatarSettings => avatarSettings.avatar

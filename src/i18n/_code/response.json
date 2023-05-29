@@ -22,6 +22,11 @@
         "entityNotFound": {
             "any": 404,
             "user": 4041
+        },
+        "invalid": {
+            "avatar": {
+                "creation": 4001
+            }
         }
     }
 }

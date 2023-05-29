@@ -13,6 +13,7 @@ export interface IAvatar {
     auth_ticket: string;
     last_online: number;
     settings: AvatarSettings;
+    credits: number;
     currencies : AvatarCurrency[];
     account: Account;
 }

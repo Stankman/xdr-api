@@ -10,10 +10,7 @@ export class AvatarSettingsService {
     ) {}
 
     public async createAvatarSettings(avatar : Avatar) : Promise<AvatarSettings> {
-        let settings = await this.getNewAvatarSettings();
-        
-        settings.avatar = avatar;
-
+        let settings = await this.getNewAvatarSettings(avatar);
         return this.saveAvatarSettings(settings);
     }
 
@@ -21,15 +18,14 @@ export class AvatarSettingsService {
         return this.repository.save(settings);
     }
 
-    private async getNewAvatarSettings() : Promise<AvatarSettings> {
+    private async getNewAvatarSettings(avatar : Avatar) : Promise<AvatarSettings> {
         let settings : AvatarSettings = new AvatarSettings();
-
         settings.allow_name_change = true;
         settings.can_trade = false;
         settings.block_following = false;
         settings.block_friendrequests = false;
         settings.block_roominvites = false;
-
+        settings.avatar = avatar;
         return settings;
     }
 }
