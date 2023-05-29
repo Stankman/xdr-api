@@ -7,7 +7,7 @@ export class AvatarCurrency implements IAvatarCurrency {
     @PrimaryColumn()
     user_id: number;
     
-    @Column()
+    @PrimaryColumn()
     type: number;
 
     @Column()

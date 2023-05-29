@@ -29,8 +29,9 @@ export class AccountService {
   public async createAccount(newAccountDTO : NewAccountDTO) : Promise<Account> {
     let account = await this.getNewAccount(newAccountDTO);
     account = await this.saveAccount(account);
-    await this.avatarService.generateAvatar(account);
-    return account;
+    const avatar = await this.avatarService.generateAvatar(account);
+    account.active_avatar = avatar;
+    return await this.saveAccount(account);
   }
 
   public async saveAccount(account : Account) : Promise<Account> {
