@@ -59,17 +59,17 @@ export class AvatarService {
         return this.repository.save(avatar);
     }
 
-    private async checkUsernameAvailability(username : string) : Promise<boolean> {
-        return !!this.repository.getAvatar(username, 'username', [], false);
+    private async avatarExists(username : string) : Promise<boolean> {
+        return !!await this.repository.getAvatar(username, 'username', [], false);
     }
 
     private async generateRandomUsername(username : string, randomize : boolean = false) : Promise<string> {
-        let newUsername : string;
+        let newUsername : string = username;
         
         if(randomize) {
-            newUsername = newUsername.concat(`- ${ Math.floor(Math.random() * 100) }`);
+            newUsername = newUsername.concat(`-XDR-${ Math.floor(Math.random() * 1000) }`);
         } else {
-            newUsername = username.substring(0, username.indexOf('@'));
+            newUsername = newUsername.substring(0, username.indexOf('@'));
 
             let chars : string[] = ['-', '_', '.'];
 
@@ -82,7 +82,7 @@ export class AvatarService {
             };
         }
 
-        if(!this.checkUsernameAvailability(newUsername)) {
+        if(await this.avatarExists(newUsername)) {
             return this.generateRandomUsername(newUsername, true);
         }
 
