@@ -38,7 +38,8 @@ export class Avatar implements IAvatar {
 
     @OneToOne(
         () => AvatarSettings,
-        avatarSettings => avatarSettings.avatar
+        avatarSettings => avatarSettings.avatar,
+        { cascade: true }
     )
     settings: AvatarSettings;
 
@@ -51,7 +52,8 @@ export class Avatar implements IAvatar {
 
     @OneToMany(
         () => AvatarCurrency,
-        currency => currency.avatar
+        currency => currency.avatar,
+        { cascade: true }
     )
     currencies: AvatarCurrency[];
 }

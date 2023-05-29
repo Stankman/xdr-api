@@ -31,7 +31,8 @@ export class Account implements IAccount {
 
     @OneToMany(
         () => Avatar,
-        avatar => avatar.account
+        avatar => avatar.account,
+        { cascade: true }
     )
     avatars: Avatar[];
 
