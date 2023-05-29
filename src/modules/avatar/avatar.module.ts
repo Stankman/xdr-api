@@ -9,6 +9,8 @@ import { AvatarSettings } from "./entities/avatar-settings.entity";
 import { AvatarsSettingsRepository } from "./repositories/avatars-settings.repository";
 import { AvatarSettingsService } from "./services/avatar-settings.service";
 import { AvatarCurrency } from "./entities/avatar-currency.entity";
+import { AvatarCurrencyService } from "./services/avatar-currency.service";
+import { AvatarsCurrencyRepository } from "./repositories/avatars-currency.repository";
 
 @Module({
     imports: [
@@ -22,13 +24,17 @@ import { AvatarCurrency } from "./entities/avatar-currency.entity";
         AvatarService,
         AvatarsRepository,
         AvatarSettingsService,
-        AvatarsSettingsRepository
+        AvatarsSettingsRepository,
+        AvatarCurrencyService,
+        AvatarsCurrencyRepository
     ],
     exports: [
         AvatarService,
         AvatarsRepository,
         AvatarSettingsService,
-        AvatarsSettingsRepository
+        AvatarsSettingsRepository,
+        AvatarCurrencyService,
+        AvatarsCurrencyRepository
     ]
 })
 export class AvatarModule {}
