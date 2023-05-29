@@ -1,11 +1,10 @@
 import { Injectable } from "@nestjs/common";
-import { ModelRepository } from "src/modules/shared/model.repository";
 import { DataSource } from "typeorm";
 import { XdrSetting } from "../entities/xdr-setting.entity";
-import { SettingSerializer } from "../serializers/setting.serializer";
+import { SettingsRepository } from "./settings.repository";
 
 @Injectable()
-export class XdrSettingsRepository extends ModelRepository<XdrSetting, SettingSerializer> {
+export class XdrSettingsRepository extends SettingsRepository<XdrSetting> {
     constructor(private dataSource : DataSource) {
         super(XdrSetting, dataSource.createEntityManager());
     }
