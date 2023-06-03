@@ -1,3 +1,4 @@
+import { Avatar } from "src/modules/avatar/entities/avatar.entity";
 import { RankCommand } from "../entities/rank-command.entity";
 import { RankRight } from "../entities/rank-right.entity";
 
@@ -10,7 +11,8 @@ export interface IRank {
     prefix: string;
     prefixColor: string;
     roomEffect: number;
-    logEnabled: boolean;
+    logEnabled: string;
     commands: RankCommand[];
     rights: RankRight[];
+    avatars: Avatar[];
 }

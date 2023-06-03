@@ -3,6 +3,7 @@ import { IAvatar } from "../interfaces/avatar.interface";
 import { Account } from "src/modules/account/entities/account.entity";
 import { AvatarSettings } from "./avatar-settings.entity";
 import { AvatarCurrency } from "./avatar-currency.entity";
+import { Rank } from "src/modules/rank/entities/rank.entity";
 
 @Entity({ name: 'users'})
 export class Avatar implements IAvatar {
@@ -21,8 +22,8 @@ export class Avatar implements IAvatar {
     @Column()
     gender: string;
     
-    @Column()
-    rank: number;
+    @Column({ name: "rank" })
+    rankId: number;
     
     @Column()
     online: boolean;
@@ -59,6 +60,15 @@ export class Avatar implements IAvatar {
         { cascade: true }
     )
     currencies: AvatarCurrency[];
+
+    @ManyToOne(
+        () => Rank,
+        rank => rank.avatars
+    )
+    @JoinColumn({ name: 'rank' })
+    rank: Rank
+
+    
 
     @CreateDateColumn()
     account_created: number;

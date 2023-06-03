@@ -1,6 +1,7 @@
 import { Account } from "src/modules/account/entities/account.entity";
 import { AvatarSettings } from "../entities/avatar-settings.entity";
 import { AvatarCurrency } from "../entities/avatar-currency.entity";
+import { Rank } from "src/modules/rank/entities/rank.entity";
 
 export interface IAvatar {
     id: number;
@@ -8,7 +9,7 @@ export interface IAvatar {
     motto: string;
     look: string;
     gender: string;
-    rank: number;
+    rankId: number;
     online: boolean;
     auth_ticket: string;
     last_online: number;
@@ -17,5 +18,6 @@ export interface IAvatar {
     credits: number;
     currencies : AvatarCurrency[];
     account: Account;
+    rank: Rank;
     account_created: number;
 }

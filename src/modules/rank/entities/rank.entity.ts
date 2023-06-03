@@ -2,6 +2,7 @@ import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColum
 import { IRank } from "../interfaces/rank.interface";
 import { RankCommand } from "./rank-command.entity";
 import { RankRight } from "./rank-right.entity";
+import { Avatar } from "src/modules/avatar/entities/avatar.entity";
 
 @Entity({ name: 'permission_groups' })
 export class Rank implements IRank {
@@ -30,17 +31,29 @@ export class Rank implements IRank {
     roomEffect: number;
 
     @Column({ name: 'log_enabled' })
-    logEnabled: boolean;
+    logEnabled: string;
 
     @OneToMany(
         () => RankCommand,
-        rankCommand => rankCommand.rank
+        rankCommand => rankCommand.rank,
+        {
+            cascade: true
+        }
     )
     commands: RankCommand[];
 
     @OneToMany(
         () => RankRight,
-        rankRight => rankRight.rank
+        rankRight => rankRight.rank,
+        {
+            cascade: true
+        }
     )
     rights: RankRight[];
+
+    @OneToMany(
+        () => Avatar,
+        avatar => avatar.rank
+    )
+    avatars: Avatar[];
 }

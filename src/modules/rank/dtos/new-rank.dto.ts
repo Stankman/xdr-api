@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsString, IsOptional, IsNumber, IsBoolean, ValidateNested } from "class-validator";
-import { NewRankCommandDTO } from "./new-rank-command.dto";
-import { NewRankRightDTO } from "./new-rank-right.dto";
+import { RankCommandDTO } from "./rank-command.dto";
+import { RankRightDTO } from "./rank-right.dto";
 import { Type } from "class-transformer";
 
 export class NewRankDTO {
@@ -42,12 +42,12 @@ export class NewRankDTO {
     @ApiProperty()
     @IsOptional()
     @ValidateNested({ each: true })
-    @Type(() => NewRankCommandDTO)
-    commands : NewRankCommandDTO[];
+    @Type(() => RankCommandDTO)
+    commands : RankCommandDTO[];
 
     @ApiProperty()
     @IsOptional()
     @ValidateNested({ each: true })
-    @Type(() => NewRankRightDTO)
-    rights : NewRankRightDTO[];
+    @Type(() => RankRightDTO)
+    rights : RankRightDTO[];
 }

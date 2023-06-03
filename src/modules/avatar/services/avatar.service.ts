@@ -26,7 +26,7 @@ export class AvatarService {
     }
 
     public async getAvatarById(id : number|string) : Promise<Avatar> {
-        return this.repository.getAvatar(id, 'id', ['settings']);
+        return this.repository.getAvatar(id, 'id', ['settings', 'rank']);
     }
 
     public async generateAvatar(account : Account) : Promise<Avatar> {
@@ -98,7 +98,7 @@ export class AvatarService {
         avatar.username = newAvatarDTO ? newAvatarDTO.username : await this.generateRandomUsername(account.email);
         avatar.motto = settings['hotel.initial.motto'];
         avatar.gender = newAvatarDTO ? newAvatarDTO.gender : 'M';
-        avatar.rank = 1;
+        avatar.rankId = 1;
         avatar.credits = settings['hotel.initial.credits'];
         avatar.look = settings['hotel.initial.look'];
         avatar.account_created = Date.now();

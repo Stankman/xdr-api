@@ -1,6 +1,6 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-export class NewRankRightDTO {
+export class RankRightDTO {
     @ApiProperty()
     @IsNumber()
     group_id : number;

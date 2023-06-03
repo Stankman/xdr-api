@@ -3,6 +3,7 @@ import { IAvatar } from "../interfaces/avatar.interface";
 import { Account } from "src/modules/account/entities/account.entity";
 import { AvatarSettings } from "../entities/avatar-settings.entity";
 import { AvatarCurrency } from "../entities/avatar-currency.entity";
+import { Rank } from "src/modules/rank/entities/rank.entity";
 
 export class AvatarSerializer extends ModelEntitySerializer implements IAvatar {
     id: number;
@@ -10,7 +11,7 @@ export class AvatarSerializer extends ModelEntitySerializer implements IAvatar {
     motto: string;
     look: string;
     gender: string;
-    rank: number;
+    rankId: number;
     online: boolean;
     auth_ticket: string;
     last_online: number;
@@ -20,4 +21,5 @@ export class AvatarSerializer extends ModelEntitySerializer implements IAvatar {
     currencies: AvatarCurrency[];
     account: Account;
     account_created: number;
+    rank: Rank;
 }

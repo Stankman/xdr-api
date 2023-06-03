@@ -1,8 +1,10 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-export class NewRankCommandDTO {
+
+export class RankCommandDTO {
     @ApiProperty()
     @IsNumber()
+    @IsOptional()
     group_id : number;
 
     @ApiProperty()
