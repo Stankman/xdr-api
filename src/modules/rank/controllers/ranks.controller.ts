@@ -25,7 +25,12 @@ export class RanksController {
             route: this.appConfigService.fullUrl
         };
 
-        let searchOptions : FindManyOptions<Rank> = {}
+        let searchOptions : FindManyOptions<Rank> = {
+            relations: [
+                "commands",
+                "rights"
+            ]
+        }
 
         return await this.rankService.paginateRanks(options, searchOptions);
     }
