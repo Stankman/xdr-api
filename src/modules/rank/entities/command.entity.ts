@@ -1,6 +1,6 @@
-import { Column, Entity, ManyToMany, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { ICommand } from "../interfaces/command.interface";
-import { Rank } from "./rank.entity";
+import { RankCommand } from "./rank-command.entity";
 
 @Entity({ name: 'permission_commands' })
 export class Command implements ICommand {
@@ -13,9 +13,9 @@ export class Command implements ICommand {
     @Column()
     keys: string;
 
-    @ManyToMany(
-        () => Rank,
-        rank => rank.commands
+    @OneToMany(
+        () => RankCommand,
+        rankCommand => rankCommand.command
     )
-    ranks: Rank[];
+    rankCommands: RankCommand[];
 }

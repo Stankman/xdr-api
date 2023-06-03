@@ -7,7 +7,7 @@ export class NewRankRightDTO {
 
     @ApiProperty()
     @IsString()
-    command_name : string;
+    right_name : string;
 
     @ApiProperty()
     @IsNumber()

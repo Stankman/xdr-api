@@ -27,8 +27,8 @@ export class RanksController {
 
         let searchOptions : FindManyOptions<Rank> = {
             relations: [
-                "commands",
-                "rights"
+                "rights.right",
+                "commands.command"
             ]
         }
 

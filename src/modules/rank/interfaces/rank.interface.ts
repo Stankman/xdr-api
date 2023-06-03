@@ -1,5 +1,5 @@
-import { Command } from "../entities/command.entity";
-import { Right } from "../entities/right.entity";
+import { RankCommand } from "../entities/rank-command.entity";
+import { RankRight } from "../entities/rank-right.entity";
 
 export interface IRank {
     id: number;
@@ -11,6 +11,6 @@ export interface IRank {
     prefixColor: string;
     roomEffect: number;
     logEnabled: boolean;
-    commands: Command[];
-    rights: Right[];
+    commands: RankCommand[];
+    rights: RankRight[];
 }

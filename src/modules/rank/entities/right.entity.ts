@@ -1,6 +1,6 @@
-import { Entity, Column, PrimaryColumn, ManyToMany } from "typeorm";
+import { Entity, Column, PrimaryColumn, ManyToMany, OneToMany } from "typeorm";
 import { IRight } from "../interfaces/right.interface";
-import { Rank } from "./rank.entity";
+import { RankRight } from "./rank-right.entity";
 
 @Entity({ name: 'permission_rights' })
 export class Right implements IRight {
@@ -10,9 +10,9 @@ export class Right implements IRight {
     @Column()
     description: string;
 
-    @ManyToMany(
-        () => Rank,
-        rank => rank.rights
+    @OneToMany(
+        () => RankRight,
+        rankRight => rankRight.right
     )
-    ranks: Rank[];
+    rankRights: RankRight[];
 }

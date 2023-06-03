@@ -1,7 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, IsNumber, IsBoolean } from "class-validator";
+import { IsString, IsOptional, IsNumber, IsBoolean, ValidateNested } from "class-validator";
+import { NewRankCommandDTO } from "./new-rank-command.dto";
+import { NewRankRightDTO } from "./new-rank-right.dto";
+import { Type } from "class-transformer";
 
-export class NewAccountDTO {
+export class NewRankDTO {
     @ApiProperty()    
     @IsString()
     name : string;
@@ -35,4 +38,16 @@ export class NewAccountDTO {
     @IsBoolean()
     @IsOptional()
     log_enabled : boolean;
+
+    @ApiProperty()
+    @IsOptional()
+    @ValidateNested({ each: true })
+    @Type(() => NewRankCommandDTO)
+    commands : NewRankCommandDTO[];
+
+    @ApiProperty()
+    @IsOptional()
+    @ValidateNested({ each: true })
+    @Type(() => NewRankRightDTO)
+    rights : NewRankRightDTO[];
 }

@@ -13,10 +13,16 @@ import { RightService } from './services/right.service';
 import { RightsRepository } from './repositories/rights.repository';
 import { CommandsController } from './controllers/commands.controller';
 import { RightsController } from './controllers/rights.controller';
+import { RankCommand } from './entities/rank-command.entity';
+import { RankRight } from './entities/rank-right.entity';
+import { RankCommandService } from './services/rank-command.service';
+import { RankCommandsRepository } from './repositories/rank-commands.repository';
+import { RankRightService } from './services/rank-right.service';
+import { RankRightsRepository } from './repositories/rank-rights.repository';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Rank, Command, Right]),
+        TypeOrmModule.forFeature([Rank, Command, Right, RankCommand, RankRight]),
         AppConfigModule
     ],
     controllers: [
@@ -30,7 +36,11 @@ import { RightsController } from './controllers/rights.controller';
         CommandService,
         CommandsRepository,
         RightService,
-        RightsRepository
+        RightsRepository,
+        RankCommandService,
+        RankCommandsRepository,
+        RankRightService,
+        RankRightsRepository
     ],
     exports: [
         RankService,
@@ -38,7 +48,11 @@ import { RightsController } from './controllers/rights.controller';
         CommandService,
         CommandsRepository,
         RightService,
-        RightsRepository
+        RightsRepository,
+        RankCommandService,
+        RankCommandsRepository,
+        RankRightService,
+        RankRightsRepository
     ]
 })
 export class RankModule {}
