@@ -44,7 +44,7 @@ export class AccountService {
 
   public async getAccountById(id : number|string, withRoles : boolean = false) : Promise<Account> {
     let relations : string[] = [
-      'active_avatar'
+      'active_avatar', 'active_avatar.currencies', 'active_avatar.rank'
     ];
 
     if(withRoles) {
@@ -61,7 +61,11 @@ export class AccountService {
   }
 
   public async accountExists(email : string = '', transformOptions : any = {}, throwErrors : boolean = false) : Promise<Account> {
-    return await this.repository.getAccount(email, 'email', [], throwErrors, transformOptions) ?? null;
+    let relations : string[] = [
+      'active_avatar', 'active_avatar.currencies', 'active_avatar.rank'
+    ];
+    
+    return await this.repository.getAccount(email, 'email', relations, throwErrors, transformOptions) ?? null;
   }
 
   public async getNewAccount(newAccountDTO : NewAccountDTO) : Promise<Account> {

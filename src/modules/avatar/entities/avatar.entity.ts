@@ -42,8 +42,7 @@ export class Avatar implements IAvatar {
 
     @OneToOne(
         () => AvatarSettings,
-        avatarSettings => avatarSettings.avatar,
-        { cascade: true }
+        avatarSettings => avatarSettings.avatar
     )
     settings: AvatarSettings;
 
@@ -56,8 +55,7 @@ export class Avatar implements IAvatar {
 
     @OneToMany(
         () => AvatarCurrency,
-        currency => currency.avatar,
-        { cascade: true }
+        currency => currency.avatar
     )
     currencies: AvatarCurrency[];
 
@@ -67,8 +65,6 @@ export class Avatar implements IAvatar {
     )
     @JoinColumn({ name: 'rank' })
     rank: Rank
-
-    
 
     @CreateDateColumn()
     account_created: number;

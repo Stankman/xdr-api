@@ -36,4 +36,9 @@ export class AvatarsController {
     ) : Promise<Avatar> {
         return await this.avatarService.getAvatarById(params.id);
     }
+
+    // @Put(':id')
+    // public async updateAvatar() : Promise<Avatar> {
+    //     return await this.avatarService.updateAvatar();
+    // }
 }
