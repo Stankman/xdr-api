@@ -42,14 +42,12 @@ export class AvatarService {
     }
 
     public async setAvatarProperties(avatar : Avatar) : Promise<Avatar> {
-        const avatarSettings : AvatarSettings = await this.avatarSettingsService.createAvatarSettings();
         const avatarCurrencies : AvatarCurrency[] = [];
 
         for(let currency of await this.xdrSettingService.getInitialCurrency()) {
             avatarCurrencies.push(await this.avatarCurrencyService.createAvatarCurrency(currency['type'], currency['amount']));
         }
 
-        avatar.settings = avatarSettings;
         avatar.currencies = avatarCurrencies;
 
         return avatar;
