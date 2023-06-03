@@ -31,10 +31,10 @@ export class AccountService {
     const avatar = await this.avatarService.generateAvatar(account);
     account.avatars = [avatar];
     account.active_avatar = avatar;
-    return await this.saveAccount(account);
+    return await this.save(account);
   }
 
-  public async saveAccount(account : Account) : Promise<Account> {
+  public async save(account : Account) : Promise<Account> {
     return this.repository.save(account);
   }
 
@@ -43,7 +43,9 @@ export class AccountService {
   }
 
   public async getAccountById(id : number|string, withRoles : boolean = false) : Promise<Account> {
-    let relations : string[] = [];
+    let relations : string[] = [
+      'active_avatar'
+    ];
 
     if(withRoles) {
       relations.push('roles');

@@ -14,6 +14,7 @@ import { ArticleModule } from './modules/article/article.module';
 import { AuthenticationModule } from './modules/auth/authentication.module';
 import { AvatarModule } from './modules/avatar/avatar.module';
 import { BanModule } from './modules/ban/ban.module';
+import { RankModule } from './modules/rank/rank.module';
 import { RolesModule } from './modules/role/roles.module';
 import { SettingModule } from './modules/setting/setting.module';
 
@@ -44,8 +45,9 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     AuthenticationModule,
     AvatarModule,
     BanModule,
+    RankModule,
     RolesModule,
-    SettingModule
+    SettingModule,
   ],
   providers: [
     {

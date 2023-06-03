@@ -12,7 +12,7 @@ export class AvatarSettingsService {
         return await this.getNewAvatarSettings();
     }
 
-    public async saveAvatarSettings(settings : AvatarSettings) : Promise<AvatarSettings> {
+    public async save(settings : AvatarSettings) : Promise<AvatarSettings> {
         return this.repository.save(settings);
     }
 

@@ -19,10 +19,4 @@ export class XdrSettingsController {
     ) : Promise<XdrSetting> {
         return this.xdrSettingService.getSettingByKey(key);
     }
-
-    @Get('initial')
-    public async getInitialSettings() : Promise<any> {
-        let settings : Object = await this.xdrSettingService.getInitialCurrency();
-        return settings;
-    }
 }

@@ -31,17 +31,17 @@ export class AvatarService {
 
     public async generateAvatar(account : Account) : Promise<Avatar> {
         let avatar = await this.getNewAvatar(null, account);
-        this.newAvatar(avatar);
-        return await this.saveAvatar(avatar);
+        avatar = await this.setAvatarProperties(avatar);
+        return await this.save(avatar);
     }
 
     public async createAvatar(newAvatarDTO : NewAvatarDTO) : Promise<Avatar> {
         let avatar : Avatar = await this.getNewAvatar(newAvatarDTO);
-        this.newAvatar(avatar);
-        return await this.saveAvatar(avatar);
+        avatar = await this.setAvatarProperties(avatar);
+        return await this.save(avatar);
     }
 
-    public async newAvatar(avatar : Avatar) : Promise<Avatar> {
+    public async setAvatarProperties(avatar : Avatar) : Promise<Avatar> {
         const avatarSettings : AvatarSettings = await this.avatarSettingsService.createAvatarSettings();
         const avatarCurrencies : AvatarCurrency[] = [];
 
@@ -55,7 +55,7 @@ export class AvatarService {
         return avatar;
     }
 
-    public async saveAvatar(avatar : Avatar) : Promise<Avatar> {
+    public async save(avatar : Avatar) : Promise<Avatar> {
         return this.repository.save(avatar);
     }
 
@@ -99,9 +99,11 @@ export class AvatarService {
 
         avatar.username = newAvatarDTO ? newAvatarDTO.username : await this.generateRandomUsername(account.email);
         avatar.motto = settings['hotel.initial.motto'];
-        avatar.gender = 'M';
+        avatar.gender = newAvatarDTO ? newAvatarDTO.gender : 'M';
         avatar.rank = 1;
         avatar.credits = settings['hotel.initial.credits'];
+        avatar.look = settings['hotel.initial.look'];
+        avatar.account_created = Date.now();
 
         return avatar;
     }

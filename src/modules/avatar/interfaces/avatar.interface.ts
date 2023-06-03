@@ -12,8 +12,10 @@ export interface IAvatar {
     online: boolean;
     auth_ticket: string;
     last_online: number;
+    last_login: number;
     settings: AvatarSettings;
     credits: number;
     currencies : AvatarCurrency[];
     account: Account;
+    account_created: number;
 }

@@ -10,10 +10,10 @@ export class AvatarCurrencyService {
     ) {}
 
     public async createAvatarCurrency(type : number, amount : number) : Promise<AvatarCurrency> {
-        return await this.getNewAvatarCurrency(type, amount)
+        return await this.getNewAvatarCurrency(type, amount);
     }
 
-    public async saveAvatarCurrency(currency : AvatarCurrency) : Promise<AvatarCurrency> {
+    public async save(currency : AvatarCurrency) : Promise<AvatarCurrency> {
         return this.repository.save(currency);
     }
 

@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { IAvatar } from "../interfaces/avatar.interface";
 import { Account } from "src/modules/account/entities/account.entity";
 import { AvatarSettings } from "./avatar-settings.entity";
@@ -34,6 +34,9 @@ export class Avatar implements IAvatar {
     last_online: number;
 
     @Column()
+    last_login: number;
+
+    @Column()
     credits: number;
 
     @OneToOne(
@@ -56,4 +59,7 @@ export class Avatar implements IAvatar {
         { cascade: true }
     )
     currencies: AvatarCurrency[];
+
+    @CreateDateColumn()
+    account_created: number;
 }
