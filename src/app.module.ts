@@ -17,6 +17,7 @@ import { BanModule } from './modules/ban/ban.module';
 import { RankModule } from './modules/rank/rank.module';
 import { RolesModule } from './modules/role/roles.module';
 import { SettingModule } from './modules/setting/setting.module';
+import { ShopModule } from './modules/shop/shop.module';
 
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/exceptions/exception.filter';
@@ -48,6 +49,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     RankModule,
     RolesModule,
     SettingModule,
+    ShopModule
   ],
   providers: [
     {

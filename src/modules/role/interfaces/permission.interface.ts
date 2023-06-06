@@ -1,6 +1,6 @@
 import { Role } from "../entities/role.entity";
 
-export interface IRolePermission {
+export interface IPermission {
     id : number;
     name : string;
     description : string;

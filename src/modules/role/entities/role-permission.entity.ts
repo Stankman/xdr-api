@@ -1,10 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany } from "typeorm";
-import { IRolePermission } from "../interfaces/role-permission.interface";
+import { IPermission } from "../interfaces/permission.interface";
 import { Role } from "./role.entity";
 
 @Entity({ name: 'xdr_role_permissions' })
-export class RolePermission implements IRolePermission {
+export class RolePermission implements IPermission {
     @ApiProperty({ example: 1, description: 'The role permission ID' })
     @PrimaryGeneratedColumn()
     id: number;

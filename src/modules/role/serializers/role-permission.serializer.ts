@@ -1,13 +1,13 @@
 import { Expose } from "class-transformer";
 import { ModelEntitySerializer } from "src/common/serializers/model.serializer";
-import { IRolePermission } from "../interfaces/role-permission.interface";
+import { IPermission } from "../interfaces/permission.interface";
 import { Role } from "../entities/role.entity";
 
 export const defaultRolePermissionGroupsForSerializing: string[] = [
     'role_permission.timestamps'
 ];
 
-export class RolePermissionSerializer extends ModelEntitySerializer implements IRolePermission {
+export class RolePermissionSerializer extends ModelEntitySerializer implements IPermission {
     id: number;
     
     name: string;
