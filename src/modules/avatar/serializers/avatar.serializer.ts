@@ -4,6 +4,7 @@ import { Account } from "src/modules/account/entities/account.entity";
 import { AvatarSettings } from "../entities/avatar-settings.entity";
 import { AvatarCurrency } from "../entities/avatar-currency.entity";
 import { Rank } from "src/modules/rank/entities/rank.entity";
+import { ShopPayment } from "src/modules/shop/entities/shop-payment.entity";
 
 export class AvatarSerializer extends ModelEntitySerializer implements IAvatar {
     id: number;
@@ -22,4 +23,5 @@ export class AvatarSerializer extends ModelEntitySerializer implements IAvatar {
     account: Account;
     account_created: number;
     rank: Rank;
+    payments: ShopPayment[];
 }

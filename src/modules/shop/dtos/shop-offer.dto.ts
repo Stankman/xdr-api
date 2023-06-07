@@ -8,6 +8,7 @@ export class ShopOfferDTO {
     id: number;
     
     @IsString()
+    @IsOptional()
     @ApiProperty()
     title: string;
     

@@ -5,6 +5,7 @@ import * as path from 'path';
 import { AppConfigModule } from './config/app/app-config.module';
 import { Argon2ConfigModule } from './config/argon2/argon2-config.module';
 import { MySQLConfigModule } from './config/mysql/mysql-config.module';
+import { RconConfigModule } from './config/rcon/rcon-config.module';
 import { TokenConfigModule } from './config/token/token-config.module';
 
 import { MySQLProviderModule } from './providers/database/mysql/mysql-provider.module';
@@ -15,6 +16,7 @@ import { AuthenticationModule } from './modules/auth/authentication.module';
 import { AvatarModule } from './modules/avatar/avatar.module';
 import { BanModule } from './modules/ban/ban.module';
 import { RankModule } from './modules/rank/rank.module';
+import { RconModule } from './modules/rcon/rcon.module';
 import { RolesModule } from './modules/role/roles.module';
 import { SettingModule } from './modules/setting/setting.module';
 import { ShopModule } from './modules/shop/shop.module';
@@ -37,6 +39,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     AppConfigModule,
     Argon2ConfigModule,
     MySQLConfigModule,
+    RconConfigModule,
     TokenConfigModule,
 
     MySQLProviderModule,
@@ -47,6 +50,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     AvatarModule,
     BanModule,
     RankModule,
+    RconModule,
     RolesModule,
     SettingModule,
     ShopModule

@@ -26,6 +26,12 @@
         "invalid": {
             "avatar": {
                 "creation": 4001
+            },
+            "shop": {
+                "payment": {
+                    "duplicate": 4002,
+                    "completed": 4003
+                }
             }
         }
     }

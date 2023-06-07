@@ -14,19 +14,19 @@ import { ChangeEmailDTO } from '../dtos/change-email.dto';
 export class AccountController {
 
     constructor(
-        private readonly accountsService : AccountService,
+        private readonly accountService : AccountService,
         private readonly accountSettingsService : AccountSettingsService
     ) {}
 
     @Get()
     public async getLoggedAccount(@Req() req : Request) : Promise<Account> {
-        return await this.accountsService.getLoggedAccount(req);
+        return await this.accountService.getLoggedAccount(req);
     }
 
     @ApiBody({ type: [ChangePasswordDTO] })
     @Put('/settings/change-password')
     public async changePassword(@Req() req : Request, @Body() changePassword : ChangePasswordDTO) {
-        let account : Account = await this.accountsService.getLoggedAccount(req);
+        let account : Account = await this.accountService.getLoggedAccount(req);
 
         return await this.accountSettingsService.changePassword(account, changePassword);
     }
@@ -34,7 +34,7 @@ export class AccountController {
     @ApiBody({ type: [ChangeEmailDTO] })
     @Put('/settings/change-email')
     public async changeEmail(@Req() req : Request, @Body() changeEmail : ChangeEmailDTO) {
-        let account : Account = await this.accountsService.getLoggedAccount(req);
+        let account : Account = await this.accountService.getLoggedAccount(req);
 
         return await this.accountSettingsService.changeEmail(account, changeEmail);
     }

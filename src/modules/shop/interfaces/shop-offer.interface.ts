@@ -1,8 +1,12 @@
+import { ShopPayment } from "../entities/shop-payment.entity";
+
 export interface IShopOffer {
     id: number;
     title: string;
     description: string;
     image: string;
-    price: number;
-    data: any;
+    price: string;
+    currency: string;
+    data: string;
+    purchases: ShopPayment[];
 }

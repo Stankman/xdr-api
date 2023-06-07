@@ -1,7 +1,11 @@
-import { IsString } from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 
 export class NewPurchaseDTO {
-    //TODO AVATAR ID & OFFER ID
+    @IsNumber()
+    avatarId: number;
+
+    @IsNumber()
+    offerId: number;
 
     @IsString()
     orderId: string;
@@ -11,7 +15,4 @@ export class NewPurchaseDTO {
 
     @IsString()
     status: string;
-    
-    @IsString()
-    delivered: string;
 }

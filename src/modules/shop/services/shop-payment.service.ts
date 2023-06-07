@@ -5,16 +5,34 @@ import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-
 import { FindOptionsWhere, FindManyOptions } from "typeorm";
 import { NewPurchaseDTO } from "../dtos/new-purchase.dto";
 import { PurchaseStatusDTO } from "../dtos/purchase-status.dto";
+import { RconService } from "src/modules/rcon/services/rcon.service";
+import { ShopOfferService } from "./shop-offer.service";
+import { AvatarService } from "src/modules/avatar/services/avatar.service";
+import { ShopOffer } from "../entities/shop-offer.entity";
+import { Avatar } from "src/modules/avatar/entities/avatar.entity";
+import { DuplicatePaymentException } from "../exceptions/duplicate-payment.exception";
 
 @Injectable()
 export class ShopPaymentService {
+    private readonly COMPLETED : string = "COMPLETED";
+    private readonly CANCELLED : string = "CANCELLED";
+    private readonly DELIVERED_YES : string = "YES";
+
     constructor(
-        private readonly repository : ShopPaymentsRepository
+        private readonly repository : ShopPaymentsRepository,
+        private readonly rconService : RconService,
+        private readonly shopOfferService : ShopOfferService,
+        private readonly avatarService : AvatarService
     ) {}
 
-    public async createNewPayment(newPurchaseDTO : NewPurchaseDTO) : Promise<ShopPayment> {
-        const payment : ShopPayment = await this.getNewPayment(newPurchaseDTO);
+    public async createNewPayment(newPurchaseDTO : NewPurchaseDTO, loggedAvatar : Avatar) : Promise<ShopPayment> {
+        const existingOrder : ShopPayment = await this.repository.getPayment(newPurchaseDTO.orderId, 'orderId');
 
+        if(existingOrder) {
+            throw new DuplicatePaymentException();
+        }
+
+        const payment : ShopPayment = await this.getNewPayment(newPurchaseDTO, loggedAvatar);
         return this.repository.save(payment);
     }
 
@@ -27,25 +45,30 @@ export class ShopPaymentService {
     }
 
     public async updatePaymentStatus(purchaseStatusDTO : PurchaseStatusDTO) : Promise<ShopPayment> {
-        const payment : ShopPayment = await this.repository.getPayment(purchaseStatusDTO.orderId, 'order_id');
+        const payment : ShopPayment = await this.repository.getPayment(purchaseStatusDTO.orderId, 'orderId', ['offer','avatar']);
         
         payment.status = purchaseStatusDTO.status;
-        payment.delivered = purchaseStatusDTO.delivered;
+
+        if(payment.delivered === this.DELIVERED_YES || payment.status === this.COMPLETED || payment.status === this.CANCELLED) {
+            throw new DuplicatePaymentException();
+        } else {
+            this.rconService.executeData(payment.offer.data, payment.avatar.id);
+            payment.delivered = this.DELIVERED_YES;
+        }
 
         return this.repository.save(payment);
     }
 
-    private async getNewPayment(newPurchaseDTO : NewPurchaseDTO) : Promise<ShopPayment> {
-        //Get Offer
-
-        //Get Avatar
+    private async getNewPayment(newPurchaseDTO : NewPurchaseDTO, loggedAvatar : Avatar) : Promise<ShopPayment> {
+        const offer : ShopOffer = await this.shopOfferService.getOfferById(newPurchaseDTO.offerId);
         
         const payment : ShopPayment = new ShopPayment();
-        //payment.avatar = avatar;
-        // payment.offer = offer;
+        payment.avatar = loggedAvatar;
+        payment.offer = offer;
         payment.orderId = newPurchaseDTO.orderId;
         payment.payerId = newPurchaseDTO.payerId;
         payment.status = newPurchaseDTO.status;
+        payment.createdAt = new Date();
         return payment;
     }
 }

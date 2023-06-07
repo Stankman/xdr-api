@@ -12,6 +12,8 @@ import { AppConfigModule } from 'src/config/app/app-config.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ShopOffer } from './entities/shop-offer.entity';
 import { ShopPayment } from './entities/shop-payment.entity';
+import { RconModule } from '../rcon/rcon.module';
+import { AvatarModule } from '../avatar/avatar.module';
 
 @Module({
     imports: [
@@ -19,7 +21,9 @@ import { ShopPayment } from './entities/shop-payment.entity';
             ShopOffer,
             ShopPayment
         ]),
-        AppConfigModule
+        AppConfigModule,
+        AvatarModule,
+        RconModule
     ],
     controllers: [ShopController],
     providers: [

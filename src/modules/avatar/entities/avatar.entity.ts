@@ -4,6 +4,7 @@ import { Account } from "src/modules/account/entities/account.entity";
 import { AvatarSettings } from "./avatar-settings.entity";
 import { AvatarCurrency } from "./avatar-currency.entity";
 import { Rank } from "src/modules/rank/entities/rank.entity";
+import { ShopPayment } from "src/modules/shop/entities/shop-payment.entity";
 
 @Entity({ name: 'users'})
 export class Avatar implements IAvatar {
@@ -65,6 +66,12 @@ export class Avatar implements IAvatar {
     )
     @JoinColumn({ name: 'rank' })
     rank: Rank
+
+    @OneToMany(
+        () => ShopPayment,
+        payment => payment.avatar
+    )
+    payments: ShopPayment[];
 
     @CreateDateColumn()
     account_created: number;

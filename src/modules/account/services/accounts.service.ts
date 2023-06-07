@@ -77,7 +77,6 @@ export class AccountService {
     account.ip_current = newAccountDTO.ip;
     account.ip_register = newAccountDTO.ip;
     account.created_at = new Date();
-
     return account;
 }
 }

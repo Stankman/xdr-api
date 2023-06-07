@@ -3,6 +3,7 @@ import { ShopOffersRepository } from "../repositories/shop-offers.repository";
 import { ShopOffer } from "../entities/shop-offer.entity";
 import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
 import { FindOptionsWhere, FindManyOptions } from "typeorm";
+import { NewShopOfferDTO } from "../dtos/new-shop-offer.dto";
 
 @Injectable()
 export class ShopOfferService {
@@ -10,8 +11,8 @@ export class ShopOfferService {
         private readonly repository : ShopOffersRepository
     ) {}
 
-    public async createNewOffer(shopOfferDTO : ShopOfferDTO) : Promise<ShopOffer> {
-        const offer : ShopOffer = await this.getNewOffer(shopOfferDTO);
+    public async createNewOffer(newShopOfferDTO : NewShopOfferDTO) : Promise<ShopOffer> {
+        const offer : ShopOffer = await this.getNewOffer(newShopOfferDTO);
         return this.repository.save(offer);
     }
 
@@ -23,13 +24,14 @@ export class ShopOfferService {
         return this.repository.getOffer(id);
     }
 
-    private async getNewOffer(shopOfferDTO : ShopOfferDTO) : Promise<ShopOffer> {
+    private async getNewOffer(newShopOfferDTO : NewShopOfferDTO) : Promise<ShopOffer> {
         const offer : ShopOffer = new ShopOffer();
-        offer.title = shopOfferDTO.title;
-        offer.description = shopOfferDTO.description;
-        offer.image = shopOfferDTO.image;
-        offer.price = shopOfferDTO.price;
-        offer.data = shopOfferDTO.data; //TODO Maybe JSON to string
+        offer.title = newShopOfferDTO.title;
+        offer.description = newShopOfferDTO.description;
+        offer.image = newShopOfferDTO.image;
+        offer.price = newShopOfferDTO.price;
+        offer.currency = newShopOfferDTO.currency;
+        offer.data = newShopOfferDTO.data;
         return offer;
     }
 }

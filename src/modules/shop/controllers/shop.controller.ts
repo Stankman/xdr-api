@@ -1,5 +1,6 @@
-import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Put, Query, Req } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 import { ShopOfferService } from '../services/shop-offer.service';
 import { ShopPaymentService } from '../services/shop-payment.service';
 import { Pagination, IPaginationMeta, IPaginationOptions } from 'nestjs-typeorm-paginate';
@@ -8,20 +9,23 @@ import { ShopPayment } from '../entities/shop-payment.entity';
 import { AppConfigService } from 'src/config/app/app-config.service';
 import { FindManyOptions } from 'typeorm';
 import { NewPurchaseDTO } from '../dtos/new-purchase.dto';
-import { ShopOfferDTO } from '../dtos/shop-offer.dto';
 import { PurchaseStatusDTO } from '../dtos/purchase-status.dto';
+import { NewShopOfferDTO } from '../dtos/new-shop-offer.dto';
+import { AccountService } from 'src/modules/account/services/accounts.service';
+import { Avatar } from 'src/modules/avatar/entities/avatar.entity';
 
 @ApiTags('Shop')
 @Controller('shop')
 export class ShopController {
     constructor(
+        private readonly accountService : AccountService,
         private readonly shopOfferService : ShopOfferService,
         private readonly shopPaymentService : ShopPaymentService,
         private readonly appConfigService : AppConfigService
     ) {}
 
     @Get('offers/all')
-    public async paginateShopOffers(
+    public async getPaginatedOffers(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page : number = 1, 
         @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit : number = 10
     ) : Promise<Pagination<ShopOffer, IPaginationMeta>> {
@@ -53,17 +57,18 @@ export class ShopController {
     }
 
     @Post('offers')
-    public async createOffer(@Body() shopOfferDTO : ShopOfferDTO) : Promise<ShopOffer> {
-        return this.shopOfferService.createNewOffer(shopOfferDTO);
+    public async createOffer(@Body() newShopOfferDTO : NewShopOfferDTO) : Promise<ShopOffer> {
+        return this.shopOfferService.createNewOffer(newShopOfferDTO);
     }
 
     @Post('purchase')
-    public async purchaseOffer(@Body() newPurchaseDTO : NewPurchaseDTO) : Promise<ShopPayment> {
-        return this.shopPaymentService.createNewPayment(newPurchaseDTO);
+    public async makePayment(@Req() req : Request, @Body() newPurchaseDTO : NewPurchaseDTO) : Promise<ShopPayment> {
+        const loggedAvatar : Avatar = (await this.accountService.getLoggedAccount(req)).active_avatar;
+        return this.shopPaymentService.createNewPayment(newPurchaseDTO, loggedAvatar);
     }
 
     @Put('purchase')
-    public async updatePurchaseStatus(@Body() purchaseStatusDTO : PurchaseStatusDTO) : Promise<ShopPayment> {
+    public async updatePaymentStatus(@Body() purchaseStatusDTO : PurchaseStatusDTO) : Promise<ShopPayment> {
         return this.shopPaymentService.updatePaymentStatus(purchaseStatusDTO);
     }
 
