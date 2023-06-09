@@ -7,7 +7,6 @@ import { AccountService } from "../services/accounts.service";
 import { Permission } from "src/common/decorators/permission.decorator";
 import { RolesGuard } from "../../../common/guards/roles.guard";
 import { AuthGuard } from '../../../common/guards/auth.guard';
-import { AccountsRolesService } from "../services/accounts-roles.service";
 import { AssignRoleDTO } from "../dtos/assign-role.dto";
 
 @ApiTags('Accounts')
@@ -16,7 +15,6 @@ export class AccountsController {
     
     constructor(
         private readonly accountsService : AccountService,
-        private readonly accountsRolesService : AccountsRolesService,
         private readonly appConfigService : AppConfigService
     ) {}
 
@@ -41,10 +39,5 @@ export class AccountsController {
         @Query('value', new DefaultValuePipe('0')) value : string = '0'
     ) : Promise<Account> {
         return await this.accountsService.getAccountById(value);
-    }
-
-    @Post('/assign/role')
-    public async assignRole(@Req() req : Request, @Body() assignRoleDTO : AssignRoleDTO) {
-        return await this.accountsRolesService.assignRole(assignRoleDTO);
     }
 }

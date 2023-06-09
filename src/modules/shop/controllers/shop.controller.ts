@@ -1,4 +1,4 @@
-import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Put, Query, Req } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { ShopOfferService } from '../services/shop-offer.service';
@@ -13,8 +13,11 @@ import { PurchaseStatusDTO } from '../dtos/purchase-status.dto';
 import { NewShopOfferDTO } from '../dtos/new-shop-offer.dto';
 import { AccountService } from 'src/modules/account/services/accounts.service';
 import { Avatar } from 'src/modules/avatar/entities/avatar.entity';
+import { Account } from 'src/modules/account/entities/account.entity';
+import { AuthGuard } from 'src/common/guards/auth.guard';
 
 @ApiTags('Shop')
+@UseGuards(AuthGuard)
 @Controller('shop')
 export class ShopController {
     constructor(
@@ -63,7 +66,8 @@ export class ShopController {
 
     @Post('purchase')
     public async makePayment(@Req() req : Request, @Body() newPurchaseDTO : NewPurchaseDTO) : Promise<ShopPayment> {
-        const loggedAvatar : Avatar = (await this.accountService.getLoggedAccount(req)).active_avatar;
+        const loggedAccount : Account = (await this.accountService.getLoggedAccount(req));
+        const loggedAvatar : Avatar = loggedAccount.active_avatar;
         return this.shopPaymentService.createNewPayment(newPurchaseDTO, loggedAvatar);
     }
 

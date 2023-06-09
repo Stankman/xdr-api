@@ -26,7 +26,7 @@ export class ShopPaymentService {
     ) {}
 
     public async createNewPayment(newPurchaseDTO : NewPurchaseDTO, loggedAvatar : Avatar) : Promise<ShopPayment> {
-        const existingOrder : ShopPayment = await this.repository.getPayment(newPurchaseDTO.orderId, 'orderId');
+        const existingOrder : ShopPayment = await this.repository.getPayment(newPurchaseDTO.orderId, 'orderId', [], false);
 
         if(existingOrder) {
             throw new DuplicatePaymentException();
@@ -46,12 +46,11 @@ export class ShopPaymentService {
 
     public async updatePaymentStatus(purchaseStatusDTO : PurchaseStatusDTO) : Promise<ShopPayment> {
         const payment : ShopPayment = await this.repository.getPayment(purchaseStatusDTO.orderId, 'orderId', ['offer','avatar']);
-        
-        payment.status = purchaseStatusDTO.status;
 
         if(payment.delivered === this.DELIVERED_YES || payment.status === this.COMPLETED || payment.status === this.CANCELLED) {
             throw new DuplicatePaymentException();
         } else {
+            payment.status = purchaseStatusDTO.status;
             this.rconService.executeData(payment.offer.data, payment.avatar.id);
             payment.delivered = this.DELIVERED_YES;
         }

@@ -1,6 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinTable, ManyToMany, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, OneToMany, JoinColumn } from 'typeorm';
 import { IAccount } from "../interfaces/account.interface";
-import { Role } from 'src/modules/role/entities/role.entity';
 import { Avatar } from 'src/modules/avatar/entities/avatar.entity';
 
 @Entity({ name: 'xdr_accounts'})
@@ -38,10 +37,4 @@ export class Account implements IAccount {
     @JoinColumn({ name: 'active_avatar_id'})
     @OneToOne(() => Avatar)
     active_avatar: Avatar;
-
-    @ManyToMany(
-        () => Role,
-        role => role.accounts
-    )
-    roles : Role[];
 }

@@ -39,8 +39,6 @@ export class AccountSerializer extends ModelEntitySerializer implements IAccount
   @Exclude()
   updated_at: Date;
 
-  roles : Role[];
-
   avatars: Avatar[];
 
   active_avatar: Avatar;

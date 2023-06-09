@@ -17,7 +17,7 @@ import { DatabaseType } from "typeorm";
                 username: mySQLConfigService.username,
                 password: mySQLConfigService.password,
                 autoLoadEntities: true,
-                logging: true //Show SQL Queries
+                logging: false //Show SQL Queries
             }),
             inject: [MySQLConfigService]
         } as TypeOrmModuleAsyncOptions)

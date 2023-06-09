@@ -1,8 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, JoinTable, OneToMany, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, JoinTable } from "typeorm";
 import { IRole } from "../interfaces/role.interface";
 import { RolePermission } from "./role-permission.entity";
-import { Account } from "src/modules/account/entities/account.entity";
 
 @Entity({ name: 'xdr_roles' })
 export class Role implements IRole {
@@ -43,22 +42,4 @@ export class Role implements IRole {
         },
   })
   permissions : RolePermission[];
-
-  @ApiProperty()
-  @ManyToMany(
-    () => Account,
-    account => account.roles
-  )
-  @JoinTable({
-    name: 'xdr_accounts_roles',
-    joinColumn: {
-        name: 'role_id',
-        referencedColumnName: 'id',
-      },
-      inverseJoinColumn: {
-        name: 'account_id',
-        referencedColumnName: 'id',
-      },
-  })
-  accounts : Account[];
 }

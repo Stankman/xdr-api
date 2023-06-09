@@ -37,16 +37,6 @@ export class RolesGuard implements CanActivate {
 
     const loggedAccount : Account = await this.accountsService.getLoggedAccount(request);
 
-    if(loggedAccount) {
-      let roles : Role[] = loggedAccount.roles;
-
-      for (const role of roles) {
-        if(await this.rolesPermissionsService.hasPermission(role.id, requiredRolePermission.id)) {
-          return true;
-        }
-      }
-    }
-
     return false;
   }
 }

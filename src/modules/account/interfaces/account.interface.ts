@@ -8,7 +8,6 @@ export interface IAccount {
     last_login : number;
     created_at: Date;
     updated_at: Date;
-    roles : Role[];
     avatars: Avatar[];
     active_avatar: Avatar;
 }

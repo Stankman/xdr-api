@@ -11,10 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AccountSettingsService } from './services/account-settings.service';
 import { HashService } from '../shared/services/hash.service';
 import { Argon2ConfigModule } from 'src/config/argon2/argon2-config.module';
-import { AccountsRoles } from './entities/accounts-roles.entity';
-import { AccountsRolesService } from './services/accounts-roles.service';
 import { RolesService } from '../role/services/roles.service';
-import { AccountsRolesRepository } from './repositories/accounts-roles.repository';
 import { RolesRepository } from '../role/repositories/roles.repository';
 import { RolePermissionsService } from '../role/services/role-permissions.service';
 import { RolePermissionsRepository } from '../role/repositories/role-permissions.repository';
@@ -24,7 +21,7 @@ import { AvatarModule } from '../avatar/avatar.module';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Account, AccountsRoles]),
+        TypeOrmModule.forFeature([Account]),
         TokenConfigModule,
         AppConfigModule,
         Argon2ConfigModule,
@@ -36,14 +33,12 @@ import { AvatarModule } from '../avatar/avatar.module';
     ],
     providers: [
         AccountsRepository,
-        AccountsRolesRepository,
         RolesRepository,
         RolePermissionsRepository,
         RolesPermissionsRepository,
 
         AccountService,
         AccountSettingsService,
-        AccountsRolesService,
         RolesService,
         RolePermissionsService,
         RolesPermissionsService,
@@ -53,7 +48,6 @@ import { AvatarModule } from '../avatar/avatar.module';
     exports: [
         AccountService,
         AccountSettingsService,
-        AccountsRolesService
     ]
 })
 export class AccountModule {}

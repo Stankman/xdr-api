@@ -63,7 +63,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
-    },
+    }
   ],
 })
 export class AppModule {}

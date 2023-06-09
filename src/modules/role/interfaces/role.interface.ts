@@ -1,4 +1,3 @@
-import { Account } from "src/modules/account/entities/account.entity";
 import { RolePermission } from "../entities/role-permission.entity";
 
 export interface IRole {
@@ -8,5 +7,4 @@ export interface IRole {
     created_at : Date;
     updated_at : Date;
     permissions : RolePermission[];
-    accounts : Account[];
 }

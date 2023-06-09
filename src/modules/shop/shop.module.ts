@@ -14,6 +14,9 @@ import { ShopOffer } from './entities/shop-offer.entity';
 import { ShopPayment } from './entities/shop-payment.entity';
 import { RconModule } from '../rcon/rcon.module';
 import { AvatarModule } from '../avatar/avatar.module';
+import { AccountModule } from '../account/account.module';
+import { TokenConfigModule } from 'src/config/token/token-config.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
     imports: [
@@ -22,8 +25,11 @@ import { AvatarModule } from '../avatar/avatar.module';
             ShopPayment
         ]),
         AppConfigModule,
+        AccountModule,
         AvatarModule,
-        RconModule
+        JwtModule,
+        RconModule,
+        TokenConfigModule
     ],
     controllers: [ShopController],
     providers: [

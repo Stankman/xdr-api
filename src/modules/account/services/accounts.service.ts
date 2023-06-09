@@ -23,7 +23,7 @@ export class AccountService {
       return null;
     }
 
-    return await this.getAccountById(authAccount, true) ?? null;
+    return await this.getAccountById(authAccount) ?? null;
   }
 
   public async createAccount(newAccountDTO : NewAccountDTO) : Promise<Account> {
@@ -42,14 +42,10 @@ export class AccountService {
     return this.repository.paginate(options);
   }
 
-  public async getAccountById(id : number|string, withRoles : boolean = false) : Promise<Account> {
+  public async getAccountById(id : number|string) : Promise<Account> {
     let relations : string[] = [
       'active_avatar', 'active_avatar.currencies', 'active_avatar.rank'
     ];
-
-    if(withRoles) {
-      relations.push('roles');
-    }
     
     return await this.repository.getAccount(id, 'id', relations) ?? null;
   }
