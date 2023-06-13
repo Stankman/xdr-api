@@ -1,15 +1,15 @@
-import { Module } from '@nestjs/common';
-import { BanController } from './controllers/ban.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Ban } from './entities/ban.entity';
-import { BanService } from './services/ban.service';
-import { BanRepository } from './repositories/ban.repository';
-import { AppConfigModule } from 'src/config/app/app-config.module';
+import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { SharedModule } from "../shared/shared.module";
+import { BanController } from "./controllers/ban.controller";
+import { Ban } from "./entities/ban.entity";
+import { BanRepository } from "./repositories/ban.repository";
+import { BanService } from "./services/ban.service";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Ban]),
-    AppConfigModule
+    SharedModule,
+    TypeOrmModule.forFeature([Ban])
   ],
   controllers: [
     BanController

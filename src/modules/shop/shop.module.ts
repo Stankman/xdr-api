@@ -1,37 +1,28 @@
-import { ShopController } from './controllers/shop.controller';
-/*
-https://docs.nestjs.com/modules
-*/
-
-import { Module } from '@nestjs/common';
-import { ShopOfferService } from './services/shop-offer.service';
-import { ShopPaymentService } from './services/shop-payment.service';
-import { ShopOffersRepository } from './repositories/shop-offers.repository';
-import { ShopPaymentsRepository } from './repositories/shop-payments.repository';
-import { AppConfigModule } from 'src/config/app/app-config.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ShopOffer } from './entities/shop-offer.entity';
-import { ShopPayment } from './entities/shop-payment.entity';
-import { RconModule } from '../rcon/rcon.module';
-import { AvatarModule } from '../avatar/avatar.module';
-import { AccountModule } from '../account/account.module';
-import { TokenConfigModule } from 'src/config/token/token-config.module';
-import { JwtModule } from '@nestjs/jwt';
+import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { AccountModule } from "../account/account.module";
+import { AvatarModule } from "../avatar/avatar.module";
+import { RconModule } from "../rcon/rcon.module";
+import { SharedModule } from "../shared/shared.module";
+import { ShopController } from "./controllers/shop.controller";
+import { ShopOffer } from "./entities/shop-offer.entity";
+import { ShopPayment } from "./entities/shop-payment.entity";
+import { ShopOffersRepository } from "./repositories/shop-offers.repository";
+import { ShopPaymentsRepository } from "./repositories/shop-payments.repository";
+import { ShopOfferService } from "./services/shop-offer.service";
+import { ShopPaymentService } from "./services/shop-payment.service";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([
-            ShopOffer,
-            ShopPayment
-        ]),
-        AppConfigModule,
         AccountModule,
         AvatarModule,
-        JwtModule,
         RconModule,
-        TokenConfigModule
+        SharedModule,
+        TypeOrmModule.forFeature([ShopOffer, ShopPayment])
     ],
-    controllers: [ShopController],
+    controllers: [
+        ShopController
+    ],
     providers: [
         ShopOfferService,
         ShopPaymentService,

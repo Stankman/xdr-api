@@ -1,23 +1,29 @@
-import { Controller, DefaultValuePipe, Get, ParseIntPipe, Query, UseGuards } from "@nestjs/common";
+import { Controller, UseGuards, Get, Query, DefaultValuePipe, ParseIntPipe, Post, Req, Body, Put, Param } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
-import { AppConfigService } from "src/config/app/app-config.service";
-import { ArticlesService } from "../services/articles.service";
+import { Request } from 'express';
 import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
-import { Permission } from "src/common/decorators/permission.decorator";
-import { AuthGuard } from 'src/common/guards/auth.guard';
+import { RolePermission } from "src/common/decorators/role-permission.decorator";
 import { RolesGuard } from "src/common/guards/roles.guard";
+import { AppConfigService } from "src/config/app/app-config.service";
+import { Account } from "src/modules/account/entities/account.entity";
+import { AccountService } from "src/modules/account/services/accounts.service";
+import { FindOptionsWhere } from "typeorm";
+import { ArticleDTO } from "../dtos/article.dto";
 import { Article } from "../entities/article.entity";
-import { FindManyOptions, FindOptionsWhere } from 'typeorm';
+import { ArticlesService } from "../services/articles.service";
+import { Avatar } from "src/modules/avatar/entities/avatar.entity";
+import { AuthGuard } from "src/common/guards/auth.guard";
 
 @ApiTags('Articles')
 @Controller('articles')
 export class ArticlesController {
     constructor(
+        private readonly accountService : AccountService,
         private readonly articlesService : ArticlesService,
         private readonly appConfigService : AppConfigService
     ) {}
 
-    @Permission('view-articles')
+    @RolePermission('manage-articles')
     @UseGuards(AuthGuard, RolesGuard)
     @Get('all')
     public async paginateArticles(
@@ -50,5 +56,28 @@ export class ArticlesController {
         };
 
         return await this.articlesService.paginateArticles(options, searchOptions);
+    }
+
+    @Get(':id')
+    public async getArticle(@Param() params : any) : Promise<Article> {
+        return await this.articlesService.getArticleById(params.id);
+    }
+
+    @RolePermission('manage-articles')
+    @UseGuards(AuthGuard)
+    @Post('')
+    public async createArticle(@Req() req : Request, @Body() articleDTO : ArticleDTO) : Promise<Article> {
+        const loggedAccount : Account = (await this.accountService.getLoggedAccount(req));
+        const loggedAvatar : Avatar = loggedAccount.active_avatar;
+        return this.articlesService.createArticle(articleDTO, loggedAvatar.id);
+    }
+
+    @RolePermission('manage-articles')
+    @UseGuards(AuthGuard, RolesGuard)
+    @Put('')
+    public async editArticle(@Req() req : Request, @Body() articleDTO : ArticleDTO) : Promise<Article> {
+        const loggedAccount : Account = (await this.accountService.getLoggedAccount(req));
+        const loggedAvatar : Avatar = loggedAccount.active_avatar;
+        return this.articlesService.editArticle(articleDTO, loggedAvatar.id);
     }
 }

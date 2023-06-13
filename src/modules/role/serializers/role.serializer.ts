@@ -1,8 +1,9 @@
 import { ModelEntitySerializer } from "src/common/serializers/model.serializer";
 import { IRole } from "../interfaces/role.interface";
-import { Expose } from "class-transformer";
-import { RolePermission } from "../entities/role-permission.entity";
-import { Account } from "src/modules/account/entities/account.entity";
+import { Exclude, Expose } from "class-transformer";
+import { Permission } from "../entities/permission.entity";
+import { Rank } from "src/modules/rank/entities/rank.entity";
+import { Role } from "../entities/role.entity";
 
 export const defaultRoleGroupsForSerializing: string[] = [
     'role.timestamps'
@@ -15,13 +16,19 @@ export class RoleSerializer extends ModelEntitySerializer implements IRole {
 
     description: string;
 
+    hidden: boolean;
+
     @Expose({ groups: ['role.timestamps'] })
     created_at: Date;
 
     @Expose({ groups: ['role.timestamps'] })
     updated_at: Date;
 
-    permissions: RolePermission[];
+    rank: Rank;
 
-    accounts : Account[];
+    permissions: Permission[];
+
+    parent: Role;
+
+    children: Role[];
 }

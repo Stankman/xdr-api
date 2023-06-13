@@ -1,4 +1,5 @@
 import { Avatar } from "src/modules/avatar/entities/avatar.entity";
+import { Role } from "src/modules/role/entities/role.entity";
 import { RankCommand } from "../entities/rank-command.entity";
 import { RankRight } from "../entities/rank-right.entity";
 
@@ -15,4 +16,5 @@ export interface IRank {
     commands: RankCommand[];
     rights: RankRight[];
     avatars: Avatar[];
+    role: Role;
 }

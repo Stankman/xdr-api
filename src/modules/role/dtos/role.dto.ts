@@ -1,7 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsNotEmpty } from "class-validator";
+import { IsString, IsNotEmpty, IsNumber } from "class-validator";
 
-export class NewRolePermissionDTO {
+export class RoleDTO {
+    @ApiProperty()    
+    @IsNumber()
+    @IsNotEmpty()
+    id : number;
+
     @ApiProperty()    
     @IsString()
     @IsNotEmpty()

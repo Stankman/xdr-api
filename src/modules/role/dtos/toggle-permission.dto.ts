@@ -1,14 +1,14 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsNotEmpty } from "class-validator";
+import { IsNumber, IsNotEmpty, IsString } from "class-validator";
 
 export class TogglePermissionDTO {
     @ApiProperty()    
     @IsNumber()
     @IsNotEmpty()
-    role_id : number;
+    roleId : number;
 
     @ApiProperty()
-    @IsNumber()
+    @IsString()
     @IsNotEmpty()
-    permission_id : number;
+    permissionName : string;
 }

@@ -1,28 +1,25 @@
 import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { Pagination, IPaginationMeta, IPaginationOptions } from 'nestjs-typeorm-paginate';
-import { Permission } from 'src/common/decorators/permission.decorator';
+import { RolePermission } from 'src/common/decorators/role-permission.decorator';
 import { AuthGuard } from '../../../common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { AppConfigService } from 'src/config/app/app-config.service';
 import { Role } from '../entities/role.entity';
-import { RolesService } from '../services/roles.service';
+import { RoleService } from '../services/role.service';
 import { NewRoleDTO } from '../dtos/new-role.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { EditRoleDTO } from '../dtos/edit-role.dto';
+import { RoleDTO } from '../dtos/role.dto';
 import { TogglePermissionDTO } from '../dtos/toggle-permission.dto';
-import { RolePermission } from '../entities/role-permission.entity';
-import { RolesPermissionsService } from '../services/roles-permissions.service';
 
 @ApiTags('Roles')
 @Controller('roles')
 export class RolesController {
     constructor(
-        private readonly rolesService : RolesService,
-        private readonly rolesPermissionsService : RolesPermissionsService,
+        private readonly rolesService : RoleService,
         private readonly appConfigService : AppConfigService
     ) {}
 
-    @Permission('view-roles')
+    @RolePermission('view-roles')
     @UseGuards(AuthGuard, RolesGuard)
     @Get('all')
     public async paginateRoles(
@@ -38,38 +35,38 @@ export class RolesController {
         return await this.rolesService.paginateRoles(options);
     }
 
-    @Permission('view-roles')
+    @RolePermission('view-roles')
     @UseGuards(AuthGuard, RolesGuard)
     @Get(':id')
     public async getRole(@Param() params : any) : Promise<Role> {
-        return await this.rolesService.getRole(params.id, false, true);
+        return await this.rolesService.getRoleById(params.id, false, true);
     }
 
-    @Permission('manage-roles')
+    @RolePermission('manage-roles')
     @UseGuards(AuthGuard, RolesGuard)    
     @Post()
     public async createRole(@Body() newRoleDTO : NewRoleDTO) : Promise<Role> {
         return await this.rolesService.createRole(newRoleDTO);
     }
 
-    @Permission('manage-roles')
+    @RolePermission('manage-roles')
     @UseGuards(AuthGuard, RolesGuard)    
     @Put(':id')
-    public async editRole(@Body() editRoleDTO : EditRoleDTO) : Promise<Role> {
+    public async editRole(@Body() editRoleDTO : RoleDTO) : Promise<Role> {
         return await this.rolesService.editRole(editRoleDTO);
     }
 
-    @Permission('manage-roles')
+    @RolePermission('manage-roles')
     @UseGuards(AuthGuard, RolesGuard)    
     @Put(':id/toggle-permission')
-    public async togglePermission(@Body() togglePermissionDTO : TogglePermissionDTO) : Promise<RolePermission> {
-        return await this.rolesPermissionsService.togglePermission(togglePermissionDTO);
+    public async togglePermission(@Body() togglePermissionDTO : TogglePermissionDTO) : Promise<Role> {
+        return await this.rolesService.togglePermission(togglePermissionDTO);
     }
 
-    @Permission('manage-roles')
+    @RolePermission('manage-roles')
     @UseGuards(AuthGuard, RolesGuard)    
     @Put(':id/clear-permissions')
-    public async clearPermissions(@Param() params : any) : Promise<RolePermission> {
-        return await this.rolesPermissionsService.clearPermissions(params.id);
+    public async clearPermissions(@Param() params : any) : Promise<Role> {
+        return await this.rolesService.clearPermissions(params.id);
     }
 }

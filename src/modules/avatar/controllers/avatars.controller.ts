@@ -31,9 +31,7 @@ export class AvatarsController {
     }
 
     @Get(':id')
-    public async getAvatar(
-        @Param() params : any
-    ) : Promise<Avatar> {
+    public async getAvatar(@Param() params : any) : Promise<Avatar> {
         return await this.avatarService.getAvatarById(params.id);
     }
 

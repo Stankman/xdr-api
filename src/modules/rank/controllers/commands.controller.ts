@@ -1,13 +1,16 @@
-import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Query } from "@nestjs/common";
+import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Query, UseGuards } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { Command } from "../entities/command.entity";
 import { CommandService } from "../services/command.service";
 import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
 import { FindManyOptions } from "typeorm";
 import { AppConfigService } from "src/config/app/app-config.service";
+import { AuthGuard } from "src/common/guards/auth.guard";
+import { RolesGuard } from "src/common/guards/roles.guard";
 
 @ApiTags('Commands')
 @Controller('ranks/commands')
+@UseGuards(AuthGuard, RolesGuard)
 export class CommandsController {
     constructor(
         private readonly commandService : CommandService,

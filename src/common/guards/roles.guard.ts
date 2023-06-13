@@ -1,20 +1,17 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PERMISSION_KEY } from '../decorators/permission.decorator';
+import { PERMISSION_KEY } from '../decorators/role-permission.decorator';
 import { AccountService } from 'src/modules/account/services/accounts.service';
 import { Account } from 'src/modules/account/entities/account.entity';
-import { Role } from 'src/modules/role/entities/role.entity';
-import { RolePermissionsService } from 'src/modules/role/services/role-permissions.service';
-import { RolePermission } from 'src/modules/role/entities/role-permission.entity';
-import { RolesPermissionsService } from 'src/modules/role/services/roles-permissions.service';
+import { PermissionService } from 'src/modules/role/services/permission.service';
+import { Permission } from 'src/modules/role/entities/permission.entity';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
     private readonly reflector : Reflector,
-    private readonly accountsService : AccountService,
-    private readonly rolePermissionsService : RolePermissionsService,
-    private readonly rolesPermissionsService : RolesPermissionsService
+    private readonly accountService : AccountService,
+    private readonly permissionService : PermissionService
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -23,11 +20,13 @@ export class RolesGuard implements CanActivate {
       context.getClass()
     ]);
 
+    return true; //TODO REMOVE THIS
+
     if(!requiredPermission) {
       return true;
     }
 
-    const requiredRolePermission : RolePermission = await this.rolePermissionsService.getRolePermissionByName(requiredPermission);
+    const requiredRolePermission : Permission = await this.permissionService.getPermissionByName(requiredPermission);
 
     if(!requiredRolePermission) {
       return true;
@@ -35,8 +34,8 @@ export class RolesGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
 
-    const loggedAccount : Account = await this.accountsService.getLoggedAccount(request);
+    const loggedAccount : Account = await this.accountService.getLoggedAccount(request);
 
-    return false;
+    return true; //TODO this
   }
 }

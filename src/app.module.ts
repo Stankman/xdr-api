@@ -17,8 +17,9 @@ import { AvatarModule } from './modules/avatar/avatar.module';
 import { BanModule } from './modules/ban/ban.module';
 import { RankModule } from './modules/rank/rank.module';
 import { RconModule } from './modules/rcon/rcon.module';
-import { RolesModule } from './modules/role/roles.module';
+import { RoleModule } from './modules/role/role.module';
 import { SettingModule } from './modules/setting/setting.module';
+import { SharedModule } from './modules/shared/shared.module';
 import { ShopModule } from './modules/shop/shop.module';
 
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
@@ -51,9 +52,10 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     BanModule,
     RankModule,
     RconModule,
-    RolesModule,
+    RoleModule,
     SettingModule,
-    ShopModule
+    SharedModule,
+    ShopModule,
   ],
   providers: [
     {
@@ -63,7 +65,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
-    }
+    },
   ],
 })
 export class AppModule {}

@@ -1,58 +1,62 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Rank } from './entities/rank.entity';
-import { RankService } from './services/rank.service';
-import { RanksRepository } from './repositories/ranks.repository';
-import { RanksController } from './controllers/ranks.controller';
-import { AppConfigModule } from 'src/config/app/app-config.module';
-import { Command } from './entities/command.entity';
-import { Right } from './entities/right.entity';
-import { CommandService } from './services/command.service';
-import { CommandsRepository } from './repositories/commands.repository';
-import { RightService } from './services/right.service';
-import { RightsRepository } from './repositories/rights.repository';
-import { CommandsController } from './controllers/commands.controller';
-import { RightsController } from './controllers/rights.controller';
-import { RankCommand } from './entities/rank-command.entity';
-import { RankRight } from './entities/rank-right.entity';
-import { RankCommandService } from './services/rank-command.service';
-import { RankCommandsRepository } from './repositories/rank-commands.repository';
-import { RankRightService } from './services/rank-right.service';
-import { RankRightsRepository } from './repositories/rank-rights.repository';
+import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { AccountModule } from "../account/account.module";
+import { RoleModule } from "../role/role.module";
+import { SharedModule } from "../shared/shared.module";
+import { CommandsController } from "./controllers/commands.controller";
+import { RanksController } from "./controllers/ranks.controller";
+import { RightsController } from "./controllers/rights.controller";
+import { Command } from "./entities/command.entity";
+import { RankCommand } from "./entities/rank-command.entity";
+import { RankRight } from "./entities/rank-right.entity";
+import { Rank } from "./entities/rank.entity";
+import { Right } from "./entities/right.entity";
+import { CommandsRepository } from "./repositories/commands.repository";
+import { RankCommandsRepository } from "./repositories/rank-commands.repository";
+import { RankRightsRepository } from "./repositories/rank-rights.repository";
+import { RanksRepository } from "./repositories/ranks.repository";
+import { RightsRepository } from "./repositories/rights.repository";
+import { CommandService } from "./services/command.service";
+import { RankCommandService } from "./services/rank-command.service";
+import { RankRightService } from "./services/rank-right.service";
+import { RankService } from "./services/rank.service";
+import { RightService } from "./services/right.service";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Rank, Command, Right, RankCommand, RankRight]),
-        AppConfigModule
+        AccountModule,
+        RoleModule,
+        SharedModule,
+        TypeOrmModule.forFeature([Rank, Command, Right, RankCommand, RankRight])
     ],
     controllers: [
-        RanksController,
         CommandsController,
+        RanksController,
         RightsController
     ],
     providers: [
-        RankService,
-        RanksRepository,
         CommandService,
         CommandsRepository,
-        RightService,
-        RightsRepository,
+        RankService,
+        RanksRepository,
         RankCommandService,
         RankCommandsRepository,
         RankRightService,
-        RankRightsRepository
+        RankRightsRepository,
+        RightService,
+        RightsRepository
     ],
     exports: [
-        RankService,
-        RanksRepository,
         CommandService,
         CommandsRepository,
-        RightService,
-        RightsRepository,
+        RankService,
+        RanksRepository,
         RankCommandService,
         RankCommandsRepository,
         RankRightService,
-        RankRightsRepository
+        RankRightsRepository,
+        RightService,
+        RightsRepository
     ]
 })
 export class RankModule {}

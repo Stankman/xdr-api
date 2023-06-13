@@ -1,8 +1,9 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { IRank } from "../interfaces/rank.interface";
 import { RankCommand } from "./rank-command.entity";
 import { RankRight } from "./rank-right.entity";
 import { Avatar } from "src/modules/avatar/entities/avatar.entity";
+import { Role } from "src/modules/role/entities/role.entity";
 
 @Entity({ name: 'permission_groups' })
 export class Rank implements IRank {
@@ -56,4 +57,10 @@ export class Rank implements IRank {
         avatar => avatar.rank
     )
     avatars: Avatar[];
+
+    @OneToOne(
+        () => Role, 
+        role => role.rank
+    )
+    role: Role;
 }
