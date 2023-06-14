@@ -52,14 +52,15 @@ export class RolesController {
     @RolePermission('manage-roles')
     @UseGuards(AuthGuard, RolesGuard)    
     @Put(':id')
-    public async updateRank(@Body() roleDTO : RoleDTO) : Promise<Role> {
+    public async updateRole(@Body() roleDTO : RoleDTO) : Promise<Role> {
         return await this.rolesService.editRole(roleDTO);
     }
 
     @RolePermission('manage-roles')
     @UseGuards(AuthGuard, RolesGuard)    
     @Put(':id/toggle-permission')
-    public async togglePermission(@Body() togglePermissionDTO : TogglePermissionDTO) : Promise<Role> {
+    public async togglePermission(@Body() togglePermissionDTO : TogglePermissionDTO) : Promise<boolean> {
+        //TODO Get Request logged to log system
         return await this.rolesService.togglePermission(togglePermissionDTO);
     }
 

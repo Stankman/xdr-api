@@ -1,3 +1,5 @@
+import { Avatar } from "src/modules/avatar/entities/avatar.entity";
+
 export interface IArticle {
     id : number;
     title : string;
@@ -6,9 +8,9 @@ export interface IArticle {
     content : string;
     image : string;
     thumbnail : string;
-    author_id : number;
-    hidden : number;
-    pinned : number;
+    author: Avatar;
+    hidden : boolean;
+    pinned : boolean;
     created_at : Date;
     updated_at : Date;
 }

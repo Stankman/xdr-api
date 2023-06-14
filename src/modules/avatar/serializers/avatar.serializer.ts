@@ -11,22 +11,51 @@ import { ShopPaymentSerializer } from "src/modules/shop/serializers/shop-payment
 import { AccountSerializer } from "src/modules/account/serializers/account.serializer";
 import { AvatarSettingsSerializer } from "./avatar-settings.serializer";
 import { AvatarCurrencySerializer } from "./avatar-currency.serializer";
+import { ArticleSerializer } from "src/modules/article/serializers/article.serializer";
+import { Article } from "src/modules/article/entities/article.entity";
+
+export const defaultAvatarGroup: string[] = [
+    'avatar.default'
+];
+
+export const extendRankAvatarGroup: string[] = [
+    ...defaultAvatarGroup,
+    'avatar.rank'
+];
 
 export class AvatarSerializer extends ModelEntitySerializer implements IAvatar {
     id: number;
     
+    @Expose({groups: ['avatar.default']})
     username: string;
+
+    @Type(() => AccountSerializer)
+    account: Account;
     
+    @Expose({groups: ['avatar.default']})
     motto: string;
     
+    @Expose({groups: ['avatar.default']})
     look: string;
     
     @Exclude()
     gender: string;
 
+    @Expose({groups: ['avatar.currencies']})
+    credits: number;
+
+    @Expose({groups: ['avatar.currencies']})
+    @Type(() => AvatarCurrencySerializer)
+    currencies: AvatarCurrency[];
+
     @Exclude()
     rankId: number;
 
+    @Expose({groups: ['avatar.rank']})
+    @Type(() => RankSerializer)
+    rank: Rank;
+
+    @Expose({groups: ['avatar.default']})
     online: boolean;
 
     @Expose({groups: ['avatar.ticket']})
@@ -38,24 +67,14 @@ export class AvatarSerializer extends ModelEntitySerializer implements IAvatar {
     @Expose({groups: ['avatar.timestamps']})
     last_login: number;
     
-    @Expose({groups: ['avatar.currencies']})
-    credits: number;
-    
     @Expose({groups: ['avatar.timestamps']})
     account_created: number;
 
     @Type(() => AvatarSettingsSerializer)
     settings: AvatarSettings;
 
-    @Expose({groups: ['avatar.currencies']})
-    @Type(() => AvatarCurrencySerializer)
-    currencies: AvatarCurrency[];
-    
-    @Type(() => AccountSerializer)
-    account: Account;
-    
-    @Type(() => RankSerializer)
-    rank: Rank;
+    @Type(() => ArticleSerializer)
+    articles: Article[];
     
     @Type(() => ShopPaymentSerializer)
     payments: ShopPayment[];

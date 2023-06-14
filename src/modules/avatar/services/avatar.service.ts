@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
-import { FindOptionsWhere, FindManyOptions } from "typeorm";
+import { FindManyOptions } from "typeorm";
 import { Avatar } from "../entities/avatar.entity";
 import { AvatarsRepository } from "../repositories/avatars.repository";
 import { NewAvatarDTO } from "../dtos/new-avatar.dto";
@@ -21,7 +21,7 @@ export class AvatarService {
         private readonly xdrSettingService : XdrSettingService
     ) {}
 
-    public async paginateAvatars(options : IPaginationOptions, searchOptions? : FindOptionsWhere<Avatar> | FindManyOptions<Avatar>) : Promise<Pagination<Avatar, IPaginationMeta>> {
+    public async paginateAvatars(options : IPaginationOptions, searchOptions? : FindManyOptions<Avatar>) : Promise<Pagination<Avatar, IPaginationMeta>> {
         return this.repository.paginate(options, searchOptions);
     }
 

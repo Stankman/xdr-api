@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { RanksRepository } from "../repositories/ranks.repository";
 import { Rank } from "../entities/rank.entity";
 import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
-import { FindOptionsWhere, FindManyOptions } from "typeorm";
+import { FindManyOptions } from "typeorm";
 import { NewRankDTO } from '../dtos/new-rank.dto';
 import { RankRightService } from "./rank-right.service";
 import { RankCommandService } from "./rank-command.service";
@@ -19,7 +19,7 @@ export class RankService {
         private readonly rankRightService : RankRightService
     ) {}
 
-    public async paginateRanks(options : IPaginationOptions, searchOptions? : FindOptionsWhere<Rank> | FindManyOptions<Rank>) : Promise<Pagination<Rank, IPaginationMeta>> {
+    public async paginateRanks(options : IPaginationOptions, searchOptions? : FindManyOptions<Rank>) : Promise<Pagination<Rank, IPaginationMeta>> {
         return this.repository.paginate(options, searchOptions);
     }
 

@@ -8,6 +8,7 @@ import { AccountGuardService } from 'src/modules/account/services/account-guard.
 import { PermissionGuardService } from 'src/modules/role/services/permission-guard.service';
 import { InsufficientPermissionsException } from '../exceptions/insufficient-permissions.exception';
 import { NoSuchPermissionException } from '../exceptions/nosuchpermission.exception';
+import { extendRankAvatarGroup } from 'src/modules/avatar/serializers/avatar.serializer';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -35,7 +36,7 @@ export class RolesGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
 
-    const loggedAccount : Account = await this.accountGuardService.getLoggedAccount(request);
+    const loggedAccount : Account = await this.accountGuardService.getLoggedAccount(request, { groups: extendRankAvatarGroup });
 
     const role : Role = loggedAccount.activeAvatar.rank.role;
 

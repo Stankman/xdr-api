@@ -3,7 +3,8 @@ import { ModelRepository } from "src/modules/shared/model.repository";
 import { Article } from "../entities/article.entity";
 import { ArticleSerializer } from "../serializers/article.serializer";
 import { DataSource } from "typeorm";
-import { plainToInstance, instanceToPlain } from "class-transformer";
+import { plainToInstance, instanceToPlain, ClassTransformOptions } from "class-transformer";
+import { defaultAvatarGroup } from "src/modules/avatar/serializers/avatar.serializer";
 
 @Injectable()
 export class ArticlesRepository extends ModelRepository<Article, ArticleSerializer> {
@@ -11,15 +12,15 @@ export class ArticlesRepository extends ModelRepository<Article, ArticleSerializ
         super(Article, dataSource.createEntityManager());
     }
 
-    public async getArticle(value : any, column : string = 'id', relations : string[] = [], throwsException : boolean = true, transformOptions? : any) : Promise<ArticleSerializer> {
+    public async getArticle(value : any, column : string = 'id', relations : string[] = ['author'], throwsException : boolean = true, transformOptions: ClassTransformOptions = { groups: [...defaultAvatarGroup] }) : Promise<ArticleSerializer> {
         return this.getOneBy({[column]: value}, relations, throwsException, transformOptions);
     }
 
-    public transform(model: Article, transformOptions : any = {}): ArticleSerializer {
+    public transform(model: Article, transformOptions: ClassTransformOptions = { groups: [...defaultAvatarGroup] }): ArticleSerializer {
         return plainToInstance(ArticleSerializer, instanceToPlain(model, transformOptions), transformOptions);
     }
 
-    public transformMany(models: Article[], transformOptions : any = {}): ArticleSerializer[] {
+    public transformMany(models: Article[], transformOptions: ClassTransformOptions = { groups: [...defaultAvatarGroup] }): ArticleSerializer[] {
         return models.map(model => this.transform(model, transformOptions));
     }
 }

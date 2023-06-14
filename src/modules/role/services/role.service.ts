@@ -46,11 +46,11 @@ export class RoleService {
         return this.repository.save(await this.getRole(roleDTO));
     }
 
-    public async hasPermission(role : Role, permission : Permission) {
+    public hasPermission(role : Role, permission : Permission) : boolean {
         return role.permissions.some((p) => p.name === permission.name); 
     }
 
-    public async togglePermission(togglePermissionDTO : TogglePermissionDTO) : Promise<Role> {
+    public async togglePermission(togglePermissionDTO : TogglePermissionDTO) : Promise<boolean> {
         const role : Role = await this.repository.getRole(togglePermissionDTO.roleId, 'id', ['permissions']);
         const permission : Permission = await this.permissionService.getPermissionByName(togglePermissionDTO.permissionName);
 
@@ -60,7 +60,9 @@ export class RoleService {
             role.permissions.push(permission);
         }
 
-        return await this.repository.save(role);
+        this.repository.save(role);
+
+        return true;
     }
 
     public async clearPermissions(roleId : number|string) : Promise<Role> {

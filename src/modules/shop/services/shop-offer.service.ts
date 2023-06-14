@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ShopOffersRepository } from "../repositories/shop-offers.repository";
 import { ShopOffer } from "../entities/shop-offer.entity";
 import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
-import { FindOptionsWhere, FindManyOptions } from "typeorm";
+import { FindManyOptions } from "typeorm";
 import { NewShopOfferDTO } from "../dtos/new-shop-offer.dto";
 
 @Injectable()
@@ -16,7 +16,7 @@ export class ShopOfferService {
         return this.repository.save(offer);
     }
 
-    public async paginateOffers(options : IPaginationOptions, searchOptions? : FindOptionsWhere<ShopOffer> | FindManyOptions<ShopOffer>) : Promise<Pagination<ShopOffer, IPaginationMeta>> {
+    public async paginateOffers(options : IPaginationOptions, searchOptions? : FindManyOptions<ShopOffer> | FindManyOptions<ShopOffer>) : Promise<Pagination<ShopOffer, IPaginationMeta>> {
         return this.repository.paginate(options, searchOptions);
     }
 

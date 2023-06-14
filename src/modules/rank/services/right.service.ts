@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { Right } from "../entities/right.entity";
 import { RightsRepository } from "../repositories/rights.repository";
 import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
-import { FindOptionsWhere, FindManyOptions } from "typeorm";
+import { FindManyOptions } from "typeorm";
 
 @Injectable()
 export class RightService {
@@ -10,7 +10,7 @@ export class RightService {
         private readonly repository : RightsRepository
     ) {}
 
-    public async paginateRights(options : IPaginationOptions, searchOptions? : FindOptionsWhere<Right> | FindManyOptions<Right>) : Promise<Pagination<Right, IPaginationMeta>> {
+    public async paginateRights(options : IPaginationOptions, searchOptions? : FindManyOptions<Right> | FindManyOptions<Right>) : Promise<Pagination<Right, IPaginationMeta>> {
         return this.repository.paginate(options, searchOptions);
     }
 

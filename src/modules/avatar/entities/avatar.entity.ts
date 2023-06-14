@@ -7,6 +7,7 @@ import { Rank } from "src/modules/rank/entities/rank.entity";
 import { ShopPayment } from "src/modules/shop/entities/shop-payment.entity";
 import { BooleanEnum } from "src/common/models/boolean.model";
 import { BooleanTransformer } from "src/common/transformers/boolean.transformer";
+import { Article } from "src/modules/article/entities/article.entity";
 
 @Entity({ name: 'users'})
 export class Avatar implements IAvatar {
@@ -15,6 +16,10 @@ export class Avatar implements IAvatar {
 
     @Column()
     username: string;
+
+    @ManyToOne(() => Account, account => account.avatars)
+    @JoinColumn({ name: 'account_id'})
+    account: Account;
     
     @Column()
     motto: string;
@@ -24,15 +29,21 @@ export class Avatar implements IAvatar {
     
     @Column()
     gender: string;
+
+    @Column()
+    credits: number;
+
+    @OneToMany(() => AvatarCurrency, currency => currency.avatar)
+    currencies: AvatarCurrency[];
     
     @Column({ name: "rank" })
     rankId: number;
+
+    @ManyToOne(() => Rank, rank => rank.avatars)
+    @JoinColumn({ name: 'rank' })
+    rank: Rank
     
-    @Column({
-        type: 'enum',
-        enum: BooleanEnum,
-        transformer: new BooleanTransformer()
-      })
+    @Column({type: 'enum', enum: BooleanEnum, transformer: new BooleanTransformer()})
     online: boolean;
     
     @Column()
@@ -44,41 +55,15 @@ export class Avatar implements IAvatar {
     @Column()
     last_login: number;
 
-    @Column()
-    credits: number;
-
-    @OneToOne(
-        () => AvatarSettings,
-        avatarSettings => avatarSettings.avatar
-    )
-    settings: AvatarSettings;
-
-    @ManyToOne(
-        () => Account,
-        account => account.avatars
-    )
-    @JoinColumn({ name: 'account_id'})
-    account: Account;
-
-    @OneToMany(
-        () => AvatarCurrency,
-        currency => currency.avatar
-    )
-    currencies: AvatarCurrency[];
-
-    @ManyToOne(
-        () => Rank,
-        rank => rank.avatars
-    )
-    @JoinColumn({ name: 'rank' })
-    rank: Rank
-
-    @OneToMany(
-        () => ShopPayment,
-        payment => payment.avatar
-    )
-    payments: ShopPayment[];
-
     @CreateDateColumn()
     account_created: number;
+
+    @OneToOne(() => AvatarSettings, avatarSettings => avatarSettings.avatar)
+    settings: AvatarSettings;
+
+    @OneToMany(() => Article, article => article.author)
+    articles: Article[];
+
+    @OneToMany(() => ShopPayment,payment => payment.avatar)
+    payments: ShopPayment[];
 }

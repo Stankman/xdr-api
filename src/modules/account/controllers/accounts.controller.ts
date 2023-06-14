@@ -1,4 +1,4 @@
-import { Controller, Get, Query, DefaultValuePipe, ParseIntPipe, UseGuards, Body, Post, Req } from "@nestjs/common";
+import { Controller, Get, Query, DefaultValuePipe, ParseIntPipe, UseGuards, Param } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
 import { AppConfigService } from "src/config/app/app-config.service";
@@ -7,9 +7,9 @@ import { AccountService } from "../services/accounts.service";
 import { RolePermission } from "src/common/decorators/role-permission.decorator";
 import { RolesGuard } from "../../../common/guards/roles.guard";
 import { AuthGuard } from '../../../common/guards/auth.guard';
-import { AssignRoleDTO } from "../dtos/assign-role.dto";
 
 @ApiTags('Accounts')
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('accounts')
 export class AccountsController {
     
@@ -18,8 +18,7 @@ export class AccountsController {
         private readonly appConfigService : AppConfigService
     ) {}
 
-    @RolePermission('view-accounts')
-    @UseGuards(AuthGuard, RolesGuard)
+    @RolePermission('manage-accounts')
     @Get('all')
     public async paginateAccounts(
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page : number = 1, 
@@ -34,10 +33,9 @@ export class AccountsController {
         return await this.accountsService.paginateAccounts(options);
     }
 
-    @Get('find')
-    public async getAccount(
-        @Query('value', new DefaultValuePipe('0')) value : string = '0'
-    ) : Promise<Account> {
-        return await this.accountsService.getAccountById(value);
+    @RolePermission('manage-accounts')
+    @Get(':id')
+    public async getAccount(@Param() params : any) : Promise<Account> {
+        return await this.accountsService.getAccountById(params.id);
     }
 }

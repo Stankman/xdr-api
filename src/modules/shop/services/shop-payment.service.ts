@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ShopPaymentsRepository } from "../repositories/shop-payments.repository";
 import { ShopPayment } from "../entities/shop-payment.entity";
 import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
-import { FindOptionsWhere, FindManyOptions } from "typeorm";
+import { FindManyOptions } from "typeorm";
 import { NewPurchaseDTO } from "../dtos/new-purchase.dto";
 import { PurchaseStatusDTO } from "../dtos/purchase-status.dto";
 import { RconService } from "src/modules/rcon/services/rcon.service";
@@ -36,7 +36,7 @@ export class ShopPaymentService {
         return this.repository.save(payment);
     }
 
-    public async paginatePayments(options : IPaginationOptions, searchOptions? : FindOptionsWhere<ShopPayment> | FindManyOptions<ShopPayment>) : Promise<Pagination<ShopPayment, IPaginationMeta>> {
+    public async paginatePayments(options : IPaginationOptions, searchOptions? : FindManyOptions<ShopPayment>) : Promise<Pagination<ShopPayment, IPaginationMeta>> {
         return this.repository.paginate(options, searchOptions);
     }
 
