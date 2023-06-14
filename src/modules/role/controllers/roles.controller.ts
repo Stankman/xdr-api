@@ -35,7 +35,7 @@ export class RolesController {
         return await this.rolesService.paginateRoles(options);
     }
 
-    @RolePermission('manage-roles')
+    @RolePermission('manage-roless')
     @UseGuards(AuthGuard, RolesGuard)
     @Get(':id')
     public async getRole(@Param() params : any) : Promise<Role> {

@@ -9,5 +9,5 @@ export interface IAccount {
     created_at: Date;
     updated_at: Date;
     avatars: Avatar[];
-    active_avatar: Avatar;
+    activeAvatar: Avatar;
 }

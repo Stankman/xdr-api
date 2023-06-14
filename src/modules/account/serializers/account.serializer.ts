@@ -41,5 +41,5 @@ export class AccountSerializer extends ModelEntitySerializer implements IAccount
 
   avatars: Avatar[];
 
-  active_avatar: Avatar;
+  activeAvatar: Avatar;
 }

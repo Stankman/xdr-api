@@ -6,6 +6,8 @@ import { Permission } from 'src/modules/role/entities/permission.entity';
 import { Role } from 'src/modules/role/entities/role.entity';
 import { AccountGuardService } from 'src/modules/account/services/account-guard.service';
 import { PermissionGuardService } from 'src/modules/role/services/permission-guard.service';
+import { InsufficientPermissionsException } from '../exceptions/insufficient-permissions.exception';
+import { NoSuchPermissionException } from '../exceptions/nosuchpermission.exception';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -21,28 +23,32 @@ export class RolesGuard implements CanActivate {
       context.getClass()
     ]);
 
-    return true;
-
     if(!requiredRolePermission) {
       return true;
     }
 
     const requiredPermission : Permission = await this.permissionGuardService.getPermissionByName(requiredRolePermission);
 
-    if(!requiredRolePermission) {
-      return true;
+    if(!requiredPermission) {
+      throw new NoSuchPermissionException();
     }
 
     const request = context.switchToHttp().getRequest();
 
     const loggedAccount : Account = await this.accountGuardService.getLoggedAccount(request);
 
-    const role : Role = loggedAccount.active_avatar.rank.role;
+    const role : Role = loggedAccount.activeAvatar.rank.role;
 
     if(!role) {
-      return false;
+      throw new InsufficientPermissionsException();
     }
     
-    return role.permissions.some((p) => p.name === requiredPermission.name);
+    const hasPermission : boolean = role.permissions.some((p) => p.name === requiredPermission.name);
+
+    if(!hasPermission) {
+      throw new InsufficientPermissionsException();
+    }
+
+    return true;
   }
 }

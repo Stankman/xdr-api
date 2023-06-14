@@ -9,6 +9,6 @@ export class PermissionGuardService {
   ) {}
 
   public async getPermissionByName(name: string) : Promise<Permission> {
-    return this.repository.getPermission(name);
+    return this.repository.getPermission(name, 'name', false);
   }
 }

@@ -39,7 +39,7 @@ export class SignInService {
 
         account.ip_current = signInDTO.ip;
         account.last_login = Math.floor(Date.now() / 1000);
-        account.active_avatar.last_login = Date.now()
+        account.activeAvatar.last_login = Date.now()
 
         this.accountsService.save(account);
 

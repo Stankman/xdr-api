@@ -67,7 +67,7 @@ export class ShopController {
     @Post('purchase')
     public async makePayment(@Req() req : Request, @Body() newPurchaseDTO : NewPurchaseDTO) : Promise<ShopPayment> {
         const loggedAccount : Account = (await this.accountGuardService.getLoggedAccount(req));
-        const loggedAvatar : Avatar = loggedAccount.active_avatar;
+        const loggedAvatar : Avatar = loggedAccount.activeAvatar;
         return this.shopPaymentService.createNewPayment(newPurchaseDTO, loggedAvatar);
     }
 

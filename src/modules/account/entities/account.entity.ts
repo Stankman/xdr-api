@@ -36,5 +36,5 @@ export class Account implements IAccount {
 
     @JoinColumn({ name: 'active_avatar_id'})
     @OneToOne(() => Avatar)
-    active_avatar: Avatar;
+    activeAvatar: Avatar;
 }

@@ -68,7 +68,7 @@ export class ArticlesController {
     @Post('')
     public async createArticle(@Req() req : Request, @Body() articleDTO : ArticleDTO) : Promise<Article> {
         const loggedAccount : Account = (await this.accountGuardService.getLoggedAccount(req));
-        const loggedAvatar : Avatar = loggedAccount.active_avatar;
+        const loggedAvatar : Avatar = loggedAccount.activeAvatar;
         return this.articlesService.createArticle(articleDTO, loggedAvatar.id);
     }
 
@@ -77,7 +77,7 @@ export class ArticlesController {
     @Put('')
     public async editArticle(@Req() req : Request, @Body() articleDTO : ArticleDTO) : Promise<Article> {
         const loggedAccount : Account = (await this.accountGuardService.getLoggedAccount(req));
-        const loggedAvatar : Avatar = loggedAccount.active_avatar;
+        const loggedAvatar : Avatar = loggedAccount.activeAvatar;
         return this.articlesService.editArticle(articleDTO, loggedAvatar.id);
     }
 }

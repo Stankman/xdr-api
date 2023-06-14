@@ -16,6 +16,6 @@ export class AccountGuardService {
       return null;
     }
 
-    return await this.repository.getAccount(authAccount, 'id', [], false) ?? null;
+    return await this.repository.getAccount(authAccount, 'id', ['activeAvatar', 'activeAvatar.rank', 'activeAvatar.rank.role', 'activeAvatar.rank.role.permissions'], false) ?? null;
   }
 }

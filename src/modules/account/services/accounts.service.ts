@@ -19,7 +19,7 @@ export class AccountService {
     let account = await this.getNewAccount(newAccountDTO);
     const avatar = await this.avatarService.generateAvatar(account);
     account.avatars = [avatar];
-    account.active_avatar = avatar;
+    account.activeAvatar = avatar;
     return await this.save(account);
   }
 

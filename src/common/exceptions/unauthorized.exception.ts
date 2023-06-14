@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
 import { ModelException } from './model.exception';
 
 export class UnauthorizedException extends ModelException {
