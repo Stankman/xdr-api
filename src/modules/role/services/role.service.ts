@@ -8,27 +8,31 @@ import { Permission } from '../entities/permission.entity';
 import { TogglePermissionDTO } from '../dtos/toggle-permission.dto';
 import { PermissionService } from './permission.service';
 import { CircularReferenceException } from '../exceptions/circular-reference.exception';
+import { DuplicateRankException } from '../exceptions/duplicate-rank.exception';
+import { RankService } from 'src/modules/rank/services/rank.service';
 
 @Injectable()
 export class RoleService {
     constructor(
         private readonly repository : RolesRepository,
-        private readonly permissionService : PermissionService
+        private readonly permissionService : PermissionService,
+        private readonly rankService : RankService
     ) {}
 
     public async paginateRoles(options : IPaginationOptions) : Promise<Pagination<Role, IPaginationMeta>> {
         return this.repository.paginate(options);
     }
 
-    public async getRoleById(roleId : number, includePermissions : boolean = false, includeAccounts : boolean = false) : Promise<Role> {
+    public async getRoleById(roleId : number, includePermissions : boolean = false, includeRank : boolean = false) : Promise<Role> {
         let relations : string[] = [];
 
         if(includePermissions) {
             relations.push('permissions');
         }
 
-        if(includeAccounts) {
-            relations.push('accounts');
+        if(includeRank) {
+            relations.push('rank');
+            relations.push('rank.avatars')
         }
         
         return this.repository.getRole(roleId, 'id', relations);
@@ -38,10 +42,8 @@ export class RoleService {
         return this.repository.save(this.getNewRole(newRoleDTO));
     }
     
-    public async editRole(editRoleDTO : RoleDTO) : Promise<Role> {
-        let role : Role = await this.repository.getRole(editRoleDTO.id);
-
-        return this.repository.save(this.getEditRole(role, editRoleDTO));
+    public async editRole(roleDTO : RoleDTO) : Promise<Role> {
+        return this.repository.save(await this.getRole(roleDTO));
     }
 
     public async hasPermission(role : Role, permission : Permission) {
@@ -77,9 +79,22 @@ export class RoleService {
         return role;
     }
 
-    private getEditRole(role : Role, editRoleDTO : RoleDTO) : Role {
-        role.name = editRoleDTO.name;
-        role.description = editRoleDTO.description;
+    private async getRole(roleDTO : RoleDTO) : Promise<Role> {
+        const role : Role = await this.repository.getRole(roleDTO.id);
+
+        role.name = roleDTO.name;
+        role.description = roleDTO.description;
+        role.hidden = roleDTO.hidden;
+
+        const existingRoleWithRank = await this.repository.getRole(roleDTO.groupId, 'rank', [], false);
+
+        if (existingRoleWithRank) {
+            throw new DuplicateRankException();
+        }
+
+        const rank = await this.rankService.getRankById(roleDTO.groupId);
+
+        role.rank = rank;
 
         let roleParent: Role | undefined = role.parent;
     

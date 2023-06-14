@@ -10,10 +10,11 @@ import { PermissionsRepository } from "./repositories/permissions.repository";
 import { RolesRepository } from "./repositories/roles.repository";
 import { PermissionService } from "./services/permission.service";
 import { RoleService } from "./services/role.service";
+import { RankModule } from "../rank/rank.module";
 
 @Module({
     imports: [
-        forwardRef(() => AccountModule),
+        RankModule,
         SharedModule,
         TypeOrmModule.forFeature([Role, Permission])
     ],

@@ -12,9 +12,11 @@ import { AvatarsRepository } from "./repositories/avatars.repository";
 import { AvatarCurrencyService } from "./services/avatar-currency.service";
 import { AvatarSettingsService } from "./services/avatar-settings.service";
 import { AvatarService } from "./services/avatar.service";
+import { RoleModule } from "../role/role.module";
 
 @Module({
     imports: [
+        RoleModule,
         SettingModule,
         SharedModule,
         TypeOrmModule.forFeature([Avatar, AvatarSettings, AvatarCurrency]),

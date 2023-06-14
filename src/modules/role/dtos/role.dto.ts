@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsNotEmpty, IsNumber } from "class-validator";
+import { IsString, IsNotEmpty, IsNumber, IsBoolean, IsOptional } from "class-validator";
 
 export class RoleDTO {
     @ApiProperty()    
@@ -14,5 +14,21 @@ export class RoleDTO {
 
     @ApiProperty()
     @IsString()
+    @IsOptional()
     description : string;
+
+    @ApiProperty()
+    @IsBoolean()
+    @IsOptional()
+    hidden: boolean;
+
+    @ApiProperty()
+    @IsNumber()
+    @IsOptional()
+    groupId: number;
+
+    @ApiProperty()
+    @IsNumber()
+    @IsOptional()
+    parentId: number;
 }

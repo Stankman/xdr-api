@@ -6,19 +6,19 @@ import { RolePermission } from "src/common/decorators/role-permission.decorator"
 import { RolesGuard } from "src/common/guards/roles.guard";
 import { AppConfigService } from "src/config/app/app-config.service";
 import { Account } from "src/modules/account/entities/account.entity";
-import { AccountService } from "src/modules/account/services/accounts.service";
 import { FindOptionsWhere } from "typeorm";
 import { ArticleDTO } from "../dtos/article.dto";
 import { Article } from "../entities/article.entity";
 import { ArticlesService } from "../services/articles.service";
 import { Avatar } from "src/modules/avatar/entities/avatar.entity";
 import { AuthGuard } from "src/common/guards/auth.guard";
+import { AccountGuardService } from '../../account/services/account-guard.service';
 
 @ApiTags('Articles')
 @Controller('articles')
 export class ArticlesController {
     constructor(
-        private readonly accountService : AccountService,
+        private readonly accountGuardService : AccountGuardService,
         private readonly articlesService : ArticlesService,
         private readonly appConfigService : AppConfigService
     ) {}
@@ -67,7 +67,7 @@ export class ArticlesController {
     @UseGuards(AuthGuard)
     @Post('')
     public async createArticle(@Req() req : Request, @Body() articleDTO : ArticleDTO) : Promise<Article> {
-        const loggedAccount : Account = (await this.accountService.getLoggedAccount(req));
+        const loggedAccount : Account = (await this.accountGuardService.getLoggedAccount(req));
         const loggedAvatar : Avatar = loggedAccount.active_avatar;
         return this.articlesService.createArticle(articleDTO, loggedAvatar.id);
     }
@@ -76,7 +76,7 @@ export class ArticlesController {
     @UseGuards(AuthGuard, RolesGuard)
     @Put('')
     public async editArticle(@Req() req : Request, @Body() articleDTO : ArticleDTO) : Promise<Article> {
-        const loggedAccount : Account = (await this.accountService.getLoggedAccount(req));
+        const loggedAccount : Account = (await this.accountGuardService.getLoggedAccount(req));
         const loggedAvatar : Avatar = loggedAccount.active_avatar;
         return this.articlesService.editArticle(articleDTO, loggedAvatar.id);
     }

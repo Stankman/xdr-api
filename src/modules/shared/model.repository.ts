@@ -1,4 +1,4 @@
-import { plainToInstance } from "class-transformer";
+import { ClassTransformOptions, plainToInstance } from "class-transformer";
 import { FindManyOptions, FindOptionsWhere, Repository } from "typeorm";
 import { IPaginationMeta, IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
 import { ModelEntitySerializer } from "src/common/serializers/model.serializer";
@@ -6,7 +6,7 @@ import { NoSuchEntityException } from "src/common/exceptions/nosuchentity.except
 
 export class ModelRepository<T, K extends ModelEntitySerializer> extends Repository<T> {
     
-  public async getOneBy(whereOptions: FindOptionsWhere<T> | FindOptionsWhere<T>[], relations : string[] = [], throwsException : boolean = true,  transformOptions? : any): Promise<K> {
+  public async getOneBy(whereOptions: FindOptionsWhere<T> | FindOptionsWhere<T>[], relations : string[] = [], throwsException : boolean = true,  transformOptions? : ClassTransformOptions): Promise<K> {
     return this.findOne({
       where: whereOptions,
       relations: relations
@@ -27,11 +27,11 @@ export class ModelRepository<T, K extends ModelEntitySerializer> extends Reposit
     });
   }
 
-  public transform(model : T, transformOptions : any = {}) : K {
+  public transform(model : T, transformOptions : ClassTransformOptions = {}) : K {
     return plainToInstance(ModelEntitySerializer, model, transformOptions) as K;
   }
 
-  public transformMany(models : T[], transformOptions : any = {}) : K[] {
+  public transformMany(models : T[], transformOptions : ClassTransformOptions = {}) : K[] {
     return models.map(model => this.transform(model, transformOptions));
   }
 }

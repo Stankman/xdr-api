@@ -11,17 +11,17 @@ import { FindManyOptions } from 'typeorm';
 import { NewPurchaseDTO } from '../dtos/new-purchase.dto';
 import { PurchaseStatusDTO } from '../dtos/purchase-status.dto';
 import { NewShopOfferDTO } from '../dtos/new-shop-offer.dto';
-import { AccountService } from 'src/modules/account/services/accounts.service';
 import { Avatar } from 'src/modules/avatar/entities/avatar.entity';
 import { Account } from 'src/modules/account/entities/account.entity';
 import { AuthGuard } from 'src/common/guards/auth.guard';
+import { AccountGuardService } from 'src/modules/account/services/account-guard.service';
 
 @ApiTags('Shop')
 @UseGuards(AuthGuard)
 @Controller('shop')
 export class ShopController {
     constructor(
-        private readonly accountService : AccountService,
+        private readonly accountGuardService : AccountGuardService,
         private readonly shopOfferService : ShopOfferService,
         private readonly shopPaymentService : ShopPaymentService,
         private readonly appConfigService : AppConfigService
@@ -66,7 +66,7 @@ export class ShopController {
 
     @Post('purchase')
     public async makePayment(@Req() req : Request, @Body() newPurchaseDTO : NewPurchaseDTO) : Promise<ShopPayment> {
-        const loggedAccount : Account = (await this.accountService.getLoggedAccount(req));
+        const loggedAccount : Account = (await this.accountGuardService.getLoggedAccount(req));
         const loggedAvatar : Avatar = loggedAccount.active_avatar;
         return this.shopPaymentService.createNewPayment(newPurchaseDTO, loggedAvatar);
     }

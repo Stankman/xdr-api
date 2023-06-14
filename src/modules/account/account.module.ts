@@ -16,7 +16,6 @@ import { RoleModule } from "../role/role.module";
     imports: [
         Argon2ConfigModule,
         AvatarModule,
-        RoleModule,
         SharedModule,
         TypeOrmModule.forFeature([Account])
     ],

@@ -4,6 +4,8 @@ import { RankCommand } from "./rank-command.entity";
 import { RankRight } from "./rank-right.entity";
 import { Avatar } from "src/modules/avatar/entities/avatar.entity";
 import { Role } from "src/modules/role/entities/role.entity";
+import { BooleanEnum } from "src/common/models/boolean.model";
+import { BooleanTransformer } from "src/common/transformers/boolean.transformer";
 
 @Entity({ name: 'permission_groups' })
 export class Rank implements IRank {
@@ -31,8 +33,13 @@ export class Rank implements IRank {
     @Column({ name: 'room_effect' })
     roomEffect: number;
 
-    @Column({ name: 'log_enabled' })
-    logEnabled: string;
+    @Column({
+        name: 'log_enabled',
+        type: 'enum',
+        enum: BooleanEnum,
+        transformer: new BooleanTransformer()
+    })
+    logEnabled: boolean;
 
     @OneToMany(
         () => RankCommand,

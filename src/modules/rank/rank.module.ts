@@ -1,7 +1,5 @@
-import { Module } from "@nestjs/common";
+import { Module, forwardRef } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { AccountModule } from "../account/account.module";
-import { RoleModule } from "../role/role.module";
 import { SharedModule } from "../shared/shared.module";
 import { CommandsController } from "./controllers/commands.controller";
 import { RanksController } from "./controllers/ranks.controller";
@@ -24,8 +22,6 @@ import { RightService } from "./services/right.service";
 
 @Module({
     imports: [
-        AccountModule,
-        RoleModule,
         SharedModule,
         TypeOrmModule.forFeature([Rank, Command, Right, RankCommand, RankRight])
     ],

@@ -3,10 +3,10 @@ import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { Account } from '../entities/account.entity';
 import { Request } from 'express';
 import { AuthGuard } from '../../../common/guards/auth.guard';
-import { AccountService } from '../services/accounts.service';
 import { ChangePasswordDTO } from '../dtos/change-password.dto';
 import { AccountSettingsService } from '../services/account-settings.service';
 import { ChangeEmailDTO } from '../dtos/change-email.dto';
+import { AccountGuardService } from '../services/account-guard.service';
 
 @ApiTags('Account')
 @UseGuards(AuthGuard)
@@ -14,19 +14,19 @@ import { ChangeEmailDTO } from '../dtos/change-email.dto';
 export class AccountController {
 
     constructor(
-        private readonly accountService : AccountService,
+        private readonly accountGuardService : AccountGuardService,
         private readonly accountSettingsService : AccountSettingsService
     ) {}
 
     @Get()
     public async getLoggedAccount(@Req() req : Request) : Promise<Account> {
-        return await this.accountService.getLoggedAccount(req);
+        return await this.accountGuardService.getLoggedAccount(req);
     }
 
     @ApiBody({ type: [ChangePasswordDTO] })
     @Put('/settings/change-password')
     public async changePassword(@Req() req : Request, @Body() changePassword : ChangePasswordDTO) {
-        let account : Account = await this.accountService.getLoggedAccount(req);
+        let account : Account = await this.accountGuardService.getLoggedAccount(req);
 
         return await this.accountSettingsService.changePassword(account, changePassword);
     }
@@ -34,7 +34,7 @@ export class AccountController {
     @ApiBody({ type: [ChangeEmailDTO] })
     @Put('/settings/change-email')
     public async changeEmail(@Req() req : Request, @Body() changeEmail : ChangeEmailDTO) {
-        let account : Account = await this.accountService.getLoggedAccount(req);
+        let account : Account = await this.accountGuardService.getLoggedAccount(req);
 
         return await this.accountSettingsService.changeEmail(account, changeEmail);
     }

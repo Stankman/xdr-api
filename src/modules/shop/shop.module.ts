@@ -1,6 +1,5 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { AccountModule } from "../account/account.module";
 import { AvatarModule } from "../avatar/avatar.module";
 import { RconModule } from "../rcon/rcon.module";
 import { SharedModule } from "../shared/shared.module";
@@ -14,7 +13,6 @@ import { ShopPaymentService } from "./services/shop-payment.service";
 
 @Module({
     imports: [
-        AccountModule,
         AvatarModule,
         RconModule,
         SharedModule,

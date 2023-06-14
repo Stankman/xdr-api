@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { plainToInstance, instanceToPlain } from "class-transformer";
+import { plainToInstance, instanceToPlain, ClassTransformOptions } from "class-transformer";
 import { DataSource } from "typeorm";
 import { ModelRepository } from "../../shared/model.repository";
 import { Role } from "../entities/role.entity";
@@ -11,15 +11,15 @@ export class RolesRepository extends ModelRepository<Role, RoleSerializer> {
         super(Role, dataSource.createEntityManager());
     }
 
-    public async getRole(value : any, column : string = 'id', relations : string[] = [], throwsException : boolean = true, transformOptions? : any) : Promise<RoleSerializer> {
+    public async getRole(value : any, column : string = 'id', relations : string[] = [], throwsException : boolean = true, transformOptions? : ClassTransformOptions) : Promise<RoleSerializer> {
         return this.getOneBy({[column]: value}, relations, throwsException, transformOptions);
     }
 
-    public transform(model: Role, transformOptions : any = { groups: defaultRoleGroupsForSerializing }): RoleSerializer {
+    public transform(model: Role, transformOptions : ClassTransformOptions = {}): RoleSerializer {
         return plainToInstance(RoleSerializer, instanceToPlain(model, transformOptions), transformOptions);
     }
 
-    public transformMany(models: Role[], transformOptions : any = { groups: defaultRoleGroupsForSerializing }): RoleSerializer[] {
+    public transformMany(models: Role[], transformOptions : ClassTransformOptions = {}): RoleSerializer[] {
         return models.map(model => this.transform(model, transformOptions));
     }
 }

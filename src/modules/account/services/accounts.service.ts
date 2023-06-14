@@ -3,7 +3,6 @@ import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-
 import { FindOptionsWhere, In } from "typeorm";
 import { AccountsRepository } from "../repositories/accounts.repository";
 import { Account } from "../entities/account.entity";
-import { Request } from "express";
 import { NewAccountDTO } from "../dtos/new-account.dto";
 import { HashService } from "src/modules/shared/services/hash.service";
 import { AvatarService } from "src/modules/avatar/services/avatar.service";
@@ -15,16 +14,6 @@ export class AccountService {
       private readonly hashService : HashService,
       private readonly avatarService : AvatarService
   ) {}
-
-  public async getLoggedAccount(request : Request) : Promise<Account> {
-    let authAccount = request['xdr_uid'];
-
-    if(!authAccount) {
-      return null;
-    }
-
-    return await this.getAccountById(authAccount) ?? null;
-  }
 
   public async createAccount(newAccountDTO : NewAccountDTO) : Promise<Account> {
     let account = await this.getNewAccount(newAccountDTO);

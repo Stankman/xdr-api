@@ -12,7 +12,7 @@ export interface IRank {
     prefix: string;
     prefixColor: string;
     roomEffect: number;
-    logEnabled: string;
+    logEnabled: boolean;
     commands: RankCommand[];
     rights: RankRight[];
     avatars: Avatar[];

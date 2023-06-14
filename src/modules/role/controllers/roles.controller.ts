@@ -19,7 +19,7 @@ export class RolesController {
         private readonly appConfigService : AppConfigService
     ) {}
 
-    @RolePermission('view-roles')
+    @RolePermission('manage-roles')
     @UseGuards(AuthGuard, RolesGuard)
     @Get('all')
     public async paginateRoles(
@@ -35,7 +35,7 @@ export class RolesController {
         return await this.rolesService.paginateRoles(options);
     }
 
-    @RolePermission('view-roles')
+    @RolePermission('manage-roles')
     @UseGuards(AuthGuard, RolesGuard)
     @Get(':id')
     public async getRole(@Param() params : any) : Promise<Role> {
@@ -52,8 +52,8 @@ export class RolesController {
     @RolePermission('manage-roles')
     @UseGuards(AuthGuard, RolesGuard)    
     @Put(':id')
-    public async editRole(@Body() editRoleDTO : RoleDTO) : Promise<Role> {
-        return await this.rolesService.editRole(editRoleDTO);
+    public async updateRank(@Body() roleDTO : RoleDTO) : Promise<Role> {
+        return await this.rolesService.editRole(roleDTO);
     }
 
     @RolePermission('manage-roles')

@@ -5,6 +5,8 @@ import { AvatarSettings } from "./avatar-settings.entity";
 import { AvatarCurrency } from "./avatar-currency.entity";
 import { Rank } from "src/modules/rank/entities/rank.entity";
 import { ShopPayment } from "src/modules/shop/entities/shop-payment.entity";
+import { BooleanEnum } from "src/common/models/boolean.model";
+import { BooleanTransformer } from "src/common/transformers/boolean.transformer";
 
 @Entity({ name: 'users'})
 export class Avatar implements IAvatar {
@@ -26,7 +28,11 @@ export class Avatar implements IAvatar {
     @Column({ name: "rank" })
     rankId: number;
     
-    @Column()
+    @Column({
+        type: 'enum',
+        enum: BooleanEnum,
+        transformer: new BooleanTransformer()
+      })
     online: boolean;
     
     @Column()

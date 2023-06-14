@@ -113,7 +113,7 @@ export class RankService {
         rank.prefix = newRankDTO.prefix;
         rank.prefixColor = newRankDTO.prefix_color;
         rank.roomEffect = newRankDTO.room_effect;
-        rank.logEnabled = newRankDTO.log_enabled ? '1' : '0';
+        rank.logEnabled = newRankDTO.log_enabled;
         rank.commands = [];
         rank.rights = [];
 

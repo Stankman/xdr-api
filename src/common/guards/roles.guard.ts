@@ -1,32 +1,33 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PERMISSION_KEY } from '../decorators/role-permission.decorator';
-import { AccountService } from 'src/modules/account/services/accounts.service';
 import { Account } from 'src/modules/account/entities/account.entity';
-import { PermissionService } from 'src/modules/role/services/permission.service';
 import { Permission } from 'src/modules/role/entities/permission.entity';
+import { Role } from 'src/modules/role/entities/role.entity';
+import { AccountGuardService } from 'src/modules/account/services/account-guard.service';
+import { PermissionGuardService } from 'src/modules/role/services/permission-guard.service';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
     private readonly reflector : Reflector,
-    private readonly accountService : AccountService,
-    private readonly permissionService : PermissionService
+    private readonly accountGuardService : AccountGuardService,
+    private readonly permissionGuardService : PermissionGuardService
   ) {}
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredPermission = this.reflector.getAllAndOverride<string>(PERMISSION_KEY, [
+    const requiredRolePermission = this.reflector.getAllAndOverride<string>(PERMISSION_KEY, [
       context.getHandler(),
       context.getClass()
     ]);
 
-    return true; //TODO REMOVE THIS
+    return true;
 
-    if(!requiredPermission) {
+    if(!requiredRolePermission) {
       return true;
     }
 
-    const requiredRolePermission : Permission = await this.permissionService.getPermissionByName(requiredPermission);
+    const requiredPermission : Permission = await this.permissionGuardService.getPermissionByName(requiredRolePermission);
 
     if(!requiredRolePermission) {
       return true;
@@ -34,8 +35,14 @@ export class RolesGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
 
-    const loggedAccount : Account = await this.accountService.getLoggedAccount(request);
+    const loggedAccount : Account = await this.accountGuardService.getLoggedAccount(request);
 
-    return true; //TODO this
+    const role : Role = loggedAccount.active_avatar.rank.role;
+
+    if(!role) {
+      return false;
+    }
+    
+    return role.permissions.some((p) => p.name === requiredPermission.name);
   }
 }
