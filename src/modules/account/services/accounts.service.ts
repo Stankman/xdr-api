@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
-import { FindOptionsWhere, In } from "typeorm";
 import { AccountsRepository } from "../repositories/accounts.repository";
 import { Account } from "../entities/account.entity";
 import { NewAccountDTO } from "../dtos/new-account.dto";
 import { HashService } from "src/modules/shared/services/hash.service";
 import { AvatarService } from "src/modules/avatar/services/avatar.service";
-import { Avatar } from "src/modules/avatar/entities/avatar.entity";
 import { ClassTransformOptions } from "class-transformer";
 import { extendedAccountGroupsForSerializing } from "../serializers/account.serializer";
+import { extendTimestampsAvatarGroup } from "src/modules/avatar/serializers/avatar.serializer";
+import { In } from "typeorm";
 
 @Injectable()
 export class AccountService {
@@ -49,11 +49,11 @@ export class AccountService {
   }
 
   public async accountExists(email : string = '') : Promise<Account> {
-    const privacyGroup : ClassTransformOptions = {
-      groups: extendedAccountGroupsForSerializing
+    const transformOptions: ClassTransformOptions = {
+      groups: [...extendedAccountGroupsForSerializing, ...extendTimestampsAvatarGroup]
     }
 
-    return await this.repository.getAccount(email, 'email', ['activeAvatar'], false, privacyGroup) ?? null;
+    return await this.repository.getAccount(email, 'email', ['activeAvatar'], false, transformOptions) ?? null;
   }
 
   public async getNewAccount(newAccountDTO : NewAccountDTO) : Promise<Account> {
@@ -61,7 +61,7 @@ export class AccountService {
 
     account.email = newAccountDTO.email;
     account.password = await this.hashService.hash(newAccountDTO.password);
-    account.last_login = Math.floor(Date.now() / 1000);
+    account.lastLogin = new Date();
     account.ip_current = newAccountDTO.ip;
     account.ip_register = newAccountDTO.ip;
     account.created_at = new Date();

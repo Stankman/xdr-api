@@ -32,8 +32,8 @@ export class SignInService {
         }
 
         account.ip_current = signInDTO.ip;
-        account.last_login = Math.floor(Date.now() / 1000);
-        account.activeAvatar.last_login = Date.now()
+        account.lastLogin = new Date();
+        account.activeAvatar.lastLogin = Math.floor(Date.now() / 1000);
 
         this.accountsService.save(account);
 

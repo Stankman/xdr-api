@@ -13,8 +13,8 @@ export class Account implements IAccount {
     @Column()
     password: string;
 
-    @Column()
-    last_login : number;
+    @Column({ name: 'last_login'})
+    lastLogin : Date;
 
     @Column()
     ip_current: string;
@@ -35,6 +35,6 @@ export class Account implements IAccount {
     avatars: Avatar[];
 
     @JoinColumn({ name: 'active_avatar_id'})
-    @OneToOne(() => Avatar)
+    @OneToOne(() => Avatar, avatar => avatar.account, { cascade: true })
     activeAvatar: Avatar;
 }

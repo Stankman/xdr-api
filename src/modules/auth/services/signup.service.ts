@@ -25,7 +25,7 @@ export class SignUpService {
 
         const token = await this.tokenService.execute(account.id);
 
-        account.activeAvatar.last_login = Date.now();
+        account.activeAvatar.lastLogin = Date.now();
 
         this.accountService.save(account);
 

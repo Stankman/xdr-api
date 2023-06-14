@@ -46,14 +46,14 @@ export class Avatar implements IAvatar {
     @Column({type: 'enum', enum: BooleanEnum, transformer: new BooleanTransformer()})
     online: boolean;
     
-    @Column()
-    auth_ticket: string;
+    @Column({name: 'auth_ticket'})
+    authTicket: string;
     
-    @Column()
-    last_online: number;
+    @Column({name: 'last_online'})
+    lastOnline: number;
 
-    @Column()
-    last_login: number;
+    @Column({name: 'last_login'})
+    lastLogin: number;
 
     @CreateDateColumn()
     account_created: number;

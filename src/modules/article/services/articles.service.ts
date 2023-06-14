@@ -56,7 +56,7 @@ export class ArticlesService {
         article.hidden = articleDTO.hidden;
         article.pinned = articleDTO.pinned;
         article.author = avatar;
-        article.created_at = new Date();
+        article.createdAt = new Date();
 
         return article;
     }

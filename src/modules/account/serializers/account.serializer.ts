@@ -22,7 +22,7 @@ export class AccountSerializer extends ModelEntitySerializer implements IAccount
   password: string;
 
   @Expose({ groups: ['account.timestamps'] })
-  last_login: number;
+  lastLogin: Date;
 
   @Expose({ groups: ['account.privacy']})
   ip_current: string;

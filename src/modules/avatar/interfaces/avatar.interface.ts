@@ -17,9 +17,9 @@ export interface IAvatar {
     rankId: number;
     rank: Rank;
     online: boolean;
-    auth_ticket: string;
-    last_online: number;
-    last_login: number;
+    authTicket: string;
+    lastOnline: number;
+    lastLogin: number;
     account_created: number;
     settings: AvatarSettings;
     articles: Article[];

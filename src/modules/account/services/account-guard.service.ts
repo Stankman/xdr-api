@@ -18,6 +18,6 @@ export class AccountGuardService {
       return null;
     }
 
-    return await this.repository.getAccount(authAccount, 'id', ['activeAvatar.rank.role.permissions'], false, transformOptions) ?? null;
+    return await this.repository.getAccount(authAccount, 'id', ['activeAvatar.currencies', 'activeAvatar.rank.role.permissions'], false, transformOptions) ?? null;
   }
 }

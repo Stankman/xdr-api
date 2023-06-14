@@ -18,6 +18,20 @@ export const defaultAvatarGroup: string[] = [
     'avatar.default'
 ];
 
+export const extendCurrenciesAvatarGroup: string[] = [
+    ...defaultAvatarGroup,
+    'avatar.currencies'
+];
+
+export const extendTimestampsAvatarGroup: string[] = [
+    'avatar.timestamps'
+];
+
+export const extendCompleteAvatarGroup: string[] = [
+    ...extendCurrenciesAvatarGroup,
+    ...extendTimestampsAvatarGroup
+];
+
 export const extendRankAvatarGroup: string[] = [
     ...defaultAvatarGroup,
     'avatar.rank'
@@ -59,13 +73,13 @@ export class AvatarSerializer extends ModelEntitySerializer implements IAvatar {
     online: boolean;
 
     @Expose({groups: ['avatar.ticket']})
-    auth_ticket: string;
+    authTicket: string;
 
     @Expose({groups: ['avatar.timestamps']})
-    last_online: number;
+    lastOnline: number;
     
     @Expose({groups: ['avatar.timestamps']})
-    last_login: number;
+    lastLogin: number;
     
     @Expose({groups: ['avatar.timestamps']})
     account_created: number;

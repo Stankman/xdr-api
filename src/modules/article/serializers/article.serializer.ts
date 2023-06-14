@@ -28,8 +28,8 @@ export class ArticleSerializer extends ModelEntitySerializer implements IArticle
     pinned: boolean;
 
     @Expose()
-    created_at: Date;
+    createdAt: Date;
 
     @Expose()
-    updated_at: Date;
+    updatedAt: Date;
 }

@@ -7,6 +7,7 @@ import { ChangePasswordDTO } from '../dtos/change-password.dto';
 import { AccountSettingsService } from '../services/account-settings.service';
 import { ChangeEmailDTO } from '../dtos/change-email.dto';
 import { AccountGuardService } from '../services/account-guard.service';
+import { extendCompleteAvatarGroup } from 'src/modules/avatar/serializers/avatar.serializer';
 
 @ApiTags('Account')
 @UseGuards(AuthGuard)
@@ -20,7 +21,7 @@ export class AccountController {
 
     @Get()
     public async getLoggedAccount(@Req() req : Request) : Promise<Account> {
-        return await this.accountGuardService.getLoggedAccount(req);
+        return await this.accountGuardService.getLoggedAccount(req, { groups: extendCompleteAvatarGroup });
     }
 
     @ApiBody({ type: [ChangePasswordDTO] })

@@ -30,6 +30,10 @@ export class AvatarsController {
         return await this.avatarService.paginateAvatars(options, searchOptions);
     }
 
+    //TODO recent avatars registered
+    // @Get('recent')
+    // public async recent
+
     @Get(':id')
     public async getAvatar(@Param() params : any) : Promise<Avatar> {
         return await this.avatarService.getAvatarById(params.id);

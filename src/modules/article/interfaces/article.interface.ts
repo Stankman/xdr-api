@@ -11,6 +11,6 @@ export interface IArticle {
     author: Avatar;
     hidden : boolean;
     pinned : boolean;
-    created_at : Date;
-    updated_at : Date;
+    createdAt : Date;
+    updatedAt : Date;
 }
