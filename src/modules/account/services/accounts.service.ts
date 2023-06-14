@@ -6,6 +6,9 @@ import { Account } from "../entities/account.entity";
 import { NewAccountDTO } from "../dtos/new-account.dto";
 import { HashService } from "src/modules/shared/services/hash.service";
 import { AvatarService } from "src/modules/avatar/services/avatar.service";
+import { Avatar } from "src/modules/avatar/entities/avatar.entity";
+import { ClassTransformOptions } from "class-transformer";
+import { extendedAccountGroupsForSerializing } from "../serializers/account.serializer";
 
 @Injectable()
 export class AccountService {
@@ -33,7 +36,7 @@ export class AccountService {
 
   public async getAccountById(id : number|string) : Promise<Account> {
     let relations : string[] = [
-      'active_avatar', 'active_avatar.currencies', 'active_avatar.rank'
+      'activeAvatar', 'activeAvatar.currencies', 'activeAvatar.rank'
     ];
     
     return await this.repository.getAccount(id, 'id', relations) ?? null;
@@ -45,12 +48,12 @@ export class AccountService {
     });
   }
 
-  public async accountExists(email : string = '', transformOptions : any = {}, throwErrors : boolean = false) : Promise<Account> {
-    let relations : string[] = [
-      'active_avatar', 'active_avatar.currencies', 'active_avatar.rank'
-    ];
-    
-    return await this.repository.getAccount(email, 'email', relations, throwErrors, transformOptions) ?? null;
+  public async accountExists(email : string = '') : Promise<Account> {
+    const privacyGroup : ClassTransformOptions = {
+      groups: extendedAccountGroupsForSerializing
+    }
+
+    return await this.repository.getAccount(email, 'email', ['activeAvatar'], false, privacyGroup) ?? null;
   }
 
   public async getNewAccount(newAccountDTO : NewAccountDTO) : Promise<Account> {

@@ -12,14 +12,12 @@ import { XdrSettingsRepository } from "./repositories/xdr-settings.repository";
 import { ArcturusSettingService } from "./services/arcturus-setting.service";
 import { ArcturusTextService } from "./services/arcturus-text.service";
 import { XdrSettingService } from "./services/xdr-setting.service";
+import { SharedModule } from "../shared/shared.module";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([
-            XdrSetting,
-            ArcturusSetting,
-            ArcturusText
-        ])
+        SharedModule,
+        TypeOrmModule.forFeature([ArcturusSetting, ArcturusText, XdrSetting])
     ],
     controllers: [
         XdrSettingsController,

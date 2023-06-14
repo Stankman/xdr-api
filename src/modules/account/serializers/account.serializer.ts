@@ -1,21 +1,18 @@
-import { Exclude, Expose } from "class-transformer";
+import { Exclude, Expose, Type } from "class-transformer";
 import { ModelEntitySerializer } from "src/common/serializers/model.serializer";
 import { IAccount } from "../interfaces/account.interface";
-import { Role } from "src/modules/role/entities/role.entity";
 import { Avatar } from "src/modules/avatar/entities/avatar.entity";
+import { AvatarSerializer } from "src/modules/avatar/serializers/avatar.serializer";
 
 export const defaultAccountGroupsForSerializing: string[] = [
-  'account.timestamps', 'roles'
+  'account.timestamps'
 ];
 
 export const extendedAccountGroupsForSerializing: string[] = [
   ...defaultAccountGroupsForSerializing,
+  'account.privacy'
 ];
 
-export const allAccountGroupsForSerializing: string[] = [
-  ...extendedAccountGroupsForSerializing,
-  'account.privacy',
-];
 export class AccountSerializer extends ModelEntitySerializer implements IAccount {
   id: number;
 
@@ -41,5 +38,6 @@ export class AccountSerializer extends ModelEntitySerializer implements IAccount
 
   avatars: Avatar[];
 
+  @Type(() => AvatarSerializer)
   activeAvatar: Avatar;
 }

@@ -32,7 +32,7 @@ export class RoleService {
 
         if(includeRank) {
             relations.push('rank');
-            relations.push('rank.avatars')
+            relations.push('rank.avatars');
         }
         
         return this.repository.getRole(roleId, 'id', relations);
@@ -51,7 +51,7 @@ export class RoleService {
     }
 
     public async togglePermission(togglePermissionDTO : TogglePermissionDTO) : Promise<Role> {
-        const role : Role = await this.repository.getRole(togglePermissionDTO.roleId);
+        const role : Role = await this.repository.getRole(togglePermissionDTO.roleId, 'id', ['permissions']);
         const permission : Permission = await this.permissionService.getPermissionByName(togglePermissionDTO.permissionName);
 
         if(this.hasPermission(role, permission)) {

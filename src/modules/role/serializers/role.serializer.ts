@@ -5,6 +5,7 @@ import { Permission } from "../entities/permission.entity";
 import { Rank } from "src/modules/rank/entities/rank.entity";
 import { Role } from "../entities/role.entity";
 import { RankSerializer } from "src/modules/rank/serializers/rank.serializer";
+import { PermissionSerializer } from "./permission.serializer";
 
 export const defaultRoleGroupsForSerializing: string[] = [
     'role.timestamps'
@@ -15,8 +16,10 @@ export class RoleSerializer extends ModelEntitySerializer implements IRole {
     
     name: string;
 
+    @Expose({groups: ['role.details']})
     description: string;
 
+    @Expose({groups: ['role.details']})
     hidden: boolean;
 
     @Expose({ groups: ['role.timestamps'] })
@@ -28,6 +31,7 @@ export class RoleSerializer extends ModelEntitySerializer implements IRole {
     @Type(() => RankSerializer)
     rank: Rank;
 
+    @Type(() => PermissionSerializer)
     permissions: Permission[];
 
     parent: Role;

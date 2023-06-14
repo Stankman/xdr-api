@@ -6,6 +6,7 @@ import { RankRight } from "../entities/rank-right.entity";
 import { IRank } from "../interfaces/rank.interface";
 import { Exclude, Expose, Type } from "class-transformer";
 import { AvatarSerializer } from "src/modules/avatar/serializers/avatar.serializer";
+import { RoleSerializer } from "src/modules/role/serializers/role.serializer";
 
 export const extendedRankSerializing: string[] = [
     'extended.rank'
@@ -18,10 +19,10 @@ export class RankSerializer extends ModelEntitySerializer implements IRank {
     @Expose()
     name: string;
     
-    @Expose()
+    @Expose({groups: ['rank.details']})
     description: string;
     
-    @Expose()
+    @Expose({groups: ['rank.details']})
     badge: string;
     
     @Expose({groups: ['rank.extended']})
@@ -46,5 +47,6 @@ export class RankSerializer extends ModelEntitySerializer implements IRank {
     @Type(() => AvatarSerializer)
     avatars: Avatar[];
     
+    @Type(() => RoleSerializer)
     role: Role;
 }

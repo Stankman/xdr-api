@@ -3,7 +3,7 @@ import { plainToInstance, instanceToPlain } from "class-transformer";
 import { DataSource } from "typeorm";
 import { ModelRepository } from "../../shared/model.repository";
 import { Permission } from "../entities/permission.entity";
-import { PermissionSerializer, defaultPermissionGroupsForSerializing } from "../serializers/permission.serializer";
+import { PermissionSerializer, extendedPermissionGroupsForSerializing } from "../serializers/permission.serializer";
 
 @Injectable()
 export class PermissionsRepository extends ModelRepository<Permission, PermissionSerializer> {
@@ -15,11 +15,11 @@ export class PermissionsRepository extends ModelRepository<Permission, Permissio
         return this.getOneBy({[column]: value}, [], throwsException, transformOptions);
     }
 
-    public transform(model: Permission, transformOptions : any = { groups: defaultPermissionGroupsForSerializing }): PermissionSerializer {
+    public transform(model: Permission, transformOptions : any = { groups: extendedPermissionGroupsForSerializing }): PermissionSerializer {
         return plainToInstance(PermissionSerializer, instanceToPlain(model, transformOptions), transformOptions);
     }
 
-    public transformMany(models: Permission[], transformOptions : any = { groups: defaultPermissionGroupsForSerializing }): PermissionSerializer[] {
+    public transformMany(models: Permission[], transformOptions : any = { groups: extendedPermissionGroupsForSerializing }): PermissionSerializer[] {
         return models.map(model => this.transform(model, transformOptions));
     }
 }

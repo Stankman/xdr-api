@@ -49,8 +49,7 @@ export class PermissionService {
 
     private async getPermission(permissionDTO : PermissionDTO) : Promise<Permission> {
         const permission : Permission = await this.repository.getPermission(permissionDTO.name);
-
-        permission.name = permissionDTO.name;
+        
         permission.description = permissionDTO.description;
 
         return permission;

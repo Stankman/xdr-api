@@ -7,7 +7,6 @@ import { SignInDTO } from "../dtos/signin.dto";
 import { BanException } from "../exceptions/ban.exception";
 import { LoginException } from "../exceptions/login.exception";
 import { TokenService } from "./token.service";
-import { allAccountGroupsForSerializing } from "src/modules/account/serializers/account.serializer";
 import { HashService } from "src/modules/shared/services/hash.service";
 
 @Injectable()
@@ -20,18 +19,13 @@ export class SignInService {
     ) {}
 
     public async signIn(signInDTO : SignInDTO) : Promise<any> {
-        let account : Account = await this.accountsService.accountExists(
-            signInDTO.identification, 
-            {
-                groups: allAccountGroupsForSerializing
-            }
-        );
+        let account : Account = await this.accountsService.accountExists(signInDTO.identification);
 
         if(!account || !(await this.hashService.verify(account.password, signInDTO.password))) {
             throw new LoginException();
         }
 
-        let ban : Ban = await this.banService.getBan(account.id);
+        let ban : Ban = await this.banService.getBan(account.activeAvatar.id);
 
         if(ban) {
             throw new BanException();

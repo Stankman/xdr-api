@@ -18,7 +18,7 @@ export class PermissionsController {
         private readonly appConfigService : AppConfigService
     ) {}
 
-    @RolePermission('view-roles')
+    @RolePermission('manage-roles')
     @UseGuards(AuthGuard, RolesGuard)
     @Get('all')
     public async paginatePermissions(
@@ -34,7 +34,7 @@ export class PermissionsController {
         return await this.permissionService.paginatePermissions(options);
     }
 
-    @RolePermission('view-roles')
+    @RolePermission('manage-roles')
     @UseGuards(AuthGuard, RolesGuard)
     @Get(':name')
     public async getPermission(@Param() params : any) : Promise<Permission> {
@@ -44,14 +44,14 @@ export class PermissionsController {
     @RolePermission('manage-roles')
     @UseGuards(AuthGuard, RolesGuard)
     @Post()
-    public async createRole(@Body() newPermissionDTO : NewPermissionDTO) : Promise<Permission> {
+    public async createPermission(@Body() newPermissionDTO : NewPermissionDTO) : Promise<Permission> {
         return await this.permissionService.createPermission(newPermissionDTO);
     }
 
     @RolePermission('manage-roles')
     @UseGuards(AuthGuard, RolesGuard)    
-    @Put(':id')
-    public async editRole(@Body() PermissionDTO : PermissionDTO) : Promise<Permission> {
+    @Put()
+    public async updatePermission(@Body() PermissionDTO : PermissionDTO) : Promise<Permission> {
         return await this.permissionService.editPermission(PermissionDTO);
     }
 }
