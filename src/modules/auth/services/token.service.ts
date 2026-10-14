@@ -14,11 +14,10 @@ export class TokenService {
         if (!sessionId) {
             throw new Error('An active website session is required to issue an access token.');
         }
+        // iat and iss are added by JwtService signOptions.
         const payload : IPayload = {
-            iat: Math.floor(Date.now() / 1000),
             uid: userId,
             sid: sessionId,
-            iss: this.tokenConfig.issuer
         }
 
         return await this.jwtService.signAsync(payload);

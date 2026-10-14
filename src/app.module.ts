@@ -11,7 +11,7 @@ import { AuthenticationModule } from './modules/auth/authentication.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { SettingModule } from './modules/setting/setting.module';
-import { TurboModule } from './modules/turbo/turbo.module';
+import { PermissionModule } from './modules/permission/permission.module';
 import { RequestContextMiddleware } from './common/middleware/request-context.middleware';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/exceptions/exception.filter';
@@ -37,7 +37,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     AuditModule,
     AdminModule,
     SettingModule,
-    TurboModule,
+    PermissionModule,
   ],
   providers: [
     {

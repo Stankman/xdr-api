@@ -3,6 +3,17 @@
 -- Apply production changes only with the xdr-scoped TypeORM migrations.
 -- No database connection is opened by the exporter.
 
+CREATE TABLE `xdr_account_permission_groups` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `account_id` int NOT NULL,
+  `group_id` int UNSIGNED NOT NULL,
+  `expires_at` datetime NULL,
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  INDEX `IDX_xdr_account_permission_groups_group` (`group_id`),
+  UNIQUE INDEX `UQ_xdr_account_permission_groups_account_group` (`account_id`, `group_id`),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
 CREATE TABLE `xdr_account_players` (
   `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
   `account_id` int NOT NULL,
@@ -80,6 +91,26 @@ CREATE TABLE `xdr_audit_logs` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
+CREATE TABLE `xdr_permission_group_nodes` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `group_id` int UNSIGNED NOT NULL,
+  `node` varchar(128) NOT NULL,
+  `value` tinyint NOT NULL,
+  UNIQUE INDEX `UQ_xdr_permission_group_nodes_group_node` (`group_id`, `node`),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `xdr_permission_groups` (
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL,
+  `display_name` varchar(128) NOT NULL,
+  `weight` int NOT NULL DEFAULT '0',
+  `created_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  `updated_at` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  UNIQUE INDEX `UQ_xdr_permission_groups_name` (`name`),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
 CREATE TABLE `xdr_sessions` (
   `id` char(36) NOT NULL,
   `account_id` int NOT NULL,
@@ -104,10 +135,16 @@ CREATE TABLE `xdr_settings` (
   PRIMARY KEY (`key`)
 ) ENGINE=InnoDB;
 
+ALTER TABLE `xdr_account_permission_groups` ADD CONSTRAINT `FK_1641f31decb6dad8801e9095eff` FOREIGN KEY (`account_id`) REFERENCES `xdr_accounts`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
+ALTER TABLE `xdr_account_permission_groups` ADD CONSTRAINT `FK_fbdbb49f0ff129f90554b3ea6a3` FOREIGN KEY (`group_id`) REFERENCES `xdr_permission_groups`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
+
 ALTER TABLE `xdr_account_players` ADD CONSTRAINT `FK_1c4cfd13550596991c4c1c31994` FOREIGN KEY (`account_id`) REFERENCES `xdr_accounts`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 ALTER TABLE `xdr_account_tokens` ADD CONSTRAINT `FK_d2c046b9273fea038176a71150b` FOREIGN KEY (`account_id`) REFERENCES `xdr_accounts`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 ALTER TABLE `xdr_articles` ADD CONSTRAINT `FK_69d95f9e39c9d6ace4a827a03d2` FOREIGN KEY (`author_account_id`) REFERENCES `xdr_accounts`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION;
+
+ALTER TABLE `xdr_permission_group_nodes` ADD CONSTRAINT `FK_8c0b279bdf8079640b3af79f88b` FOREIGN KEY (`group_id`) REFERENCES `xdr_permission_groups`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 ALTER TABLE `xdr_sessions` ADD CONSTRAINT `FK_f3e0d53c9321db18fd0f79b0674` FOREIGN KEY (`account_id`) REFERENCES `xdr_accounts`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;

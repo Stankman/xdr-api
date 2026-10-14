@@ -1,7 +1,7 @@
 # XDR API
 
-NestJS backend for XDR website accounts and content, with a typed integration to the Turbo Admin
-API. This repository does not include or modify a frontend.
+NestJS backend for XDR website accounts, content and CMS permissions. It shares the Turbo
+emulator's MySQL database. This repository does not include or modify a frontend.
 
 ## Requirements
 
@@ -29,6 +29,14 @@ npm run start:prod
 
 Swagger/OpenAPI is served at `/api/docs`. The default application port is 9000.
 
+Public news is available at `GET /articles` and `GET /articles/available`.
+Both accept `page` (1–100000), `limit` (1–100, default 10), and optional `q`
+(at most 80 characters) to search titles and descriptions. Surrounding search
+whitespace is ignored and wildcard characters are treated literally. Results
+include only visible, published articles, ordered pinned first and newest first,
+with `items` and `meta` pagination data inside the standard response envelope.
+Deploy this search support alongside frontend URL-backed news search.
+
 ## Persistence
 
 NestJS manages only XDR-owned tables. Synchronization and startup migrations are disabled. The
@@ -44,26 +52,31 @@ Review [docs/database-model.md](docs/database-model.md) and [docs/schema.sql](do
 before applying production migrations. The schema export is a metadata reference, not a live
 database dump or proof that a migration was applied.
 
-## Turbo reference
+## Turbo emulator
 
-Turbo remains authoritative for game state, permission resolution, game login tickets, and game
-mutations. XDR requests that access Turbo Admin need both an XDR access token and the caller's
-individual Turbo Admin bearer session in `X-Turbo-Admin-Token`. Configure the private Turbo Admin
-URL with `TURBO_ADMIN_BASE_URL`.
+XDR does not use the Turbo Admin API. Public registration (`POST /auth/register`) creates the
+website account, one emulator `players` row and their `xdr_account_players` link in a single
+transaction. CMS routes are authorized by XDR's own account permission groups, assigned with:
 
-The inspected Turbo integration routes, authentication requirements, and unsupported XDR account
-linking/CMS permission capabilities are documented in
-[docs/turbo-integration.md](docs/turbo-integration.md). Live Turbo compatibility and live MySQL
-migrations were not verified by local tests.
+```powershell
+npm run permissions:assign -- --email staff@example.com --group admin
+npm run permissions:list -- --email staff@example.com
+npm run permissions:remove -- --email staff@example.com --group admin
+```
+
+The `players` insert contract and the Turbo behaviors not reproduced (owner bootstrap, word filter)
+are documented in [docs/turbo-integration.md](docs/turbo-integration.md). Live Turbo compatibility
+and live MySQL migrations were not verified by local tests.
 
 ## Scope and plan
 
-The current API excludes payment-shop endpoints, media uploads, XDR role/permission tables, direct
-Turbo table writes, and frontend changes. See [docs/api-plan.md](docs/api-plan.md) for implemented
-routes, operational configuration, test boundaries, and remaining integration blockers.
+The current API excludes payment-shop endpoints, media uploads, game-table writes other than the
+registration player insert, and frontend changes. See [docs/api-plan.md](docs/api-plan.md) for
+implemented routes, operational configuration and test boundaries.
 
 Unit tests cover pagination, session revocation/ownership, refresh rotation and reuse detection,
-published-article filtering, Turbo authorization/failure handling, and mail configuration. The
+published-article filtering, atomic registration with its player link, XDR permission resolution
+and guarding, and mail configuration. The
 e2e suite loads the application using XDR entity metadata without a database connection; it checks
 configuration, Swagger, validation/authorization responses, XDR-only entities and migration scope.
-It does not prove live MySQL migration execution, SMTP delivery, or Turbo connectivity/permissions.
+It does not prove live MySQL migration execution, SMTP delivery, or the live `players` insert.

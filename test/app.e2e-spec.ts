@@ -73,7 +73,7 @@ describe('NestJS migration smoke tests (no external database)', () => {
     expect(app.get(AppConfigService).name).toBeTruthy();
   });
 
-  it('documents only the active XDR and Turbo integration routes', () => {
+  it('documents only the active XDR routes', () => {
     const document = SwaggerModule.createDocument(
       app,
       new DocumentBuilder().build(),
@@ -81,7 +81,9 @@ describe('NestJS migration smoke tests (no external database)', () => {
     expect(document.paths['/articles/available'].get).toBeDefined();
     expect(document.paths['/auth/login'].post).toBeDefined();
     expect(document.paths['/settings/public'].get).toBeDefined();
-    expect(document.paths['/turbo/players'].get).toBeDefined();
+    expect(
+      Object.keys(document.paths).filter((path) => path.startsWith('/turbo')),
+    ).toEqual([]);
     expect(document.paths['/shop/purchase']).toBeUndefined();
     expect(document.paths['/account/sessions'].get).toEqual(
       expect.objectContaining({
@@ -135,7 +137,7 @@ describe('NestJS migration smoke tests (no external database)', () => {
       join(__dirname, '..', 'docs', 'schema.sql'),
       'utf8',
     );
-    expect(source.entityMetadatas).toHaveLength(7);
+    expect(source.entityMetadatas).toHaveLength(10);
     expect(source.entityMetadatas.every((metadata) => metadata.tableName.startsWith('xdr_'))).toBe(
       true,
     );

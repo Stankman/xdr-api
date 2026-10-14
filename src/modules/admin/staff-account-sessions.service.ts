@@ -15,7 +15,7 @@ export class StaffAccountSessionsService {
   async list(
     targetAccountId: number,
     actorAccountId: number,
-    actorPlayerId: number,
+    actorPlayerId: number | null,
     requestId: string,
     page: number,
     limit: number,
@@ -37,7 +37,7 @@ export class StaffAccountSessionsService {
     targetAccountId: number,
     sessionId: string,
     actorAccountId: number,
-    actorPlayerId: number,
+    actorPlayerId: number | null,
     requestId: string,
   ): Promise<{ message: string }> {
     try {

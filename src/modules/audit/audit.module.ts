@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AuthenticationModule } from '../auth/authentication.module';
-import { TurboModule } from '../turbo/turbo.module';
+import { PermissionModule } from '../permission/permission.module';
 import { AuditController } from './audit.controller';
 import { AuditStorageModule } from './audit-storage.module';
 
 @Module({
-  imports: [AuditStorageModule, AuthenticationModule, TurboModule],
+  imports: [AuditStorageModule, AuthenticationModule, PermissionModule],
   controllers: [AuditController],
   exports: [AuditStorageModule],
 })

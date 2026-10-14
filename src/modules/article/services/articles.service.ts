@@ -15,7 +15,7 @@ const MAX_PAGE_SIZE = 100;
 
 interface ArticleActor {
   accountId: number;
-  playerId: number;
+  playerId: number | null;
   requestId?: string;
 }
 
@@ -28,8 +28,8 @@ export class ArticlesService {
     private readonly articles: Repository<Article>,
   ) {}
 
-  async listPublished(page: number, limit: number) {
-    return this.list({ page, limit }, true);
+  async listPublished(page: number, limit: number, search?: unknown) {
+    return this.list({ page, limit, search }, true);
   }
 
   async listForAdministration(page: number, limit: number, search?: string) {
@@ -124,12 +124,19 @@ export class ArticlesService {
   }
 
   private async list(
-    input: { page: number; limit: number; search?: string },
+    input: { page: number; limit: number; search?: unknown },
     publishedOnly: boolean,
   ) {
     this.validatePagination(input.page, input.limit);
-    if (input.search && input.search.length > 80) {
-      throw new BadRequestException('Article search must be at most 80 characters.');
+    let search: string | undefined;
+    if (input.search !== undefined) {
+      if (typeof input.search !== 'string') {
+        throw new BadRequestException('Article search must be a string.');
+      }
+      if (input.search.length > 80) {
+        throw new BadRequestException('Article search must be at most 80 characters.');
+      }
+      search = input.search.trim();
     }
     const query = this.articles.createQueryBuilder('article');
     if (publishedOnly) {
@@ -137,8 +144,8 @@ export class ArticlesService {
         .andWhere('article.hidden = :hidden', { hidden: false })
         .andWhere('article.publishedAt IS NOT NULL');
     }
-    if (input.search) {
-      const term = input.search.trim().replace(/[\\%_]/g, '\\$&');
+    if (search) {
+      const term = search.replace(/[\\%_]/g, '\\$&');
       query.andWhere('(article.title LIKE :term OR article.description LIKE :term)', {
         term: `%${term}%`,
       });

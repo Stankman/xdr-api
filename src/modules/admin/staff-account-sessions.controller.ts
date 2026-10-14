@@ -2,7 +2,6 @@ import {
   Controller,
   DefaultValuePipe,
   Delete,
-  ForbiddenException,
   Get,
   Param,
   ParseIntPipe,
@@ -11,20 +10,17 @@ import {
   UseGuards,
   Req,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiHeader, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthenticatedRequest } from '../../common/interfaces/authenticated-request.interface';
-import { RequireTurboPermission } from '../../common/decorators/turbo-permission.decorator';
+import { RequirePermission } from '../../common/decorators/permission.decorator';
 import { AuthGuard } from '../../common/guards/auth.guard';
-import { TurboAdminGuard } from '../../common/guards/turbo-admin.guard';
-import { TurboPermissionGuard } from '../../common/guards/turbo-permission.guard';
+import { PermissionGuard } from '../../common/guards/permission.guard';
 import { PositiveIntPipe } from '../../common/pipes/positive-int.pipe';
 import { BoundedPagePipe } from '../../common/pipes/bounded-page.pipe';
 import { StaffAccountSessionsService } from './staff-account-sessions.service';
 
 @ApiTags('Administrative account sessions')
 @ApiBearerAuth()
-@ApiSecurity('TurboAdminToken')
-@ApiHeader({ name: 'X-Turbo-Admin-Token', required: true })
 @Controller('admin/accounts/:accountId/sessions')
 export class StaffAccountSessionsController {
   constructor(private readonly staffSessions: StaffAccountSessionsService) {}
@@ -38,8 +34,8 @@ export class StaffAccountSessionsController {
     maximum: 100_000,
   })
   @ApiQuery({ name: 'limit', required: false, type: Number, minimum: 1, maximum: 100, example: 50 })
-  @UseGuards(AuthGuard, TurboAdminGuard, TurboPermissionGuard)
-  @RequireTurboPermission('cms.accounts.sessions.view')
+  @UseGuards(AuthGuard, PermissionGuard)
+  @RequirePermission('cms.accounts.sessions.view')
   list(
     @Param('accountId', PositiveIntPipe) accountId: number,
     @Req() request: AuthenticatedRequest,
@@ -49,7 +45,7 @@ export class StaffAccountSessionsController {
     return this.staffSessions.list(
       accountId,
       request.xdr_uid,
-      this.turboPlayerId(request),
+      null,
       this.requestId(request),
       page,
       limit,
@@ -57,8 +53,8 @@ export class StaffAccountSessionsController {
   }
 
   @Delete(':sessionId')
-  @UseGuards(AuthGuard, TurboAdminGuard, TurboPermissionGuard)
-  @RequireTurboPermission('cms.accounts.sessions.manage')
+  @UseGuards(AuthGuard, PermissionGuard)
+  @RequirePermission('cms.accounts.sessions.manage')
   revoke(
     @Param('accountId', PositiveIntPipe) accountId: number,
     @Param('sessionId', new ParseUUIDPipe()) sessionId: string,
@@ -68,16 +64,9 @@ export class StaffAccountSessionsController {
       accountId,
       sessionId,
       request.xdr_uid,
-      this.turboPlayerId(request),
+      null,
       this.requestId(request),
     );
-  }
-
-  private turboPlayerId(request: AuthenticatedRequest): number {
-    if (!request.turbo_admin_player_id) {
-      throw new ForbiddenException('Turbo Admin identity is required.');
-    }
-    return request.turbo_admin_player_id;
   }
 
   private requestId(request: AuthenticatedRequest): string {

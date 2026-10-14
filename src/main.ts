@@ -16,10 +16,6 @@ async function bootstrap() {
     .setDescription(appConfig.name + ' developed by Stankman')
     .setVersion('1.0.0')
     .addBearerAuth()
-    .addApiKey(
-      { type: 'apiKey', in: 'header', name: 'X-Turbo-Admin-Token' },
-      'TurboAdminToken',
-    )
     .build();
 
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerOptions);

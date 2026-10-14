@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthenticationModule } from '../auth/authentication.module';
 import { AuditStorageModule } from '../audit/audit-storage.module';
-import { TurboModule } from '../turbo/turbo.module';
+import { PermissionModule } from '../permission/permission.module';
 import { ArticlesController } from './controllers/articles.controller';
 import { Article } from './entities/article.entity';
 import { ArticlesService } from './services/articles.service';
@@ -12,7 +12,7 @@ import { ArticlesService } from './services/articles.service';
     TypeOrmModule.forFeature([Article]),
     AuthenticationModule,
     AuditStorageModule,
-    TurboModule,
+    PermissionModule,
   ],
   controllers: [ArticlesController],
   providers: [ArticlesService],

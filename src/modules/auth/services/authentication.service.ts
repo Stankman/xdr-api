@@ -4,12 +4,22 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  ServiceUnavailableException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { createHash, randomBytes, randomUUID } from 'crypto';
-import { DataSource, IsNull, Repository } from 'typeorm';
+import { DataSource, EntityManager, IsNull, Repository } from 'typeorm';
 import { WebsiteAccountService } from '../../account/services/website-account.service';
 import { Account } from '../../account/entities/account.entity';
+import { AccountPlayer } from '../../account/entities/account-player.entity';
+import { registrationPlayerName } from '../registration-player-name';
+import {
+  ACCOUNT_EMAIL_INDEX,
+  PLAYER_NAME_INDEX,
+  duplicateKeyIndex,
+  insertGamePlayer,
+  resolveRegistrationFigure,
+} from '../registration-player';
 import { HashService } from '../../shared/services/hash.service';
 import { AccountSession } from '../entities/account-session.entity';
 import { AccountToken, AccountTokenPurpose } from '../entities/account-token.entity';
@@ -22,7 +32,8 @@ import { TokenService } from './token.service';
 const REFRESH_TOKEN_LIFETIME_DAYS = 30;
 const EMAIL_TOKEN_LIFETIME_HOURS = 24;
 const RECOVERY_TOKEN_LIFETIME_MINUTES = 30;
-const PASSWORD_MIN_LENGTH = 12;
+const PASSWORD_MIN_LENGTH = 6;
+const REGISTRATION_PLAYER_NAME_ATTEMPTS = 5;
 
 interface RequestMetadata {
   ipAddress: string | null;
@@ -56,39 +67,33 @@ export class AuthenticationService {
     const rawToken = this.newToken();
     const now = new Date();
 
-    let account: Account;
-    try {
-      account = await this.dataSource.transaction(async (manager) => {
-        const repository = manager.getRepository(Account);
-        const exists = await repository
-          .createQueryBuilder('account')
-          .where('account.email = :email', { email: input.email.trim().toLowerCase() })
-          .getOne();
-        if (exists) throw new ConflictException('An account with that email already exists.');
+    const email = input.email.trim().toLowerCase();
 
-        const created = repository.create({
-          email: input.email.trim().toLowerCase(),
-          password: passwordHash,
-          emailVerified: false,
-          emailVerifiedAt: null,
-          ip_current: metadata.ipAddress,
-          ip_register: metadata.ipAddress,
-          lastLogin: null,
-        });
-        const saved = await repository.save(created);
-        await this.createToken(manager.getRepository(AccountToken), {
-          accountId: saved.id,
-          purpose: AccountTokenPurpose.EMAIL_VERIFICATION,
-          token: rawToken,
-          expiresAt: this.addHours(now, EMAIL_TOKEN_LIFETIME_HOURS),
-        });
-        return saved;
-      });
-    } catch (error) {
-      if (this.isDuplicateEmailError(error)) {
-        throw new ConflictException('An account with that email already exists.');
+    let account: Account | undefined;
+    for (let attempt = 1; account === undefined; attempt++) {
+      try {
+        account = await this.dataSource.transaction((manager) =>
+          this.createRegistration(manager, {
+            email,
+            passwordHash,
+            ipAddress: metadata.ipAddress,
+            rawToken,
+            now,
+          }),
+        );
+      } catch (error) {
+        const index = duplicateKeyIndex(error);
+        if (index === ACCOUNT_EMAIL_INDEX) {
+          throw new ConflictException('An account with that email already exists.');
+        }
+        if (index === PLAYER_NAME_INDEX) {
+          if (attempt < REGISTRATION_PLAYER_NAME_ATTEMPTS) continue;
+          throw new ServiceUnavailableException(
+            'A player name could not be reserved. Please try again.',
+          );
+        }
+        throw error;
       }
-      throw error;
     }
 
     await this.mailer.sendVerification(account.email, rawToken);
@@ -393,6 +398,55 @@ export class AuthenticationService {
     };
   }
 
+  /**
+   * Account, game player, account-player link and verification token commit together, so a
+   * failure at any step leaves none of them behind.
+   */
+  private async createRegistration(
+    manager: EntityManager,
+    input: {
+      email: string;
+      passwordHash: string;
+      ipAddress: string | null;
+      rawToken: string;
+      now: Date;
+    },
+  ): Promise<Account> {
+    const repository = manager.getRepository(Account);
+    const exists = await repository
+      .createQueryBuilder('account')
+      .where('account.email = :email', { email: input.email })
+      .getOne();
+    if (exists) throw new ConflictException('An account with that email already exists.');
+
+    const account = await repository.save(
+      repository.create({
+        email: input.email,
+        password: input.passwordHash,
+        emailVerified: false,
+        emailVerifiedAt: null,
+        ip_current: input.ipAddress,
+        ip_register: input.ipAddress,
+        lastLogin: null,
+      }),
+    );
+
+    const playerId = await insertGamePlayer(manager, {
+      name: registrationPlayerName(input.email),
+      figure: await resolveRegistrationFigure(manager),
+    });
+    const links = manager.getRepository(AccountPlayer);
+    await links.save(links.create({ accountId: account.id, playerId }));
+
+    await this.createToken(manager.getRepository(AccountToken), {
+      accountId: account.id,
+      purpose: AccountTokenPurpose.EMAIL_VERIFICATION,
+      token: input.rawToken,
+      expiresAt: this.addHours(input.now, EMAIL_TOKEN_LIFETIME_HOURS),
+    });
+    return account;
+  }
+
   private async createToken(
     repository: Repository<AccountToken>,
     token: {
@@ -419,10 +473,9 @@ export class AuthenticationService {
   private validatePassword(password: string): void {
     if (
       typeof password !== 'string' ||
-      password.length < PASSWORD_MIN_LENGTH ||
-      password.length > 128
+      password.length < PASSWORD_MIN_LENGTH
     ) {
-      throw new BadRequestException('Password must contain between 12 and 128 characters.');
+      throw new BadRequestException(`Password must contain at least ${PASSWORD_MIN_LENGTH} characters.`);
     }
   }
 
@@ -440,11 +493,5 @@ export class AuthenticationService {
 
   private addHours(date: Date, hours: number): Date {
     return new Date(date.getTime() + hours * 60 * 60 * 1000);
-  }
-
-  private isDuplicateEmailError(error: unknown): boolean {
-    if (!(error instanceof Error) || !('driverError' in error)) return false;
-    const driverError = (error as Error & { driverError?: { code?: string } }).driverError;
-    return driverError?.code === 'ER_DUP_ENTRY';
   }
 }

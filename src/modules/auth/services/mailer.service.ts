@@ -16,8 +16,9 @@ export class MailerService {
     this.publicUrl = config.get<string>('APP_PUBLIC_URL', '').replace(/\/+$/, '');
     this.transporter = nodemailer.createTransport({
       host: host || 'localhost',
-      port: config.get<number>('SMTP_PORT', 587),
-      secure: config.get<boolean>('SMTP_SECURE', false),
+      // ConfigService may return raw env strings here; "false" must not enable implicit TLS.
+      port: Number(config.get<number | string>('SMTP_PORT', 587)),
+      secure: String(config.get<boolean | string>('SMTP_SECURE', false)).toLowerCase() === 'true',
       ...(user ? { auth: { user, pass: password } } : {}),
       logger: false,
       debug: false,

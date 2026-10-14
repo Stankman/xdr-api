@@ -2,6 +2,8 @@ import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import { XdrEntities } from './xdr-entities';
 import { XdrApiFoundation1770000000000 } from './migrations/1770000000000-XdrApiFoundation';
+import { RegistrationDefaultAvatar1791940000000 } from './migrations/1791940000000-RegistrationDefaultAvatar';
+import { XdrPermissionGroups1792000000000 } from './migrations/1792000000000-XdrPermissionGroups';
 
 export default new DataSource({
   type: 'mysql',
@@ -11,7 +13,11 @@ export default new DataSource({
   password: process.env.MYSQL_PASSWORD || '',
   database: process.env.MYSQL_DATABASE || 'database',
   entities: XdrEntities,
-  migrations: [XdrApiFoundation1770000000000],
+  migrations: [
+    XdrApiFoundation1770000000000,
+    RegistrationDefaultAvatar1791940000000,
+    XdrPermissionGroups1792000000000,
+  ],
   migrationsTableName: 'xdr_migrations',
   synchronize: false,
   migrationsRun: false,

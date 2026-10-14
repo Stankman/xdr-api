@@ -2,19 +2,17 @@ import {
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   Param,
   Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiHeader, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthenticatedRequest } from '../../../common/interfaces/authenticated-request.interface';
-import { RequireTurboPermission } from '../../../common/decorators/turbo-permission.decorator';
+import { RequirePermission } from '../../../common/decorators/permission.decorator';
 import { AuthGuard } from '../../../common/guards/auth.guard';
-import { TurboAdminGuard } from '../../../common/guards/turbo-admin.guard';
-import { TurboPermissionGuard } from '../../../common/guards/turbo-permission.guard';
+import { PermissionGuard } from '../../../common/guards/permission.guard';
 import { SettingValueDto } from '../dtos/setting-value.dto';
 import { WebsiteSettingsService } from '../services/website-settings.service';
 
@@ -30,20 +28,16 @@ export class WebsiteSettingsController {
 
   @Get('admin')
   @ApiBearerAuth()
-  @ApiSecurity('TurboAdminToken')
-  @ApiHeader({ name: 'X-Turbo-Admin-Token', required: true })
-  @UseGuards(AuthGuard, TurboAdminGuard, TurboPermissionGuard)
-  @RequireTurboPermission('cms.settings.manage')
+  @UseGuards(AuthGuard, PermissionGuard)
+  @RequirePermission('cms.settings.manage')
   manageList() {
     return this.settings.listManageable();
   }
 
   @Put('admin/:key')
   @ApiBearerAuth()
-  @ApiSecurity('TurboAdminToken')
-  @ApiHeader({ name: 'X-Turbo-Admin-Token', required: true })
-  @UseGuards(AuthGuard, TurboAdminGuard, TurboPermissionGuard)
-  @RequireTurboPermission('cms.settings.manage')
+  @UseGuards(AuthGuard, PermissionGuard)
+  @RequirePermission('cms.settings.manage')
   update(
     @Param('key') key: string,
     @Body() input: SettingValueDto,
@@ -54,21 +48,16 @@ export class WebsiteSettingsController {
 
   @Delete('admin/:key')
   @ApiBearerAuth()
-  @ApiSecurity('TurboAdminToken')
-  @ApiHeader({ name: 'X-Turbo-Admin-Token', required: true })
-  @UseGuards(AuthGuard, TurboAdminGuard, TurboPermissionGuard)
-  @RequireTurboPermission('cms.settings.manage')
+  @UseGuards(AuthGuard, PermissionGuard)
+  @RequirePermission('cms.settings.manage')
   remove(@Param('key') key: string, @Req() request: AuthenticatedRequest) {
     return this.settings.remove(key, this.actor(request));
   }
 
   private actor(request: AuthenticatedRequest) {
-    if (!request.turbo_admin_player_id) {
-      throw new ForbiddenException('Turbo Admin identity is required.');
-    }
     return {
       accountId: request.xdr_uid,
-      playerId: request.turbo_admin_player_id,
+      playerId: null,
       requestId: request.requestId,
     };
   }
