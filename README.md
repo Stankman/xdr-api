@@ -1,73 +1,69 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# XDR API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS backend for XDR website accounts and content, with a typed integration to the Turbo Admin
+API. This repository does not include or modify a frontend.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Requirements
 
-## Description
+- Node.js 24.15 or newer within the Node 24 LTS line.
+- npm.
+- MySQL for runtime and migration execution.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Install and validate:
 
-## Installation
-
-```bash
-$ npm install
+```powershell
+npm ci
+npm run build
+npm test -- --runInBand
+npm run test:e2e -- --runInBand
 ```
 
-## Running the app
+Copy `.env.example` to `.env` for local configuration. Production requires a strong
+`TOKEN_SECRET`, MySQL credentials, SMTP configuration, and an `APP_PUBLIC_URL` that serves the
+verification/recovery links. Do not commit `.env` or real credentials.
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```powershell
+npm run start:dev
+npm run start:prod
 ```
 
-## Test
+Swagger/OpenAPI is served at `/api/docs`. The default application port is 9000.
 
-```bash
-# unit tests
-$ npm run test
+## Persistence
 
-# e2e tests
-$ npm run test:e2e
+NestJS manages only XDR-owned tables. Synchronization and startup migrations are disabled. The
+migration CLI datasource explicitly registers `XdrEntities` and uses `xdr_migrations`.
 
-# test coverage
-$ npm run test:cov
+```powershell
+npm run migration:run
+npm run migration:revert
+npm run schema:export
 ```
 
-## Support
+Review [docs/database-model.md](docs/database-model.md) and [docs/schema.sql](docs/schema.sql)
+before applying production migrations. The schema export is a metadata reference, not a live
+database dump or proof that a migration was applied.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Turbo reference
 
-## Stay in touch
+Turbo remains authoritative for game state, permission resolution, game login tickets, and game
+mutations. XDR requests that access Turbo Admin need both an XDR access token and the caller's
+individual Turbo Admin bearer session in `X-Turbo-Admin-Token`. Configure the private Turbo Admin
+URL with `TURBO_ADMIN_BASE_URL`.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+The inspected Turbo integration routes, authentication requirements, and unsupported XDR account
+linking/CMS permission capabilities are documented in
+[docs/turbo-integration.md](docs/turbo-integration.md). Live Turbo compatibility and live MySQL
+migrations were not verified by local tests.
 
-## License
+## Scope and plan
 
-Nest is [MIT licensed](LICENSE).
+The current API excludes payment-shop endpoints, media uploads, XDR role/permission tables, direct
+Turbo table writes, and frontend changes. See [docs/api-plan.md](docs/api-plan.md) for implemented
+routes, operational configuration, test boundaries, and remaining integration blockers.
+
+Unit tests cover pagination, session revocation/ownership, refresh rotation and reuse detection,
+published-article filtering, Turbo authorization/failure handling, and mail configuration. The
+e2e suite loads the application using XDR entity metadata without a database connection; it checks
+configuration, Swagger, validation/authorization responses, XDR-only entities and migration scope.
+It does not prove live MySQL migration execution, SMTP delivery, or Turbo connectivity/permissions.

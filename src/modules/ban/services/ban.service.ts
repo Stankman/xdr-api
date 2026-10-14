@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { IPaginationMeta, IPaginationOptions, Pagination } from "nestjs-typeorm-paginate";
+import { IPaginationMeta, IPaginationOptions, Pagination } from "../../../common/pagination";
 import { FindOptionsWhere, MoreThan } from "typeorm";
 import { BanRepository } from "../repositories/ban.repository";
 import { Ban } from "../entities/ban.entity";

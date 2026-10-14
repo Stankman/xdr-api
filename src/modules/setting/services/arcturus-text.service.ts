@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ArcturusTextsRepository } from '../repositories/arcturus-texts.repository';
-import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
+import { IPaginationOptions, Pagination, IPaginationMeta } from "../../../common/pagination";
 import { ArcturusText } from "../entities/arcturus-text.entity";
 
 @Injectable()

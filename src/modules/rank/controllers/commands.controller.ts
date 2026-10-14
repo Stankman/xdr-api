@@ -2,7 +2,7 @@ import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Query, UseGuard
 import { ApiTags } from "@nestjs/swagger";
 import { Command } from "../entities/command.entity";
 import { CommandService } from "../services/command.service";
-import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
+import { Pagination, IPaginationMeta, IPaginationOptions } from "../../../common/pagination";
 import { FindManyOptions } from "typeorm";
 import { AppConfigService } from "src/config/app/app-config.service";
 import { AuthGuard } from "src/common/guards/auth.guard";

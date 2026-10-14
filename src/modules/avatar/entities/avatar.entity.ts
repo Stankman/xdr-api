@@ -7,7 +7,6 @@ import { Rank } from "src/modules/rank/entities/rank.entity";
 import { ShopPayment } from "src/modules/shop/entities/shop-payment.entity";
 import { BooleanEnum } from "src/common/models/boolean.model";
 import { BooleanTransformer } from "src/common/transformers/boolean.transformer";
-import { Article } from "src/modules/article/entities/article.entity";
 
 @Entity({ name: 'users'})
 export class Avatar implements IAvatar {
@@ -60,9 +59,6 @@ export class Avatar implements IAvatar {
 
     @OneToOne(() => AvatarSettings, avatarSettings => avatarSettings.avatar)
     settings: AvatarSettings;
-
-    @OneToMany(() => Article, article => article.author)
-    articles: Article[];
 
     @OneToMany(() => ShopPayment,payment => payment.avatar)
     payments: ShopPayment[];

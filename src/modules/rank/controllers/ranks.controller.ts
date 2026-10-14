@@ -2,7 +2,7 @@ import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Put
 import { RankService } from "../services/rank.service";
 import { ApiTags } from "@nestjs/swagger";
 import { Rank } from "../entities/rank.entity";
-import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
+import { Pagination, IPaginationMeta, IPaginationOptions } from "../../../common/pagination";
 import { AppConfigService } from "src/config/app/app-config.service";
 import { FindManyOptions } from "typeorm";
 import { NewRankDTO } from "../dtos/new-rank.dto";

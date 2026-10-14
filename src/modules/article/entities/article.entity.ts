@@ -1,54 +1,61 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
-import { IArticle } from "../interfaces/article.interface";
-import { Avatar } from "src/modules/avatar/entities/avatar.entity";
-import { BooleanEnum } from "src/common/models/boolean.model";
-import { BooleanTransformer } from "src/common/transformers/boolean.transformer";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Account } from '../../account/entities/account.entity';
 
-@Entity({ name: 'xdr_articles'})
-export class Article implements IArticle {
-    @PrimaryGeneratedColumn()
-    id: number;
+@Entity({ name: 'xdr_articles' })
+@Index('UQ_xdr_articles_slug', ['slug'], { unique: true })
+@Index('IDX_xdr_articles_publication', ['hidden', 'publishedAt'])
+@Index('IDX_xdr_articles_author_account', ['authorAccountId'])
+export class Article {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    title: string;
+  @Column({ type: 'varchar', length: 255 })
+  title: string;
 
-    @Column()
-    slug: string;
+  @Column({ type: 'varchar', length: 255 })
+  slug: string;
 
-    @Column()
-    description: string;
+  @Column({ type: 'varchar', length: 500 })
+  description: string;
 
-    @Column()
-    content: string;
+  @Column({ type: 'text' })
+  content: string;
 
-    @Column()
-    image: string;
+  @Column({ type: 'varchar', length: 2048, default: '' })
+  image: string;
 
-    @Column()
-    thumbnail: string;
-    
-    @ManyToOne(() => Avatar, avatar => avatar.articles)
-    @JoinColumn({name: 'author_id'})
-    author: Avatar;
+  @Column({ type: 'varchar', length: 2048, default: '' })
+  thumbnail: string;
 
-    @Column({
-        type: 'enum',
-        enum: BooleanEnum,
-        transformer: new BooleanTransformer()
-    })
-    hidden: boolean;
+  @Column({ name: 'author_account_id', type: 'int', nullable: true })
+  authorAccountId?: number | null;
 
-    @Column({
-        type: 'enum',
-        enum: BooleanEnum,
-        transformer: new BooleanTransformer()
-    })
-    pinned: boolean;
+  @ManyToOne(() => Account, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'author_account_id' })
+  authorAccount?: Account | null;
 
-    @CreateDateColumn({name: 'created_at'})
-    createdAt: Date;
+  @Column({ type: 'boolean', default: true })
+  hidden: boolean;
 
-    @UpdateDateColumn({name: 'updated_at'})
-    updatedAt: Date;
+  @Column({ type: 'boolean', default: false })
+  pinned: boolean;
+
+  @Column({ name: 'published_at', type: 'datetime', nullable: true })
+  publishedAt?: Date | null;
+
+  @CreateDateColumn({ name: 'created_at', type: 'datetime' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at', type: 'datetime' })
+  updatedAt: Date;
 
 }

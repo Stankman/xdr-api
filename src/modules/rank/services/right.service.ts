@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Right } from "../entities/right.entity";
 import { RightsRepository } from "../repositories/rights.repository";
-import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
+import { IPaginationOptions, Pagination, IPaginationMeta } from "../../../common/pagination";
 import { FindManyOptions } from "typeorm";
 
 @Injectable()

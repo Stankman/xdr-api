@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { ShopOfferService } from '../services/shop-offer.service';
 import { ShopPaymentService } from '../services/shop-payment.service';
-import { Pagination, IPaginationMeta, IPaginationOptions } from 'nestjs-typeorm-paginate';
+import { Pagination, IPaginationMeta, IPaginationOptions } from '../../../common/pagination';
 import { ShopOffer } from '../entities/shop-offer.entity';
 import { ShopPayment } from '../entities/shop-payment.entity';
 import { AppConfigService } from 'src/config/app/app-config.service';

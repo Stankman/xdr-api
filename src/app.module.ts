@@ -1,27 +1,18 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule, RequestMethod } from '@nestjs/common';
 import { I18nModule, QueryResolver, AcceptLanguageResolver } from 'nestjs-i18n';
 import * as path from 'path';
-
 import { AppConfigModule } from './config/app/app-config.module';
-import { Argon2ConfigModule } from './config/argon2/argon2-config.module';
 import { MySQLConfigModule } from './config/mysql/mysql-config.module';
-import { RconConfigModule } from './config/rcon/rcon-config.module';
 import { TokenConfigModule } from './config/token/token-config.module';
-
 import { MySQLProviderModule } from './providers/database/mysql/mysql-provider.module';
-
 import { AccountModule } from './modules/account/account.module';
 import { ArticleModule } from './modules/article/article.module';
 import { AuthenticationModule } from './modules/auth/authentication.module';
-import { AvatarModule } from './modules/avatar/avatar.module';
-import { BanModule } from './modules/ban/ban.module';
-import { RankModule } from './modules/rank/rank.module';
-import { RconModule } from './modules/rcon/rcon.module';
-import { RoleModule } from './modules/role/role.module';
+import { AuditModule } from './modules/audit/audit.module';
+import { AdminModule } from './modules/admin/admin.module';
 import { SettingModule } from './modules/setting/setting.module';
-import { SharedModule } from './modules/shared/shared.module';
-import { ShopModule } from './modules/shop/shop.module';
-
+import { TurboModule } from './modules/turbo/turbo.module';
+import { RequestContextMiddleware } from './common/middleware/request-context.middleware';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/exceptions/exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
@@ -36,26 +27,17 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
       },
       resolvers: [QueryResolver, AcceptLanguageResolver],
     }),
-
     AppConfigModule,
-    Argon2ConfigModule,
     MySQLConfigModule,
-    RconConfigModule,
     TokenConfigModule,
-
     MySQLProviderModule,
-
     AccountModule,
     ArticleModule,
     AuthenticationModule,
-    AvatarModule,
-    BanModule,
-    RankModule,
-    RconModule,
-    RoleModule,
+    AuditModule,
+    AdminModule,
     SettingModule,
-    SharedModule,
-    ShopModule,
+    TurboModule,
   ],
   providers: [
     {
@@ -68,4 +50,10 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer
+      .apply(RequestContextMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
+  }
+}

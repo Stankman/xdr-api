@@ -1,7 +1,7 @@
 import { Controller, UseGuards, Get, Query, DefaultValuePipe, ParseIntPipe, Param, Post, Body, Put } from "@nestjs/common";
 import { AuthGuard } from "src/common/guards/auth.guard";
 import { ApiTags } from "@nestjs/swagger";
-import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
+import { Pagination, IPaginationMeta, IPaginationOptions } from "../../../common/pagination";
 import { RolesGuard } from "src/common/guards/roles.guard";
 import { AppConfigService } from "src/config/app/app-config.service";
 import { PermissionDTO } from "../dtos/permission.dto";

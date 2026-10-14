@@ -1,0 +1,86 @@
+import {
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  ForbiddenException,
+  Get,
+  Param,
+  ParseIntPipe,
+  ParseUUIDPipe,
+  Query,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiHeader, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { AuthenticatedRequest } from '../../common/interfaces/authenticated-request.interface';
+import { RequireTurboPermission } from '../../common/decorators/turbo-permission.decorator';
+import { AuthGuard } from '../../common/guards/auth.guard';
+import { TurboAdminGuard } from '../../common/guards/turbo-admin.guard';
+import { TurboPermissionGuard } from '../../common/guards/turbo-permission.guard';
+import { PositiveIntPipe } from '../../common/pipes/positive-int.pipe';
+import { BoundedPagePipe } from '../../common/pipes/bounded-page.pipe';
+import { StaffAccountSessionsService } from './staff-account-sessions.service';
+
+@ApiTags('Administrative account sessions')
+@ApiBearerAuth()
+@ApiSecurity('TurboAdminToken')
+@ApiHeader({ name: 'X-Turbo-Admin-Token', required: true })
+@Controller('admin/accounts/:accountId/sessions')
+export class StaffAccountSessionsController {
+  constructor(private readonly staffSessions: StaffAccountSessionsService) {}
+
+  @Get()
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    minimum: 1,
+    maximum: 100_000,
+  })
+  @ApiQuery({ name: 'limit', required: false, type: Number, minimum: 1, maximum: 100, example: 50 })
+  @UseGuards(AuthGuard, TurboAdminGuard, TurboPermissionGuard)
+  @RequireTurboPermission('cms.accounts.sessions.view')
+  list(
+    @Param('accountId', PositiveIntPipe) accountId: number,
+    @Req() request: AuthenticatedRequest,
+    @Query('page', BoundedPagePipe) page = 1,
+    @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit = 50,
+  ) {
+    return this.staffSessions.list(
+      accountId,
+      request.xdr_uid,
+      this.turboPlayerId(request),
+      this.requestId(request),
+      page,
+      limit,
+    );
+  }
+
+  @Delete(':sessionId')
+  @UseGuards(AuthGuard, TurboAdminGuard, TurboPermissionGuard)
+  @RequireTurboPermission('cms.accounts.sessions.manage')
+  revoke(
+    @Param('accountId', PositiveIntPipe) accountId: number,
+    @Param('sessionId', new ParseUUIDPipe()) sessionId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.staffSessions.revoke(
+      accountId,
+      sessionId,
+      request.xdr_uid,
+      this.turboPlayerId(request),
+      this.requestId(request),
+    );
+  }
+
+  private turboPlayerId(request: AuthenticatedRequest): number {
+    if (!request.turbo_admin_player_id) {
+      throw new ForbiddenException('Turbo Admin identity is required.');
+    }
+    return request.turbo_admin_player_id;
+  }
+
+  private requestId(request: AuthenticatedRequest): string {
+    return request.requestId || 'unknown';
+  }
+}

@@ -1,37 +1,17 @@
-import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { Argon2ConfigModule } from "src/config/argon2/argon2-config.module";
-import { AvatarModule } from "../avatar/avatar.module";
-import { HashService } from "../shared/services/hash.service";
-import { SharedModule } from "../shared/shared.module";
-import { AccountController } from "./controllers/account.controller";
-import { AccountsController } from "./controllers/accounts.controller";
-import { Account } from "./entities/account.entity";
-import { AccountsRepository } from "./repositories/accounts.repository";
-import { AccountSettingsService } from "./services/account-settings.service";
-import { AccountService } from "./services/accounts.service";
-import { RoleModule } from "../role/role.module";
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Argon2ConfigModule } from '../../config/argon2/argon2-config.module';
+import { HashService } from '../shared/services/hash.service';
+import { AccountPlayer } from './entities/account-player.entity';
+import { Account } from './entities/account.entity';
+import { WebsiteAccountService } from './services/website-account.service';
 
 @Module({
-    imports: [
-        Argon2ConfigModule,
-        AvatarModule,
-        SharedModule,
-        TypeOrmModule.forFeature([Account])
-    ],
-    controllers: [
-        AccountController,
-        AccountsController
-    ],
-    providers: [
-        AccountsRepository,
-        AccountService,
-        AccountSettingsService,
-        HashService
-    ],
-    exports: [
-        AccountService,
-        AccountSettingsService,
-    ]
+  imports: [
+    Argon2ConfigModule,
+    TypeOrmModule.forFeature([Account, AccountPlayer]),
+  ],
+  providers: [HashService, WebsiteAccountService],
+  exports: [HashService, WebsiteAccountService],
 })
 export class AccountModule {}

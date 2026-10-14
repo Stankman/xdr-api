@@ -1,5 +1,4 @@
 import { Account } from "src/modules/account/entities/account.entity";
-import { Article } from "src/modules/article/entities/article.entity";
 import { Rank } from "src/modules/rank/entities/rank.entity";
 import { ShopPayment } from "src/modules/shop/entities/shop-payment.entity";
 import { AvatarCurrency } from "../entities/avatar-currency.entity";
@@ -22,6 +21,5 @@ export interface IAvatar {
     lastLogin: number;
     account_created: number;
     settings: AvatarSettings;
-    articles: Article[];
     payments: ShopPayment[];
 }

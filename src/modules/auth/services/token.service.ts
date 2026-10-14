@@ -10,10 +10,14 @@ export class TokenService {
         private readonly jwtService : JwtService
     ) {}
 
-    public async execute(userId : number) : Promise<string> {
+    public async execute(userId : number, sessionId?: string) : Promise<string> {
+        if (!sessionId) {
+            throw new Error('An active website session is required to issue an access token.');
+        }
         const payload : IPayload = {
             iat: Math.floor(Date.now() / 1000),
             uid: userId,
+            sid: sessionId,
             iss: this.tokenConfig.issuer
         }
 

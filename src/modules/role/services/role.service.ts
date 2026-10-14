@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IPaginationOptions, Pagination, IPaginationMeta } from 'nestjs-typeorm-paginate';
+import { IPaginationOptions, Pagination, IPaginationMeta } from '../../../common/pagination';
 import { Role } from '../entities/role.entity';
 import { RolesRepository } from '../repositories/roles.repository';
 import { NewRoleDTO } from '../dtos/new-role.dto';

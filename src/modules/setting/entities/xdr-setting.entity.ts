@@ -1,11 +1,14 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
-import { ISetting } from "../interfaces/setting";
+import { Column, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import { ISetting } from '../interfaces/setting';
 
 @Entity({ name: 'xdr_settings' })
 export class XdrSetting implements ISetting {
-    @PrimaryColumn()
-    key: string;
+  @PrimaryColumn({ type: 'varchar', length: 255 })
+  key: string;
 
-    @Column()
-    value: string;
+  @Column({ type: 'text' })
+  value: string;
+
+  @UpdateDateColumn({ name: 'updated_at', type: 'datetime' })
+  updatedAt?: Date;
 }

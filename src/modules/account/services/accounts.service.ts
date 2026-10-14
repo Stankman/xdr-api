@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
+import { IPaginationOptions, Pagination, IPaginationMeta } from "../../../common/pagination";
 import { AccountsRepository } from "../repositories/accounts.repository";
 import { Account } from "../entities/account.entity";
 import { NewAccountDTO } from "../dtos/new-account.dto";

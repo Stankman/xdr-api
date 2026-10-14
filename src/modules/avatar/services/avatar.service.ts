@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
+import { IPaginationOptions, Pagination, IPaginationMeta } from "../../../common/pagination";
 import { FindManyOptions } from "typeorm";
 import { Avatar } from "../entities/avatar.entity";
 import { AvatarsRepository } from "../repositories/avatars.repository";

@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ShopPaymentsRepository } from "../repositories/shop-payments.repository";
 import { ShopPayment } from "../entities/shop-payment.entity";
-import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
+import { IPaginationOptions, Pagination, IPaginationMeta } from "../../../common/pagination";
 import { FindManyOptions } from "typeorm";
 import { NewPurchaseDTO } from "../dtos/new-purchase.dto";
 import { PurchaseStatusDTO } from "../dtos/purchase-status.dto";

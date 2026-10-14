@@ -11,7 +11,7 @@ import { TokenConfig } from "./token.config";
         validationSchema: Joi.object({
             TOKEN_ISSUER: Joi.string().default('XDR-Issuer'),
             TOKEN_DURATION: Joi.string().default('1800s'),
-            TOKEN_SECRET: Joi.string().default('$2x$07$xdrapipoweredbystankmanhash$')
+            TOKEN_SECRET: Joi.string().min(32).allow('').default('')
         })
     })
   ],

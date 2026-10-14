@@ -1,94 +1,128 @@
-import { Controller, UseGuards, Get, Query, DefaultValuePipe, ParseIntPipe, Post, Req, Body, Put, Param } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
-import { Request } from 'express';
-import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
-import { RolePermission } from "src/common/decorators/role-permission.decorator";
-import { RolesGuard } from "src/common/guards/roles.guard";
-import { AppConfigService } from "src/config/app/app-config.service";
-import { Account } from "src/modules/account/entities/account.entity";
-import { FindManyOptions, FindOptionsWhere } from "typeorm";
-import { ArticleDTO } from "../dtos/article.dto";
-import { Article } from "../entities/article.entity";
-import { ArticlesService } from "../services/articles.service";
-import { Avatar } from "src/modules/avatar/entities/avatar.entity";
-import { AuthGuard } from "src/common/guards/auth.guard";
-import { AccountGuardService } from '../../account/services/account-guard.service';
-import { ClassTransformOptions } from "class-transformer";
-import { defaultAvatarGroup } from "src/modules/avatar/serializers/avatar.serializer";
+import {
+  Body,
+  Controller,
+  DefaultValuePipe,
+  Delete,
+  ForbiddenException,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiHeader, ApiQuery, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { AuthenticatedRequest } from '../../../common/interfaces/authenticated-request.interface';
+import { RequireTurboPermission } from '../../../common/decorators/turbo-permission.decorator';
+import { AuthGuard } from '../../../common/guards/auth.guard';
+import { TurboAdminGuard } from '../../../common/guards/turbo-admin.guard';
+import { TurboPermissionGuard } from '../../../common/guards/turbo-permission.guard';
+import { BoundedPagePipe } from '../../../common/pipes/bounded-page.pipe';
+import { PositiveIntPipe } from '../../../common/pipes/positive-int.pipe';
+import { ArticleDto } from '../dtos/article.dto';
+import { ArticlesService } from '../services/articles.service';
 
 @ApiTags('Articles')
 @Controller('articles')
 export class ArticlesController {
-    constructor(
-        private readonly accountGuardService : AccountGuardService,
-        private readonly articlesService : ArticlesService,
-        private readonly appConfigService : AppConfigService
-    ) {}
+  constructor(private readonly articles: ArticlesService) {}
 
-    @RolePermission('manage-articles')
-    @UseGuards(AuthGuard, RolesGuard)
-    @Get('all')
-    public async paginateArticles(
-        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page : number = 1, 
-        @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit : number = 10
-    ) : Promise<Pagination<Article, IPaginationMeta>> {
-        const options : IPaginationOptions = {
-            page: page,
-            limit: limit,
-            route: this.appConfigService.fullUrl
-        };
+  @Get()
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number, maximum: 100 })
+  published(
+    @Query('page', BoundedPagePipe) page = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 10,
+  ) {
+    return this.articles.listPublished(page, limit);
+  }
 
-        return await this.articlesService.paginateArticles(options);
+  @Get('available')
+  available(
+    @Query('page', BoundedPagePipe) page = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 10,
+  ) {
+    return this.articles.listPublished(page, limit);
+  }
+
+  @Get('slug/:slug')
+  bySlug(@Param('slug') slug: string) {
+    return this.articles.getPublishedBySlug(slug);
+  }
+
+  @Get('admin')
+  @ApiBearerAuth()
+  @ApiSecurity('TurboAdminToken')
+  @ApiHeader({ name: 'X-Turbo-Admin-Token', required: true })
+  @UseGuards(AuthGuard, TurboAdminGuard, TurboPermissionGuard)
+  @RequireTurboPermission('cms.articles.manage')
+  adminList(
+    @Query('page', BoundedPagePipe) page = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 10,
+    @Query('q') search?: string,
+  ) {
+    return this.articles.listForAdministration(page, limit, search);
+  }
+
+  @Post()
+  @ApiBearerAuth()
+  @ApiSecurity('TurboAdminToken')
+  @ApiHeader({ name: 'X-Turbo-Admin-Token', required: true })
+  @UseGuards(AuthGuard, TurboAdminGuard, TurboPermissionGuard)
+  @RequireTurboPermission('cms.articles.manage')
+  create(@Body() input: ArticleDto, @Req() request: AuthenticatedRequest) {
+    return this.articles.createDraft(input, this.actor(request));
+  }
+
+  @Put(':id')
+  @ApiBearerAuth()
+  @ApiSecurity('TurboAdminToken')
+  @ApiHeader({ name: 'X-Turbo-Admin-Token', required: true })
+  @UseGuards(AuthGuard, TurboAdminGuard, TurboPermissionGuard)
+  @RequireTurboPermission('cms.articles.manage')
+  update(
+    @Param('id', PositiveIntPipe) id: number,
+    @Body() input: ArticleDto,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.articles.update(id, input, this.actor(request));
+  }
+
+  @Post(':id/publish')
+  @ApiBearerAuth()
+  @ApiSecurity('TurboAdminToken')
+  @ApiHeader({ name: 'X-Turbo-Admin-Token', required: true })
+  @UseGuards(AuthGuard, TurboAdminGuard, TurboPermissionGuard)
+  @RequireTurboPermission('cms.articles.manage')
+  publish(@Param('id', PositiveIntPipe) id: number, @Req() request: AuthenticatedRequest) {
+    return this.articles.publish(id, this.actor(request));
+  }
+
+  @Delete(':id')
+  @ApiBearerAuth()
+  @ApiSecurity('TurboAdminToken')
+  @ApiHeader({ name: 'X-Turbo-Admin-Token', required: true })
+  @UseGuards(AuthGuard, TurboAdminGuard, TurboPermissionGuard)
+  @RequireTurboPermission('cms.articles.manage')
+  remove(@Param('id', PositiveIntPipe) id: number, @Req() request: AuthenticatedRequest) {
+    return this.articles.remove(id, this.actor(request));
+  }
+
+  @Get(':id')
+  byId(@Param('id', PositiveIntPipe) id: number) {
+    return this.articles.getPublishedById(id);
+  }
+
+  private actor(request: AuthenticatedRequest) {
+    if (!request.turbo_admin_player_id) {
+      throw new ForbiddenException('Turbo Admin identity is required.');
     }
-
-    @Get('available')
-    public async paginateAvailableArticles(
-        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page : number = 1, 
-        @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit : number = 10
-    ) : Promise<Pagination<Article, IPaginationMeta>> {
-        const options : IPaginationOptions = {
-            page: page,
-            limit: limit,
-            route: this.appConfigService.fullUrl
-        };
-
-        const searchOptions : FindManyOptions<Article> = {
-            where: {
-                hidden: false
-            },
-            relations: ['author']
-        };
-
-        return await this.articlesService.paginateArticles(options, searchOptions);
-    }
-
-    @Get(':id')
-    public async getArticle(@Param() params : any) : Promise<Article> {
-        return await this.articlesService.getAvailableArticleById(params.id);
-    }
-
-    @RolePermission('manage-articles')
-    @UseGuards(AuthGuard, RolesGuard)
-    @Get('all/:id')
-    public async getAllArticle(@Param() params : any) : Promise<Article> {
-        return await this.articlesService.getArticleById(params.id);
-    }
-
-    @RolePermission('manage-articles')
-    @UseGuards(AuthGuard, RolesGuard)
-    @Post()
-    public async createArticle(@Req() req : Request, @Body() articleDTO : ArticleDTO) : Promise<Article> {
-        const loggedAccount : Account = (await this.accountGuardService.getLoggedAccount(req));
-        const loggedAvatar : Avatar = loggedAccount.activeAvatar;
-        return this.articlesService.createArticle(articleDTO, loggedAvatar);
-    }
-
-    @RolePermission('manage-articles')
-    @UseGuards(AuthGuard, RolesGuard)
-    @Put(':id')
-    public async updateArticle(@Req() req : Request, @Param() params : any, @Body() articleDTO : ArticleDTO) : Promise<Article> {
-        const loggedAccount : Account = (await this.accountGuardService.getLoggedAccount(req));
-        const loggedAvatar : Avatar = loggedAccount.activeAvatar; //TODO Use this for log system
-        return this.articlesService.editArticle(params.id, articleDTO);
-    }
+    return {
+      accountId: request.xdr_uid,
+      playerId: request.turbo_admin_player_id,
+      requestId: request.requestId,
+    };
+  }
 }

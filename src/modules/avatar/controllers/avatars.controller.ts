@@ -1,6 +1,6 @@
 import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Query } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
-import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
+import { Pagination, IPaginationMeta, IPaginationOptions } from "../../../common/pagination";
 import { Avatar } from "../entities/avatar.entity";
 import { AvatarService } from "../services/avatar.service";
 import { FindManyOptions } from "typeorm";

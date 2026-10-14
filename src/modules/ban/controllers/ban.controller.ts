@@ -1,5 +1,5 @@
 import { Controller, UseInterceptors, Get, Query, DefaultValuePipe, ParseIntPipe } from "@nestjs/common";
-import { Pagination, IPaginationMeta, IPaginationOptions } from "nestjs-typeorm-paginate";
+import { Pagination, IPaginationMeta, IPaginationOptions } from "../../../common/pagination";
 import { AppConfigService } from "src/config/app/app-config.service";
 import { Ban } from "../entities/ban.entity";
 import { BanService } from "../services/ban.service";

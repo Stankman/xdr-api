@@ -1,5 +1,5 @@
 import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { Pagination, IPaginationMeta, IPaginationOptions } from 'nestjs-typeorm-paginate';
+import { Pagination, IPaginationMeta, IPaginationOptions } from '../../../common/pagination';
 import { RolePermission } from 'src/common/decorators/role-permission.decorator';
 import { AuthGuard } from '../../../common/guards/auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';

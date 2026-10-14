@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { RanksRepository } from "../repositories/ranks.repository";
 import { Rank } from "../entities/rank.entity";
-import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
+import { IPaginationOptions, Pagination, IPaginationMeta } from "../../../common/pagination";
 import { FindManyOptions } from "typeorm";
 import { NewRankDTO } from '../dtos/new-rank.dto';
 import { RankRightService } from "./rank-right.service";

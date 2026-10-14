@@ -11,8 +11,6 @@ import { ShopPaymentSerializer } from "src/modules/shop/serializers/shop-payment
 import { AccountSerializer } from "src/modules/account/serializers/account.serializer";
 import { AvatarSettingsSerializer } from "./avatar-settings.serializer";
 import { AvatarCurrencySerializer } from "./avatar-currency.serializer";
-import { ArticleSerializer } from "src/modules/article/serializers/article.serializer";
-import { Article } from "src/modules/article/entities/article.entity";
 
 export const defaultAvatarGroup: string[] = [
     'avatar.default'
@@ -87,9 +85,6 @@ export class AvatarSerializer extends ModelEntitySerializer implements IAvatar {
     @Type(() => AvatarSettingsSerializer)
     settings: AvatarSettings;
 
-    @Type(() => ArticleSerializer)
-    articles: Article[];
-    
     @Type(() => ShopPaymentSerializer)
     payments: ShopPayment[];
 }

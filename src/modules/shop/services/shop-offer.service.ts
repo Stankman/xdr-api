@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ShopOffersRepository } from "../repositories/shop-offers.repository";
 import { ShopOffer } from "../entities/shop-offer.entity";
-import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
+import { IPaginationOptions, Pagination, IPaginationMeta } from "../../../common/pagination";
 import { FindManyOptions } from "typeorm";
 import { NewShopOfferDTO } from "../dtos/new-shop-offer.dto";
 

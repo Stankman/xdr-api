@@ -1,44 +1,53 @@
-import { Module } from "@nestjs/common";
-import { JwtModule } from "@nestjs/jwt";
-import { TokenConfigModule } from "src/config/token/token-config.module";
-import { TokenConfigService } from "src/config/token/token-config.service";
-
-import { AccountModule } from "../account/account.module";
-import { BanModule } from "../ban/ban.module";
-
-import { AuthenticationController } from "./controllers/authentication.controller";
-
-import { HashService } from "../shared/services/hash.service";
-import { SignInService } from "./services/signin.service";
-import { SignUpService } from "./services/signup.service";
-import { TokenService } from "./services/token.service";
-import { Argon2ConfigModule } from '../../config/argon2/argon2-config.module';
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { TokenConfigModule } from '../../config/token/token-config.module';
+import { TokenConfigService } from '../../config/token/token-config.service';
+import { MailConfigModule } from '../../config/mail/mail-config.module';
+import { AccountModule } from '../account/account.module';
+import { AccountSession } from './entities/account-session.entity';
+import { AccountToken } from './entities/account-token.entity';
+import { AccountSessionsController } from './controllers/account-sessions.controller';
+import { AuthenticationController } from './controllers/authentication.controller';
+import { AuthGuard } from '../../common/guards/auth.guard';
+import { AuthRateLimitGuard } from '../../common/guards/auth-rate-limit.guard';
+import { AuthenticationService } from './services/authentication.service';
+import { SessionService } from './services/session.service';
+import { TokenService } from './services/token.service';
 
 @Module({
   imports: [
     AccountModule,
-    BanModule,
+    MailConfigModule,
+    TokenConfigModule,
+    TypeOrmModule.forFeature([AccountSession, AccountToken]),
     JwtModule.registerAsync({
       imports: [TokenConfigModule],
-      useFactory: (tokenConfig : TokenConfigService) => ({
+      useFactory: (tokenConfig: TokenConfigService) => ({
         secret: tokenConfig.secret,
         signOptions: {
-          expiresIn: tokenConfig.duration
-        }
+          expiresIn: tokenConfig.duration,
+          issuer: tokenConfig.issuer,
+        },
       }),
-      inject: [TokenConfigService]
+      inject: [TokenConfigService],
     }),
-    TokenConfigModule,
-    Argon2ConfigModule
   ],
-  controllers: [
-    AuthenticationController
-  ],
+  controllers: [AuthenticationController, AccountSessionsController],
   providers: [
-    HashService,
-    SignInService,
-    SignUpService,
-    TokenService
+    AuthGuard,
+    AuthRateLimitGuard,
+    AuthenticationService,
+    SessionService,
+    TokenService,
+  ],
+  exports: [
+    AuthGuard,
+    AuthenticationService,
+    SessionService,
+    TokenService,
+    JwtModule,
+    TokenConfigModule,
   ],
 })
 export class AuthenticationModule {}

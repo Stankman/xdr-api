@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { XdrSettingsRepository } from "../repositories/xdr-settings.repository";
 import { XdrSetting } from "../entities/xdr-setting.entity";
-import { IPaginationOptions, Pagination, IPaginationMeta } from "nestjs-typeorm-paginate";
+import { IPaginationOptions, Pagination, IPaginationMeta } from "../../../common/pagination";
 import { FindManyOptions, FindOptionsWhere, Like, Not } from "typeorm";
 import { AvatarCurrency } from "src/modules/avatar/entities/avatar-currency.entity";
 

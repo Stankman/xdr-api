@@ -1,10 +1,10 @@
 import { ClassTransformOptions, plainToInstance } from "class-transformer";
-import { FindManyOptions, FindOptionsWhere, Repository } from "typeorm";
-import { IPaginationMeta, IPaginationOptions, Pagination, paginate } from 'nestjs-typeorm-paginate';
+import { FindManyOptions, FindOptionsWhere, ObjectLiteral, Repository } from "typeorm";
+import { IPaginationMeta, IPaginationOptions, Pagination, paginate } from '../../common/pagination';
 import { ModelEntitySerializer } from "src/common/serializers/model.serializer";
 import { NoSuchEntityException } from "src/common/exceptions/nosuchentity.exception";
 
-export class ModelRepository<T, K extends ModelEntitySerializer> extends Repository<T> {
+export class ModelRepository<T extends ObjectLiteral, K extends ModelEntitySerializer> extends Repository<T> {
     
   public async getOneBy(whereOptions: FindOptionsWhere<T> | FindOptionsWhere<T>[], relations : string[] = [], throwsException : boolean = true,  transformOptions? : ClassTransformOptions): Promise<K> {
     return this.findOne({
