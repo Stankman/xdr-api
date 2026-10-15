@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthenticationModule } from '../auth/authentication.module';
 import { AuditStorageModule } from '../audit/audit-storage.module';
 import { PermissionModule } from '../permission/permission.module';
+import { AdminArticlesController } from './controllers/admin-articles.controller';
 import { ArticlesController } from './controllers/articles.controller';
 import { Article } from './entities/article.entity';
 import { ArticlesService } from './services/articles.service';
@@ -14,7 +15,7 @@ import { ArticlesService } from './services/articles.service';
     AuditStorageModule,
     PermissionModule,
   ],
-  controllers: [ArticlesController],
+  controllers: [ArticlesController, AdminArticlesController],
   providers: [ArticlesService],
   exports: [ArticlesService],
 })

@@ -71,19 +71,18 @@ export class AuthenticationService {
     private readonly accountAvatars: AccountAvatarsService,
   ) {}
 
-  async register(
-    input: RegisterAccountDto,
-    metadata: RequestMetadata,
-  ): Promise<{ message: string }> {
+  async register(input: RegisterAccountDto, metadata: RequestMetadata): Promise<{ message: string }> {
     this.mailer.assertConfigured();
+
     this.validatePassword(input.password);
+    
     const passwordHash = await this.hashService.hash(input.password);
     const rawToken = this.newToken();
     const now = new Date();
-
     const email = input.email.trim().toLowerCase();
 
     let account: Account | undefined;
+    
     for (let attempt = 1; account === undefined; attempt++) {
       try {
         account = await this.dataSource.transaction((manager) =>
@@ -118,10 +117,13 @@ export class AuthenticationService {
 
   async resendVerification(email: string): Promise<{ message: string }> {
     this.mailer.assertConfigured();
+    
     const account = await this.accounts.findByEmail(email);
+    
     if (account && !account.emailVerified) {
       const rawToken = this.newToken();
       const now = new Date();
+    
       await this.dataSource.transaction(async (manager) => {
         await manager.getRepository(AccountToken).update(
           {
@@ -131,6 +133,7 @@ export class AuthenticationService {
           },
           { consumedAt: now },
         );
+    
         await this.createToken(manager.getRepository(AccountToken), {
           accountId: account.id,
           purpose: AccountTokenPurpose.EMAIL_VERIFICATION,
@@ -138,8 +141,10 @@ export class AuthenticationService {
           expiresAt: this.addHours(now, EMAIL_TOKEN_LIFETIME_HOURS),
         });
       });
+      
       await this.mailer.sendVerification(account.email, rawToken);
     }
+
     return {
       message: 'If the account requires verification, an email will be sent.',
     };
@@ -148,8 +153,10 @@ export class AuthenticationService {
   async verifyEmail(token: string): Promise<{ message: string }> {
     const now = new Date();
     const tokenHash = this.hashToken(token);
+    
     const accountId = await this.dataSource.transaction(async (manager) => {
       const tokens = manager.getRepository(AccountToken);
+      
       const record = await tokens
         .createQueryBuilder('token')
         .setLock('pessimistic_write')
@@ -160,41 +167,41 @@ export class AuthenticationService {
         .andWhere('token.consumed_at IS NULL')
         .andWhere('token.expires_at > :now', { now })
         .getOne();
+      
       if (!record)
-        throw new BadRequestException(
-          'The verification token is invalid or expired.',
-        );
+        throw new BadRequestException('The verification token is invalid or expired.');
 
       record.consumedAt = now;
+
       await tokens.save(record);
+      
       await manager.getRepository(Account).update(record.accountId, {
         emailVerified: true,
         emailVerifiedAt: now,
       });
+      
       return record.accountId;
     });
+
     if (!accountId)
-      throw new BadRequestException(
-        'The verification token is invalid or expired.',
-      );
-    return { message: 'Email address verified.' };
+      throw new BadRequestException('The verification token is invalid or expired.');
+    
+      return { message: 'Email address verified.' };
   }
 
   async login(input: LoginDto, metadata: RequestMetadata): Promise<AuthTokens> {
     const account = await this.accounts.findByEmail(input.email, true);
-    if (
-      !account ||
-      !(await this.hashService.verify(account.password, input.password))
-    ) {
+    if (!account || !(await this.hashService.verify(account.password, input.password))) {
       throw new UnauthorizedException('Email or password is incorrect.');
     }
+
     if (!account.emailVerified) {
-      throw new ForbiddenException(
-        'Verify your email address before signing in.',
-      );
+      throw new ForbiddenException('Verify your email address before signing in.');
     }
+
     const now = new Date();
     await this.accounts.updateLogin(account.id, metadata.ipAddress, now);
+    
     return this.createSession(account.id, metadata, now);
   }
 
@@ -275,10 +282,7 @@ export class AuthenticationService {
     };
   }
 
-  async logout(
-    sessionId: string,
-    accountId: number,
-  ): Promise<{ message: string }> {
+  async logout(sessionId: string, accountId: number): Promise<{ message: string }> {
     await this.dataSource.transaction(async (manager) => {
       await manager
         .getRepository(AccountSession)
@@ -292,13 +296,17 @@ export class AuthenticationService {
         .execute();
       await this.terminatePlayerSessions(manager, accountId);
     });
+
     return { message: 'Session revoked.' };
   }
 
   async accountSummary(accountId: number): Promise<AccountSummaryDto> {
     const account = await this.accounts.findById(accountId);
+    
     if (!account) throw new UnauthorizedException();
+    
     const avatars = await this.accountAvatars.forAccount(accountId);
+    
     return {
       id: account.id,
       email: account.email,
@@ -338,27 +346,25 @@ export class AuthenticationService {
     return { revoked };
   }
 
-  async changePassword(
-    accountId: number,
-    currentPassword: string,
-    newPassword: string,
-  ): Promise<{ message: string }> {
+  async changePassword(accountId: number, currentPassword: string, newPassword: string): Promise<{ message: string }> {
     this.validatePassword(newPassword);
+
     const account = await this.accounts.findById(accountId);
+    
     if (!account) throw new UnauthorizedException();
+    
     const withPassword = await this.accounts.findByEmail(account.email, true);
-    if (
-      !withPassword ||
-      !(await this.hashService.verify(withPassword.password, currentPassword))
-    ) {
+    
+    if (!withPassword || !(await this.hashService.verify(withPassword.password, currentPassword))) {
       throw new UnauthorizedException('Current password is incorrect.');
     }
+
     if (await this.hashService.verify(withPassword.password, newPassword)) {
-      throw new BadRequestException(
-        'The new password must differ from the current password.',
-      );
+      throw new BadRequestException('The new password must differ from the current password.');
     }
+
     const passwordHash = await this.hashService.hash(newPassword);
+    
     await this.dataSource.transaction(async (manager) => {
       await manager
         .getRepository(Account)
@@ -371,12 +377,15 @@ export class AuthenticationService {
         .where('account_id = :accountId AND revoked_at IS NULL', { accountId })
         .execute();
     });
+    
     return { message: 'Password changed. Sign in again on your devices.' };
   }
 
   async requestPasswordRecovery(email: string): Promise<{ message: string }> {
     this.mailer.assertConfigured();
+    
     const account = await this.accounts.findByEmail(email);
+    
     if (account) {
       const rawToken = this.newToken();
       const now = new Date();
@@ -389,6 +398,7 @@ export class AuthenticationService {
           },
           { consumedAt: now },
         );
+    
         await this.createToken(manager.getRepository(AccountToken), {
           accountId: account.id,
           purpose: AccountTokenPurpose.PASSWORD_RECOVERY,
@@ -400,17 +410,17 @@ export class AuthenticationService {
       });
       await this.mailer.sendPasswordRecovery(account.email, rawToken);
     }
+    
     return { message: 'If the account exists, a recovery email will be sent.' };
   }
 
-  async resetPassword(
-    token: string,
-    newPassword: string,
-  ): Promise<{ message: string }> {
+  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
     this.validatePassword(newPassword);
+
     const passwordHash = await this.hashService.hash(newPassword);
     const now = new Date();
     const tokenHash = this.hashToken(token);
+    
     await this.dataSource.transaction(async (manager) => {
       const tokens = manager.getRepository(AccountToken);
       const record = await tokens
@@ -423,16 +433,17 @@ export class AuthenticationService {
         .andWhere('token.consumed_at IS NULL')
         .andWhere('token.expires_at > :now', { now })
         .getOne();
+    
       if (!record)
-        throw new BadRequestException(
-          'The recovery token is invalid or expired.',
-        );
+        throw new BadRequestException('The recovery token is invalid or expired.');
 
       record.consumedAt = now;
       await tokens.save(record);
+
       await manager
         .getRepository(Account)
         .update(record.accountId, { password: passwordHash });
+      
       await manager
         .getRepository(AccountSession)
         .createQueryBuilder()
@@ -443,6 +454,7 @@ export class AuthenticationService {
         })
         .execute();
     });
+    
     return { message: 'Password reset. Sign in with your new password.' };
   }
 

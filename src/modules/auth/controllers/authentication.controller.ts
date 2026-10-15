@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -18,16 +18,11 @@ import { PasswordResetDto } from '../dtos/password-reset.dto';
 import { RefreshTokenDto } from '../dtos/refresh-token.dto';
 import { RegisterAccountDto } from '../dtos/register-account.dto';
 import { AuthenticationService } from '../services/authentication.service';
-import { CurrentAccountResponseDto } from '../../account/dtos/account-summary.dto';
-import { PermissionService } from '../../permission/permission.service';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthenticationController {
-  constructor(
-    private readonly authentication: AuthenticationService,
-    private readonly permissions: PermissionService,
-  ) {}
+  constructor(private readonly authentication: AuthenticationService) {}
 
   @Post('register')
   @UseGuards(AuthRateLimitGuard)
@@ -82,18 +77,6 @@ export class AuthenticationController {
   @RateLimit({ limit: 5, windowMs: 15 * 60_000 })
   resetPassword(@Body() input: PasswordResetDto) {
     return this.authentication.resetPassword(input.token, input.newPassword);
-  }
-
-  @ApiBearerAuth()
-  @Get('me')
-  @ApiOkResponse({ type: CurrentAccountResponseDto })
-  @UseGuards(AuthGuard)
-  async currentAccount(@Req() request: AuthenticatedRequest) {
-    const [account, permissions] = await Promise.all([
-      this.authentication.accountSummary(request.xdr_uid),
-      this.permissions.grantedNodes(request.xdr_uid),
-    ]);
-    return { ...account, permissions };
   }
 
   @ApiBearerAuth()

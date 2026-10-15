@@ -44,6 +44,12 @@ export class ArticlesService {
     return article;
   }
 
+  async getForAdministration(id: number): Promise<Article> {
+    const article = await this.articles.findOne({ where: { id } });
+    if (!article) throw new NotFoundException('Article was not found.');
+    return article;
+  }
+
   async getPublishedBySlug(slug: string): Promise<Article> {
     if (slug.length > 255 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
       throw new BadRequestException('Article slug is invalid.');

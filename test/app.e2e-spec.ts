@@ -6,7 +6,8 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { i18nValidationErrorFactory } from 'nestjs-i18n';
@@ -21,6 +22,7 @@ import { TokenService } from '../src/modules/auth/services/token.service';
 import { AuditLogService } from '../src/modules/audit/audit-log.service';
 import { PermissionService } from '../src/modules/permission/permission.service';
 import { WebsiteSettingsService } from '../src/modules/setting/services/website-settings.service';
+import { Article } from '../src/modules/article/entities/article.entity';
 
 class TestDataSource extends DataSource {
   public async loadMetadata(): Promise<void> {
@@ -90,24 +92,71 @@ describe('NestJS migration smoke tests (no external database)', () => {
       app,
       new DocumentBuilder().build(),
     );
-    expect(document.paths['/articles/available'].get).toBeDefined();
-    expect(document.paths['/auth/login'].post).toBeDefined();
-    for (const [path, schema] of [
-      ['/account', 'AccountSummaryResponseDto'],
-      ['/auth/me', 'CurrentAccountResponseDto'],
+    expect(document.paths['/articles'].get).toBeDefined();
+    expect(document.paths['/articles/slug/{slug}'].get).toBeDefined();
+    expect(document.paths['/articles/{id}'].get).toBeDefined();
+    expect(document.paths['/admin/articles'].get).toBeDefined();
+    expect(document.paths['/admin/articles/{id}'].get).toBeDefined();
+    expect(document.paths['/articles/available']).toBeUndefined();
+    expect(document.paths['/articles/admin']).toBeUndefined();
+    expect(document.paths['/articles'].post).toBeUndefined();
+    expect(document.paths['/articles/{id}'].put).toBeUndefined();
+    expect(document.paths['/articles/{id}'].delete).toBeUndefined();
+    expect(document.paths['/articles/{id}/publish']).toBeUndefined();
+    for (const [path, method] of [
+      ['/admin/articles', 'get'],
+      ['/admin/articles', 'post'],
+      ['/admin/articles/{id}', 'get'],
+      ['/admin/articles/{id}', 'put'],
+      ['/admin/articles/{id}', 'delete'],
+      ['/admin/articles/{id}/publish', 'post'],
     ]) {
-      expect(document.paths[path].get.responses['200']).toEqual(
-        expect.objectContaining({
-          content: {
-            'application/json': {
-              schema: {
-                $ref: `#/components/schemas/${schema}`,
-              },
+      expect(document.paths[path][method].security).toEqual([{ bearer: [] }]);
+    }
+    for (const path of [
+      '/articles',
+      '/articles/slug/{slug}',
+      '/articles/{id}',
+    ]) {
+      expect(document.paths[path].get.security).toBeUndefined();
+    }
+    expect(document.paths['/auth/login'].post).toBeDefined();
+    expect(document.paths['/account'].get.responses['200']).toEqual(
+      expect.objectContaining({
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/AccountSummaryResponseDto',
             },
           },
+        },
+      }),
+    );
+    expect(document.paths['/auth/me']).toBeUndefined();
+    expect(document.paths['/account'].get.security).toEqual([{ bearer: [] }]);
+    expect(document.components?.schemas?.AccountSummaryResponseDto).toEqual(
+      expect.objectContaining({
+        properties: expect.objectContaining({
+          data: { $ref: '#/components/schemas/CurrentAccountDto' },
         }),
-      );
-    }
+      }),
+    );
+    expect(document.components?.schemas?.CurrentAccountDto).toEqual(
+      expect.objectContaining({
+        required: expect.arrayContaining(['permissions']),
+        properties: expect.objectContaining({
+          permissions: expect.objectContaining({
+            type: 'array',
+            items: { type: 'string' },
+          }),
+        }),
+      }),
+    );
+    expect(document.paths['/account'].put).toBeUndefined();
+    expect(document.paths['/account/settings/change-password']).toBeUndefined();
+    expect(document.paths['/account/settings/change-email']).toBeUndefined();
+    expect(document.paths['/accounts/all']).toBeUndefined();
+    expect(document.paths['/accounts/{id}']).toBeUndefined();
     expect(document.paths['/settings/public'].get).toBeDefined();
     expect(document.paths['/account/acp-access'].get.responses['200']).toEqual(
       expect.objectContaining({
@@ -125,7 +174,8 @@ describe('NestJS migration smoke tests (no external database)', () => {
       '/admin/audit-logs',
       '/admin/accounts/{accountId}/sessions',
       '/settings/admin',
-      '/articles/admin',
+      '/admin/articles',
+      '/admin/articles/{id}',
     ]) {
       expect(document.paths[path].get.security).toEqual(bearerSecurity);
     }
@@ -292,9 +342,171 @@ describe('NestJS migration smoke tests (no external database)', () => {
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(403);
     });
+
+    describe('administrative articles', () => {
+      const draft = {
+        id: 9,
+        title: 'Draft',
+        slug: 'draft',
+        hidden: true,
+        publishedAt: null,
+      };
+
+      it.each(['/admin/articles', '/admin/articles/9'])(
+        'requires a website login: %s',
+        (path) => request(app.getHttpServer()).get(path).expect(401),
+      );
+
+      it.each([
+        ['post', '/admin/articles'],
+        ['put', '/admin/articles/9'],
+        ['delete', '/admin/articles/9'],
+        ['post', '/admin/articles/9/publish'],
+      ] as const)('requires a website login for %s %s', (method, path) =>
+        request(app.getHttpServer())[method](path).expect(401),
+      );
+
+      it.each([
+        ['post', '/admin/articles'],
+        ['put', '/admin/articles/9'],
+        ['delete', '/admin/articles/9'],
+        ['post', '/admin/articles/9/publish'],
+      ] as const)(
+        'denies %s %s without cms.articles.manage',
+        async (method, path) => {
+          has.mockImplementation(
+            async (_account, node) => node !== 'cms.articles.manage',
+          );
+          await request(app.getHttpServer())
+            [method](path)
+            .set('Authorization', `Bearer ${accessToken}`)
+            .send({ title: 'T', description: 'D', content: 'C' })
+            .expect(403);
+        },
+      );
+
+      it.each([
+        ['post', '/articles'],
+        ['put', '/articles/9'],
+        ['delete', '/articles/9'],
+        ['post', '/articles/9/publish'],
+      ] as const)(
+        'no longer exposes legacy write route %s %s',
+        (method, path) =>
+          request(app.getHttpServer())[method](path).expect(404),
+      );
+
+      it.each([
+        ['/admin/articles', 'cms.articles.manage'],
+        ['/admin/articles/9', 'cms.articles.manage'],
+        ['/admin/articles', 'cms.acp.access'],
+        ['/admin/articles/9', 'cms.acp.access'],
+      ])('denies %s without %s', async (path, missing) => {
+        has.mockImplementation(async (_account, node) => node !== missing);
+        await request(app.getHttpServer())
+          .get(path)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .expect(403);
+      });
+
+      it('lists unavailable articles for an authorized administrator', async () => {
+        const repository = app.get<Repository<Article>>(
+          getRepositoryToken(Article),
+        );
+        const query = {
+          andWhere: jest.fn().mockReturnThis(),
+          clone: jest.fn().mockReturnThis(),
+          getCount: jest.fn().mockResolvedValue(1),
+          orderBy: jest.fn().mockReturnThis(),
+          addOrderBy: jest.fn().mockReturnThis(),
+          skip: jest.fn().mockReturnThis(),
+          take: jest.fn().mockReturnThis(),
+          getMany: jest.fn().mockResolvedValue([draft]),
+        };
+        jest
+          .spyOn(repository, 'createQueryBuilder')
+          .mockReturnValue(query as never);
+        const response = await request(app.getHttpServer())
+          .get('/admin/articles')
+          .set('Authorization', `Bearer ${accessToken}`)
+          .expect(200);
+        expect(response.body.data.items).toEqual([
+          expect.objectContaining({ id: 9, hidden: true }),
+        ]);
+        expect(response.body.data.meta.totalItems).toBe(1);
+        expect(query.andWhere).not.toHaveBeenCalled();
+        expect(has).toHaveBeenCalledWith(42, 'cms.articles.manage');
+      });
+
+      it('returns an unavailable article by ID to an authorized administrator', async () => {
+        const repository = app.get<Repository<Article>>(
+          getRepositoryToken(Article),
+        );
+        const findOne = jest
+          .spyOn(repository, 'findOne')
+          .mockResolvedValue(draft as unknown as Article);
+        const response = await request(app.getHttpServer())
+          .get('/admin/articles/9')
+          .set('Authorization', `Bearer ${accessToken}`)
+          .expect(200);
+        expect(response.body.data).toEqual(
+          expect.objectContaining({ id: 9, hidden: true, publishedAt: null }),
+        );
+        expect(findOne).toHaveBeenCalledWith({ where: { id: 9 } });
+      });
+    });
   });
 
-  describe('signed-in account avatar contract', () => {
+  describe('public articles', () => {
+    afterEach(() => jest.restoreAllMocks());
+
+    it('lists only available articles', async () => {
+      const repository = app.get<Repository<Article>>(
+        getRepositoryToken(Article),
+      );
+      const query = {
+        andWhere: jest.fn().mockReturnThis(),
+        clone: jest.fn().mockReturnThis(),
+        getCount: jest.fn().mockResolvedValue(0),
+        orderBy: jest.fn().mockReturnThis(),
+        addOrderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([]),
+      };
+      jest
+        .spyOn(repository, 'createQueryBuilder')
+        .mockReturnValue(query as never);
+      await request(app.getHttpServer()).get('/articles').expect(200);
+      expect(query.andWhere).toHaveBeenCalledWith('article.hidden = :hidden', {
+        hidden: false,
+      });
+      expect(query.andWhere).toHaveBeenCalledWith(
+        'article.publishedAt IS NOT NULL',
+      );
+    });
+
+    it.each(['/articles/9', '/articles/slug/draft'])(
+      'does not reveal an unavailable article: %s',
+      async (path) => {
+        const repository = app.get<Repository<Article>>(
+          getRepositoryToken(Article),
+        );
+        const findOne = jest
+          .spyOn(repository, 'findOne')
+          .mockResolvedValue(null);
+        await request(app.getHttpServer()).get(path).expect(404);
+        expect(findOne).toHaveBeenCalledWith({
+          where: expect.objectContaining({
+            hidden: false,
+            publishedAt: expect.anything(),
+          }),
+        });
+      },
+    );
+  });
+
+  describe('signed-in account contract', () => {
     let accessToken: string;
     let query: jest.SpyInstance;
     let grantedNodes: jest.SpiedFunction<PermissionService['grantedNodes']>;
@@ -343,66 +555,55 @@ describe('NestJS migration smoke tests (no external database)', () => {
       grantedNodes.mockRestore();
     });
 
-    it.each(['/account', '/auth/me'])(
-      'returns the full safe avatar envelope from %s',
-      async (path) => {
-        const response = await request(app.getHttpServer())
-          .get(path)
-          .set('Authorization', `Bearer ${accessToken}`)
-          .expect(200);
-        expect(response.body).toEqual({
-          status: 'ok',
-          code: 200,
-          data: {
-            id: 42,
-            email: 'fixture@example.com',
-            emailVerified: true,
-            createdAt: '2026-10-14T05:00:00.000Z',
-            ...(path === '/auth/me'
-              ? { permissions: ['cms.articles.manage'] }
-              : {}),
-            avatars: [
-              expect.objectContaining({
-                id: 501,
-                username: player.name,
-                look: player.figure,
-                credits: 25,
-                lastLogin: Date.parse('2026-10-14T05:00:00Z') / 1000,
-                gameLastLoginAt: null,
-              }),
-            ],
-            activeAvatar: expect.any(Object),
-          },
-        });
-        expect(response.body.data.activeAvatar).toEqual(
-          response.body.data.avatars[0],
-        );
-        expect(findById).toHaveBeenCalledWith(42);
-        expect(activeSession).toHaveBeenCalledWith(
-          '8e6c2d81-2936-44c2-90ad-c2479cb72126',
-          42,
-        );
-        expect(query).toHaveBeenCalledTimes(2);
-        if (path === '/auth/me') {
-          expect(grantedNodes).toHaveBeenCalledWith(42);
-        } else {
-          expect(grantedNodes).not.toHaveBeenCalled();
-        }
-      },
-    );
+    it('returns the full safe account envelope with effective permissions', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/account')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200);
+      expect(response.body).toEqual({
+        status: 'ok',
+        code: 200,
+        data: {
+          id: 42,
+          email: 'fixture@example.com',
+          emailVerified: true,
+          createdAt: '2026-10-14T05:00:00.000Z',
+          permissions: ['cms.articles.manage'],
+          avatars: [
+            expect.objectContaining({
+              id: 501,
+              username: player.name,
+              look: player.figure,
+              credits: 25,
+              lastLogin: Date.parse('2026-10-14T05:00:00Z') / 1000,
+              gameLastLoginAt: null,
+            }),
+          ],
+          activeAvatar: expect.any(Object),
+        },
+      });
+      expect(response.body.data.activeAvatar).toEqual(
+        response.body.data.avatars[0],
+      );
+      expect(findById).toHaveBeenCalledWith(42);
+      expect(activeSession).toHaveBeenCalledWith(
+        '8e6c2d81-2936-44c2-90ad-c2479cb72126',
+        42,
+      );
+      expect(query).toHaveBeenCalledTimes(2);
+      expect(grantedNodes).toHaveBeenCalledTimes(1);
+      expect(grantedNodes).toHaveBeenCalledWith(42);
+    });
 
-    it.each(['/account', '/auth/me'])(
-      'returns explicit empty/null avatar fields from %s',
-      async (path) => {
-        query.mockReset().mockResolvedValueOnce([]);
-        const response = await request(app.getHttpServer())
-          .get(path)
-          .set('Authorization', `Bearer ${accessToken}`)
-          .expect(200);
-        expect(response.body.data.avatars).toEqual([]);
-        expect(response.body.data.activeAvatar).toBeNull();
-      },
-    );
+    it('returns explicit empty/null avatar fields', async () => {
+      query.mockReset().mockResolvedValueOnce([]);
+      const response = await request(app.getHttpServer())
+        .get('/account')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200);
+      expect(response.body.data.avatars).toEqual([]);
+      expect(response.body.data.activeAvatar).toBeNull();
+    });
 
     it('uses the earliest link for activeAvatar with multiple avatars', async () => {
       query
@@ -422,17 +623,14 @@ describe('NestJS migration smoke tests (no external database)', () => {
       );
     });
 
-    it.each(['/account', '/auth/me'])(
-      'does not hide a dangling link on %s',
-      async (path) => {
-        query.mockReset().mockResolvedValueOnce([{ ...player, id: null }]);
-        const response = await request(app.getHttpServer())
-          .get(path)
-          .set('Authorization', `Bearer ${accessToken}`)
-          .expect(500);
-        expect(response.body.data).toBeUndefined();
-      },
-    );
+    it('does not hide a dangling link', async () => {
+      query.mockReset().mockResolvedValueOnce([{ ...player, id: null }]);
+      const response = await request(app.getHttpServer())
+        .get('/account')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(500);
+      expect(response.body.data).toBeUndefined();
+    });
 
     it('returns unauthorized for a missing account without reading game data', async () => {
       findById.mockResolvedValueOnce(null);
@@ -443,37 +641,76 @@ describe('NestJS migration smoke tests (no external database)', () => {
       expect(query).not.toHaveBeenCalled();
     });
 
-    it.each(['/account', '/auth/me'])(
-      'does not return an empty avatar on a database failure: %s',
-      async (path) => {
-        query
-          .mockReset()
-          .mockRejectedValueOnce(new Error('test database unavailable'));
-        const response = await request(app.getHttpServer())
-          .get(path)
-          .set('Authorization', `Bearer ${accessToken}`)
-          .expect(500);
-        expect(response.body.data).toBeUndefined();
-      },
-    );
+    it('does not return an empty avatar on a database failure', async () => {
+      query
+        .mockReset()
+        .mockRejectedValueOnce(new Error('test database unavailable'));
+      const response = await request(app.getHttpServer())
+        .get('/account')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(500);
+      expect(response.body.data).toBeUndefined();
+    });
 
     it('rejects an inactive website session without reading account or game data', async () => {
       activeSession.mockResolvedValueOnce(null);
       await request(app.getHttpServer())
-        .get('/auth/me')
+        .get('/account')
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(401);
       expect(findById).not.toHaveBeenCalled();
       expect(query).not.toHaveBeenCalled();
+      expect(grantedNodes).not.toHaveBeenCalled();
+    });
+
+    it('rejects an unauthenticated request before reading account or permissions', async () => {
+      await request(app.getHttpServer()).get('/account').expect(401);
+
+      expect(activeSession).not.toHaveBeenCalled();
+      expect(findById).not.toHaveBeenCalled();
+      expect(query).not.toHaveBeenCalled();
+      expect(grantedNodes).not.toHaveBeenCalled();
+    });
+
+    it('returns an empty permissions array when no permissions are granted', async () => {
+      grantedNodes.mockResolvedValueOnce([]);
+      const response = await request(app.getHttpServer())
+        .get('/account')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200);
+
+      expect(response.body.data.permissions).toEqual([]);
+      expect(grantedNodes).toHaveBeenCalledWith(42);
+    });
+
+    it('does not hide a permission lookup failure behind an empty permissions array', async () => {
+      grantedNodes.mockRejectedValueOnce(new Error('permission lookup failed'));
+      const response = await request(app.getHttpServer())
+        .get('/account')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(500);
+
+      expect(response.body.data).toBeUndefined();
+      expect(grantedNodes).toHaveBeenCalledWith(42);
+    });
+
+    it('does not expose the removed /auth/me route', async () => {
+      await request(app.getHttpServer()).get('/auth/me').expect(404);
+      await request(app.getHttpServer())
+        .get('/auth/me')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(404);
+
+      expect(findById).not.toHaveBeenCalled();
+      expect(query).not.toHaveBeenCalled();
+      expect(grantedNodes).not.toHaveBeenCalled();
     });
   });
 
   it.each(['page=0', 'limit=0'])(
     'rejects nonpositive pagination without querying MySQL: %s',
     (query) =>
-      request(app.getHttpServer())
-        .get(`/articles/available?${query}`)
-        .expect(400),
+      request(app.getHttpServer()).get(`/articles?${query}`).expect(400),
   );
 
   it('does not invent a root route', () => {

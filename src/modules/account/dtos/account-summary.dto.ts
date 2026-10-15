@@ -39,12 +39,6 @@ export class AccountSummaryDto {
   activeAvatar: AccountAvatarDto | null;
 }
 
-export class AccountSummaryResponseDto {
-  @ApiProperty({ example: 'ok' }) status: string;
-  @ApiProperty({ example: 200 }) code: number;
-  @ApiProperty({ type: AccountSummaryDto }) data: AccountSummaryDto;
-}
-
 export class CurrentAccountDto extends AccountSummaryDto {
   @ApiProperty({
     type: [String],
@@ -55,7 +49,7 @@ export class CurrentAccountDto extends AccountSummaryDto {
   permissions: string[];
 }
 
-export class CurrentAccountResponseDto {
+export class AccountSummaryResponseDto {
   @ApiProperty({ example: 'ok' }) status: string;
   @ApiProperty({ example: 200 }) code: number;
   @ApiProperty({ type: CurrentAccountDto }) data: CurrentAccountDto;
