@@ -11,10 +11,12 @@ const group = (
   name: string,
   weight: number,
   nodes: Record<string, boolean>,
+  parents: PermissionGroupSource[] = [],
 ): PermissionGroupSource => ({
   name,
   weight,
   nodes: Object.entries(nodes).map(([node, value]) => ({ node, value })),
+  parents,
 });
 
 describe('permission resolver', () => {
@@ -87,6 +89,59 @@ describe('permission resolver', () => {
     expect(sources.map((source) => source.name)).toEqual(['muted', 'writer']);
     expect(resolvePermission(sources, 'cms.articles.manage')).toBe(false);
     expect(resolvePermission(sources, 'cms.settings.manage')).toBe(true);
+  });
+
+  it('resolves a child before its inherited parent', () => {
+    const editor = group('content_editor', 50, {
+      'cms.articles.manage': true,
+    });
+    const admin = group(
+      'admin',
+      100,
+      { 'cms.articles.manage': false, 'cms.audit.view': true },
+      [editor],
+    );
+    const sources = collectSources(
+      [{ group: admin, expiresAt: null }],
+      null,
+      now,
+    );
+    expect(sources.map((source) => source.name)).toEqual([
+      'admin',
+      'content_editor',
+    ]);
+    expect(resolvePermission(sources, 'cms.articles.manage')).toBe(false);
+    expect(resolvePermission(sources, 'cms.audit.view')).toBe(true);
+  });
+
+  it('uses deterministic parent priority and visits a shared ancestor once', () => {
+    const base = group('base', 1, { 'cms.audit.view': true });
+    const lowerParent = group('a_parent', 10, {}, [base]);
+    const higherParent = group('z_parent', 20, { 'cms.audit.view': false }, [
+      base,
+    ]);
+    const child = group('child', 100, {}, [lowerParent, higherParent]);
+    const sources = collectSources(
+      [{ group: child, expiresAt: null }],
+      null,
+      now,
+    );
+    expect(sources.map((source) => source.name)).toEqual([
+      'child',
+      'z_parent',
+      'base',
+      'a_parent',
+    ]);
+    expect(resolvePermission(sources, 'cms.audit.view')).toBe(false);
+  });
+
+  it('fails closed when an assigned group hierarchy contains a cycle', () => {
+    const first = group('first', 10, {});
+    const second = group('second', 5, {}, [first]);
+    first.parents = [second];
+    expect(() =>
+      collectSources([{ group: first, expiresAt: null }], null, now),
+    ).toThrow('Permission group inheritance cycle detected');
   });
 
   it('ignores expired memberships and always includes the default group once', () => {

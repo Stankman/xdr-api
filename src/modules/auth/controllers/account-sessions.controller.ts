@@ -12,7 +12,13 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import { AccountSummaryResponseDto } from '../../account/dtos/account-summary.dto';
 import { AuthGuard } from '../../../common/guards/auth.guard';
 import { AuthenticatedRequest } from '../../../common/interfaces/authenticated-request.interface';
 import { BoundedPagePipe } from '../../../common/pipes/bounded-page.pipe';
@@ -27,6 +33,7 @@ export class AccountSessionsController {
   constructor(private readonly authentication: AuthenticationService) {}
 
   @Get()
+  @ApiOkResponse({ type: AccountSummaryResponseDto })
   current(@Req() request: AuthenticatedRequest) {
     return this.authentication.accountSummary(request.xdr_uid);
   }

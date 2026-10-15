@@ -9,8 +9,14 @@ import { DataSource, In, Repository } from 'typeorm';
 import { AuditLogService } from '../../audit/audit-log.service';
 import { XdrSetting } from '../entities/xdr-setting.entity';
 import {
+  ACCOUNT_MAX_AVATARS_KEY,
+  DEFAULT_ACCOUNT_MAX_AVATARS,
+  DEFAULT_REGISTRATION_MAX_ACCOUNTS_PER_IP,
   REGISTRATION_AVATAR_MAX_LENGTH,
   REGISTRATION_DEFAULT_AVATAR_KEY,
+  REGISTRATION_LIMIT_MAX_VALUE,
+  REGISTRATION_MAX_ACCOUNTS_PER_IP_KEY,
+  parsePositiveLimit,
 } from '../registration-defaults';
 
 export const PUBLIC_WEBSITE_SETTING_KEYS = [
@@ -23,7 +29,15 @@ export const PUBLIC_WEBSITE_SETTING_KEYS = [
 export const MANAGEABLE_WEBSITE_SETTING_KEYS = [
   ...PUBLIC_WEBSITE_SETTING_KEYS,
   REGISTRATION_DEFAULT_AVATAR_KEY,
+  REGISTRATION_MAX_ACCOUNTS_PER_IP_KEY,
+  ACCOUNT_MAX_AVATARS_KEY,
 ] as const;
+
+const REGISTRATION_LIMIT_DEFAULTS: Readonly<Record<string, number>> = {
+  [REGISTRATION_MAX_ACCOUNTS_PER_IP_KEY]:
+    DEFAULT_REGISTRATION_MAX_ACCOUNTS_PER_IP,
+  [ACCOUNT_MAX_AVATARS_KEY]: DEFAULT_ACCOUNT_MAX_AVATARS,
+};
 
 interface SettingActor {
   accountId: number;
@@ -63,6 +77,14 @@ export class WebsiteSettingsService {
       if (!value || value.length > REGISTRATION_AVATAR_MAX_LENGTH) {
         throw new BadRequestException(
           `Registration avatar must contain between 1 and ${REGISTRATION_AVATAR_MAX_LENGTH} characters.`,
+        );
+      }
+    }
+    if (key in REGISTRATION_LIMIT_DEFAULTS) {
+      value = value.trim();
+      if (!parsePositiveLimit(value)) {
+        throw new BadRequestException(
+          `Setting must be a positive integer no greater than ${REGISTRATION_LIMIT_MAX_VALUE}.`,
         );
       }
     }

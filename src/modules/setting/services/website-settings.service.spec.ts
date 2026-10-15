@@ -5,7 +5,9 @@ import { DataSource, EntityManager, In, Repository } from 'typeorm';
 import { AuditLogService } from '../../audit/audit-log.service';
 import { XdrSetting } from '../entities/xdr-setting.entity';
 import {
+  ACCOUNT_MAX_AVATARS_KEY,
   DEFAULT_REGISTRATION_AVATAR,
+  REGISTRATION_MAX_ACCOUNTS_PER_IP_KEY,
   REGISTRATION_DEFAULT_AVATAR_KEY,
 } from '../registration-defaults';
 import {
@@ -76,6 +78,10 @@ describe('WebsiteSettingsService registration defaults', () => {
     expect(MANAGEABLE_WEBSITE_SETTING_KEYS).toContain(
       REGISTRATION_DEFAULT_AVATAR_KEY,
     );
+    expect(MANAGEABLE_WEBSITE_SETTING_KEYS).toContain(
+      REGISTRATION_MAX_ACCOUNTS_PER_IP_KEY,
+    );
+    expect(MANAGEABLE_WEBSITE_SETTING_KEYS).toContain(ACCOUNT_MAX_AVATARS_KEY);
   });
 
   it('trims, saves and audits a registration avatar without recording its value', async () => {
@@ -121,6 +127,25 @@ describe('WebsiteSettingsService registration defaults', () => {
       value: 'a'.repeat(279),
     });
   });
+
+  it.each([REGISTRATION_MAX_ACCOUNTS_PER_IP_KEY, ACCOUNT_MAX_AVATARS_KEY])(
+    'trims and stores the numeric limit setting %s',
+    async (key) => {
+      repository.findOne.mockResolvedValue(null);
+      await service.update(key, ' 5 ', actor);
+      expect(repository.save).toHaveBeenCalledWith({ key, value: '5' });
+    },
+  );
+
+  it.each(['', '0', '-1', '1.5', '1e2', '2147483648'])(
+    'rejects an invalid numeric registration limit %s',
+    (value) => {
+      expect(() =>
+        service.update(REGISTRATION_MAX_ACCOUNTS_PER_IP_KEY, value, actor),
+      ).toThrow(BadRequestException);
+      expect(transaction).not.toHaveBeenCalled();
+    },
+  );
 
   it('does not permit removing the required registration avatar', () => {
     expect(() =>

@@ -6,7 +6,7 @@ import {
 /**
  * A port of the node-matching part of Turbo's PermissionResolver and PermissionNodeFormat
  * (turbo-cloud: Turbo.Primitives/Players/Permissions/), applied to XDR account groups.
- * Group inheritance, per-account nodes, meta and temporary node assignments are not modelled.
+ * Per-account nodes, meta and temporary node assignments are not modelled.
  */
 
 export const WILDCARD = '*';
@@ -25,6 +25,7 @@ export interface PermissionGroupSource {
   name: string;
   weight: number;
   nodes: PermissionNodeAssignment[];
+  parents?: PermissionGroupSource[];
 }
 
 export interface PermissionMembership {
@@ -98,25 +99,63 @@ function bestMatch(
   return best;
 }
 
-/** Live memberships plus the implicit default group, each once, highest weight first. */
+/**
+ * Live direct memberships and the implicit default group, expanded child-first through parents.
+ * A group is visited once even when multiple inheritance paths reach it.
+ */
 export function collectSources(
   memberships: PermissionMembership[],
   defaultGroup: PermissionGroupSource | null,
   now: Date,
 ): PermissionGroupSource[] {
-  const byName = new Map<string, PermissionGroupSource>();
+  const roots = new Map<string, PermissionGroupSource>();
   for (const membership of memberships) {
     if (membership.expiresAt && membership.expiresAt.getTime() <= now.getTime())
       continue;
-    byName.set(membership.group.name, membership.group);
+    roots.set(membership.group.name, membership.group);
   }
   if (defaultGroup?.name === DEFAULT_PERMISSION_GROUP) {
-    byName.set(defaultGroup.name, defaultGroup);
+    roots.set(defaultGroup.name, defaultGroup);
   }
-  return [...byName.values()].sort((a, b) => {
+  const orderedRoots = [...roots.values()].sort((a, b) => {
     if (b.weight !== a.weight) return b.weight - a.weight;
     return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
   });
+  assertAcyclicHierarchy(orderedRoots);
+  const result: PermissionGroupSource[] = [];
+  const visited = new Set<string>();
+  const visit = (source: PermissionGroupSource): void => {
+    if (visited.has(source.name)) return;
+    result.push(source);
+    const parents = [...(source.parents ?? [])].sort((a, b) => {
+      if (b.weight !== a.weight) return b.weight - a.weight;
+      return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+    });
+    for (const parent of parents) visit(parent);
+    visited.add(source.name);
+  };
+  for (const root of orderedRoots) visit(root);
+  return result;
+}
+
+export function assertAcyclicHierarchy(
+  groups: Iterable<PermissionGroupSource>,
+): void {
+  const visited = new Set<string>();
+  const visiting = new Set<string>();
+  const visit = (group: PermissionGroupSource): void => {
+    if (visiting.has(group.name)) {
+      throw new Error(
+        `Permission group inheritance cycle detected at '${group.name}'.`,
+      );
+    }
+    if (visited.has(group.name)) return;
+    visiting.add(group.name);
+    for (const parent of group.parents ?? []) visit(parent);
+    visiting.delete(group.name);
+    visited.add(group.name);
+  };
+  for (const group of groups) visit(group);
 }
 
 /**

@@ -1,10 +1,21 @@
-import { ConflictException, ServiceUnavailableException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  HttpException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { QueryFailedError } from 'typeorm';
 import { DataSource } from 'typeorm';
 import { Account } from '../../account/entities/account.entity';
 import { AccountPlayer } from '../../account/entities/account-player.entity';
 import { XdrSetting } from '../../setting/entities/xdr-setting.entity';
-import { DEFAULT_REGISTRATION_AVATAR } from '../../setting/registration-defaults';
+import {
+  ACCOUNT_MAX_AVATARS_KEY,
+  DEFAULT_ACCOUNT_MAX_AVATARS,
+  DEFAULT_REGISTRATION_AVATAR,
+  DEFAULT_REGISTRATION_MAX_ACCOUNTS_PER_IP,
+  REGISTRATION_MAX_ACCOUNTS_PER_IP_KEY,
+} from '../../setting/registration-defaults';
 import {
   AccountToken,
   AccountTokenPurpose,
@@ -30,14 +41,19 @@ interface Committed {
  * A fake transactional database: writes go to a per-transaction scratch area and are only
  * copied into `committed` when the callback resolves, as a real rollback would behave.
  */
-function harness(options: {
-  existing?: Account | null;
-  avatarSetting?: string | null;
-  playerInsert?: (attempt: number) => unknown;
-  linkSave?: () => unknown;
-  tokenSave?: () => unknown;
-  accountSave?: () => unknown;
-}) {
+function harness(
+  options: {
+    existing?: Account | null;
+    avatarSetting?: string | null;
+    ipLimitSetting?: string | null;
+    avatarLimitSetting?: string | null;
+    accountsFromIp?: number;
+    playerInsert?: (attempt: number) => unknown;
+    linkSave?: () => unknown;
+    tokenSave?: () => unknown;
+    accountSave?: () => unknown;
+  } = {},
+) {
   const committed: Committed = {
     accounts: [],
     players: [],
@@ -62,6 +78,7 @@ function harness(options: {
               createQueryBuilder: () => ({
                 where: () => ({ getOne: async () => options.existing ?? null }),
               }),
+              count: jest.fn().mockResolvedValue(options.accountsFromIp ?? 0),
               create: (input: object) => input,
               save: async (input: object) => {
                 const failure = options.accountSave?.();
@@ -75,6 +92,7 @@ function harness(options: {
           [
             AccountPlayer,
             {
+              count: jest.fn().mockResolvedValue(0),
               create: (input: object) => input,
               save: async (input: object) => {
                 const failure = options.linkSave?.();
@@ -99,14 +117,19 @@ function harness(options: {
           [
             XdrSetting,
             {
-              findOne: async () =>
-                options.avatarSetting === undefined ||
-                options.avatarSetting === null
-                  ? null
-                  : {
-                      key: 'registration.default_avatar',
-                      value: options.avatarSetting,
-                    },
+              findOne: async ({ where }: { where: { key: string } }) => {
+                const valueByKey: Record<string, string | null | undefined> = {
+                  'registration.default_avatar': options.avatarSetting,
+                  [REGISTRATION_MAX_ACCOUNTS_PER_IP_KEY]:
+                    options.ipLimitSetting ??
+                    String(DEFAULT_REGISTRATION_MAX_ACCOUNTS_PER_IP),
+                  [ACCOUNT_MAX_AVATARS_KEY]:
+                    options.avatarLimitSetting ??
+                    String(DEFAULT_ACCOUNT_MAX_AVATARS),
+                };
+                const value = valueByKey[where.key];
+                return value == null ? null : { key: where.key, value };
+              },
             },
           ],
         ]);
@@ -131,6 +154,7 @@ function harness(options: {
   };
   const mailer = { assertConfigured: jest.fn(), sendVerification: jest.fn() };
   const hashService = { hash: jest.fn().mockResolvedValue('password-hash') };
+  const accountAvatars = { assertCanAddAvatar: jest.fn() };
   const service = new AuthenticationService(
     dataSource as unknown as DataSource,
     {} as never,
@@ -138,12 +162,14 @@ function harness(options: {
     {} as never,
     {} as never,
     mailer as never,
+    accountAvatars as never,
   );
   return {
     service,
     committed,
     dataSource,
     mailer,
+    accountAvatars,
     attempts: () => playerAttempts,
   };
 }
@@ -153,7 +179,7 @@ const input = { email: ' Player.One@Example.com ', password: 'secret123' };
 
 describe('AuthenticationService.register', () => {
   it('creates the account, one player, the link and the verification token together', async () => {
-    const { service, committed, mailer } = harness({
+    const { service, committed, mailer, accountAvatars } = harness({
       avatarSetting: '  hd-180-1  ',
     });
 
@@ -177,6 +203,11 @@ describe('AuthenticationService.register', () => {
     expect(gender).toBe(0);
     expect(status).toBe(0);
     expect(committed.links).toEqual([{ accountId: 77, playerId: 501 }]);
+    expect(accountAvatars.assertCanAddAvatar).toHaveBeenCalledTimes(1);
+    expect(accountAvatars.assertCanAddAvatar).toHaveBeenCalledWith(
+      expect.anything(),
+      77,
+    );
     expect(committed.tokens).toEqual([
       expect.objectContaining({
         accountId: 77,
@@ -217,6 +248,52 @@ describe('AuthenticationService.register', () => {
     expect(committed.players).toHaveLength(0);
     expect(committed.accounts).toHaveLength(0);
     expect(mailer.sendVerification).not.toHaveBeenCalled();
+  });
+
+  it('rejects registration after the configured per-IP account limit', async () => {
+    const { service, committed } = harness({
+      accountsFromIp: DEFAULT_REGISTRATION_MAX_ACCOUNTS_PER_IP,
+    });
+    try {
+      await service.register(input, metadata);
+      fail('Expected the per-IP registration limit to reject the request.');
+    } catch (error) {
+      expect(error).toBeInstanceOf(HttpException);
+      if (error instanceof HttpException) {
+        expect(error.getStatus()).toBe(429);
+      }
+    }
+    expect(committed.accounts).toHaveLength(0);
+    expect(committed.players).toHaveLength(0);
+  });
+
+  it('rejects registration when the client IP is unavailable', async () => {
+    const { service, committed } = harness();
+    await expect(
+      service.register(input, { ...metadata, ipAddress: null }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(committed.accounts).toHaveLength(0);
+  });
+
+  it('fails explicitly when the per-IP registration setting is invalid', async () => {
+    const { service, committed } = harness({ ipLimitSetting: '0' });
+    await expect(service.register(input, metadata)).rejects.toBeInstanceOf(
+      ServiceUnavailableException,
+    );
+    expect(committed.accounts).toHaveLength(0);
+  });
+
+  it('rolls back registration if the avatar limit disallows adding a player', async () => {
+    const { service, committed, accountAvatars } = harness();
+    accountAvatars.assertCanAddAvatar.mockRejectedValue(
+      new ConflictException('avatar limit reached'),
+    );
+    await expect(service.register(input, metadata)).rejects.toThrow(
+      'avatar limit reached',
+    );
+    expect(committed.accounts).toHaveLength(0);
+    expect(committed.players).toHaveLength(0);
+    expect(committed.links).toHaveLength(0);
   });
 
   it('maps a concurrent duplicate email to a conflict and keeps no player', async () => {

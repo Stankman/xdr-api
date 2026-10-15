@@ -10,6 +10,7 @@ import { AuthenticatedRequest } from '../interfaces/authenticated-request.interf
 import { XDR_PERMISSION_KEY } from '../decorators/permission.decorator';
 import { PermissionService } from '../../modules/permission/permission.service';
 import { AuditLogService } from '../../modules/audit/audit-log.service';
+import { AcpAccessService } from '../../modules/acp/acp-access.service';
 
 /** Runs after AuthGuard. Any doubt (no node, no account, lookup failure) is a denial. */
 @Injectable()
@@ -18,6 +19,7 @@ export class PermissionGuard implements CanActivate {
     private readonly reflector: Reflector,
     private readonly permissions: PermissionService,
     private readonly audit: AuditLogService,
+    private readonly acp: AcpAccessService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -44,7 +46,10 @@ export class PermissionGuard implements CanActivate {
     } catch (error) {
       errorType = error instanceof Error ? error.name : 'UnknownError';
     }
-    if (granted) return true;
+    if (granted) {
+      await this.acp.authorize(request);
+      return true;
+    }
 
     try {
       await this.audit.record({

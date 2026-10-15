@@ -92,7 +92,10 @@ export class ArticlesController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard, PermissionGuard)
   @RequirePermission('cms.articles.manage')
-  publish(@Param('id', PositiveIntPipe) id: number, @Req() request: AuthenticatedRequest) {
+  publish(
+    @Param('id', PositiveIntPipe) id: number,
+    @Req() request: AuthenticatedRequest,
+  ) {
     return this.articles.publish(id, this.actor(request));
   }
 
@@ -100,7 +103,10 @@ export class ArticlesController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard, PermissionGuard)
   @RequirePermission('cms.articles.manage')
-  remove(@Param('id', PositiveIntPipe) id: number, @Req() request: AuthenticatedRequest) {
+  remove(
+    @Param('id', PositiveIntPipe) id: number,
+    @Req() request: AuthenticatedRequest,
+  ) {
     return this.articles.remove(id, this.actor(request));
   }
 

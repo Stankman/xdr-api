@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { PermissionGroupNode } from './permission-group-node.entity';
+import { PermissionGroupParent } from './permission-group-parent.entity';
 
 @Entity({ name: 'xdr_permission_groups' })
 @Index('UQ_xdr_permission_groups_name', ['name'], { unique: true })
@@ -27,6 +28,9 @@ export class PermissionGroup {
 
   @OneToMany(() => PermissionGroupNode, (node) => node.group)
   nodes?: PermissionGroupNode[];
+
+  @OneToMany(() => PermissionGroupParent, (parent) => parent.childGroup)
+  parents?: PermissionGroupParent[];
 
   @CreateDateColumn({ name: 'created_at', type: 'datetime' })
   createdAt: Date;

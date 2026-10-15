@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TokenConfigModule } from '../../config/token/token-config.module';
@@ -14,10 +14,12 @@ import { AuthRateLimitGuard } from '../../common/guards/auth-rate-limit.guard';
 import { AuthenticationService } from './services/authentication.service';
 import { SessionService } from './services/session.service';
 import { TokenService } from './services/token.service';
+import { PermissionModule } from '../permission/permission.module';
 
 @Module({
   imports: [
     AccountModule,
+    forwardRef(() => PermissionModule),
     MailConfigModule,
     TokenConfigModule,
     TypeOrmModule.forFeature([AccountSession, AccountToken]),

@@ -7,6 +7,7 @@ import { AuditLog } from '../../modules/audit/entities/audit-log.entity';
 import { XdrSetting } from '../../modules/setting/entities/xdr-setting.entity';
 import { PermissionGroup } from '../../modules/permission/entities/permission-group.entity';
 import { PermissionGroupNode } from '../../modules/permission/entities/permission-group-node.entity';
+import { PermissionGroupParent } from '../../modules/permission/entities/permission-group-parent.entity';
 import { AccountPermissionGroup } from '../../modules/permission/entities/account-permission-group.entity';
 
 export const XdrEntities = [
@@ -19,5 +20,6 @@ export const XdrEntities = [
   AuditLog,
   PermissionGroup,
   PermissionGroupNode,
+  PermissionGroupParent,
   XdrSetting,
 ];

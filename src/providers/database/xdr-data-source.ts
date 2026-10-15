@@ -4,6 +4,9 @@ import { XdrEntities } from './xdr-entities';
 import { XdrApiFoundation1770000000000 } from './migrations/1770000000000-XdrApiFoundation';
 import { RegistrationDefaultAvatar1791940000000 } from './migrations/1791940000000-RegistrationDefaultAvatar';
 import { XdrPermissionGroups1792000000000 } from './migrations/1792000000000-XdrPermissionGroups';
+import { XdrPermissionGroupInheritance1792100000000 } from './migrations/1792100000000-XdrPermissionGroupInheritance';
+import { XdrAcpAccess1792200000000 } from './migrations/1792200000000-XdrAcpAccess';
+import { RegistrationLimits1792300000000 } from './migrations/1792300000000-RegistrationLimits';
 
 export default new DataSource({
   type: 'mysql',
@@ -17,6 +20,9 @@ export default new DataSource({
     XdrApiFoundation1770000000000,
     RegistrationDefaultAvatar1791940000000,
     XdrPermissionGroups1792000000000,
+    XdrPermissionGroupInheritance1792100000000,
+    XdrAcpAccess1792200000000,
+    RegistrationLimits1792300000000,
   ],
   migrationsTableName: 'xdr_migrations',
   synchronize: false,

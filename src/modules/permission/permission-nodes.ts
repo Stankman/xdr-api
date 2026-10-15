@@ -1,10 +1,12 @@
 /** Every node an XDR permission check may ask about. Nothing here is granted by default. */
 export const XdrPermissionNodes = {
+  ACP_ACCESS: 'cms.acp.access',
   ARTICLES_MANAGE: 'cms.articles.manage',
   SETTINGS_MANAGE: 'cms.settings.manage',
   AUDIT_VIEW: 'cms.audit.view',
   ACCOUNT_SESSIONS_VIEW: 'cms.accounts.sessions.view',
   ACCOUNT_SESSIONS_MANAGE: 'cms.accounts.sessions.manage',
+  PERMISSIONS_MANAGE: 'cms.permissions.manage',
 } as const;
 
 export type XdrPermissionNode =

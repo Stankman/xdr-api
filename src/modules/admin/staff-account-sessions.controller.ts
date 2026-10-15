@@ -33,7 +33,14 @@ export class StaffAccountSessionsController {
     minimum: 1,
     maximum: 100_000,
   })
-  @ApiQuery({ name: 'limit', required: false, type: Number, minimum: 1, maximum: 100, example: 50 })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    minimum: 1,
+    maximum: 100,
+    example: 50,
+  })
   @UseGuards(AuthGuard, PermissionGuard)
   @RequirePermission('cms.accounts.sessions.view')
   list(

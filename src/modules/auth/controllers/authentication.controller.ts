@@ -18,11 +18,16 @@ import { PasswordResetDto } from '../dtos/password-reset.dto';
 import { RefreshTokenDto } from '../dtos/refresh-token.dto';
 import { RegisterAccountDto } from '../dtos/register-account.dto';
 import { AuthenticationService } from '../services/authentication.service';
+import { CurrentAccountResponseDto } from '../../account/dtos/account-summary.dto';
+import { PermissionService } from '../../permission/permission.service';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthenticationController {
-  constructor(private readonly authentication: AuthenticationService) {}
+  constructor(
+    private readonly authentication: AuthenticationService,
+    private readonly permissions: PermissionService,
+  ) {}
 
   @Post('register')
   @UseGuards(AuthRateLimitGuard)
@@ -45,7 +50,10 @@ export class AuthenticationController {
   @UseGuards(AuthRateLimitGuard)
   @RateLimit({ limit: 20, windowMs: 15 * 60_000 })
   refresh(@Body() input: RefreshTokenDto, @Req() request: Request) {
-    return this.authentication.refresh(input.refreshToken, this.metadata(request));
+    return this.authentication.refresh(
+      input.refreshToken,
+      this.metadata(request),
+    );
   }
 
   @Post('email-verification/resend')
@@ -78,9 +86,14 @@ export class AuthenticationController {
 
   @ApiBearerAuth()
   @Get('me')
+  @ApiOkResponse({ type: CurrentAccountResponseDto })
   @UseGuards(AuthGuard)
-  currentAccount(@Req() request: AuthenticatedRequest) {
-    return this.authentication.accountSummary(request.xdr_uid);
+  async currentAccount(@Req() request: AuthenticatedRequest) {
+    const [account, permissions] = await Promise.all([
+      this.authentication.accountSummary(request.xdr_uid),
+      this.permissions.grantedNodes(request.xdr_uid),
+    ]);
+    return { ...account, permissions };
   }
 
   @ApiBearerAuth()
@@ -97,7 +110,10 @@ export class AuthenticationController {
     return this.authentication.logoutAll(request.xdr_uid);
   }
 
-  private metadata(request: Request): { ipAddress: string | null; userAgent: string | null } {
+  private metadata(request: Request): {
+    ipAddress: string | null;
+    userAgent: string | null;
+  } {
     const userAgent = request.headers['user-agent'];
     return {
       ipAddress: request.ip?.slice(0, 45) || null,

@@ -16,10 +16,12 @@ describe('PermissionGuard', () => {
     if (node) Reflect.defineMetadata(XDR_PERMISSION_KEY, node, handler);
     else Reflect.deleteMetadata(XDR_PERMISSION_KEY, handler);
     const audit = { record: jest.fn().mockResolvedValue(undefined) };
+    const acp = { authorize: jest.fn().mockResolvedValue(undefined) };
     const guard = new PermissionGuard(
       reflector,
       { has } as never,
       audit as never,
+      acp as never,
     );
     const request = { xdr_uid: xdrUid, requestId: 'req-1' };
     const context = {
@@ -27,15 +29,31 @@ describe('PermissionGuard', () => {
       getClass: () => Controller,
       switchToHttp: () => ({ getRequest: () => request }),
     } as unknown as ExecutionContext;
-    return { guard, audit, context };
+    return { guard, audit, acp, context };
   }
 
   it('allows a granted account without auditing', async () => {
     const has = jest.fn().mockResolvedValue(true);
-    const { guard, audit, context } = setup('cms.audit.view', has);
+    const { guard, audit, acp, context } = setup('cms.audit.view', has);
     await expect(guard.canActivate(context)).resolves.toBe(true);
     expect(has).toHaveBeenCalledWith(7, 'cms.audit.view');
     expect(audit.record).not.toHaveBeenCalled();
+    expect(acp.authorize).toHaveBeenCalledWith(
+      expect.objectContaining({ xdr_uid: 7 }),
+    );
+  });
+
+  it('requires local ACP access in addition to the operation permission', async () => {
+    const { guard, acp, context } = setup(
+      'cms.audit.view',
+      jest.fn().mockResolvedValue(true),
+    );
+    acp.authorize.mockRejectedValue(
+      new ForbiddenException('Website ACP access is required.'),
+    );
+    await expect(guard.canActivate(context)).rejects.toThrow(
+      'Website ACP access is required.',
+    );
   });
 
   it('denies and audits an account without the node', async () => {

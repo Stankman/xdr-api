@@ -2,6 +2,8 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
   ServiceUnavailableException,
@@ -10,8 +12,11 @@ import {
 import { createHash, randomBytes, randomUUID } from 'crypto';
 import { DataSource, EntityManager, IsNull, Repository } from 'typeorm';
 import { WebsiteAccountService } from '../../account/services/website-account.service';
+import { AccountAvatarsService } from '../../account/services/account-avatars.service';
+import { AccountSummaryDto } from '../../account/dtos/account-summary.dto';
 import { Account } from '../../account/entities/account.entity';
 import { AccountPlayer } from '../../account/entities/account-player.entity';
+import { XdrSetting } from '../../setting/entities/xdr-setting.entity';
 import { registrationPlayerName } from '../registration-player-name';
 import {
   ACCOUNT_EMAIL_INDEX,
@@ -22,12 +27,20 @@ import {
 } from '../registration-player';
 import { HashService } from '../../shared/services/hash.service';
 import { AccountSession } from '../entities/account-session.entity';
-import { AccountToken, AccountTokenPurpose } from '../entities/account-token.entity';
+import {
+  AccountToken,
+  AccountTokenPurpose,
+} from '../entities/account-token.entity';
 import { LoginDto } from '../dtos/login.dto';
 import { RegisterAccountDto } from '../dtos/register-account.dto';
 import { MailerService } from './mailer.service';
 import { SessionService } from './session.service';
 import { TokenService } from './token.service';
+import {
+  DEFAULT_REGISTRATION_MAX_ACCOUNTS_PER_IP,
+  parsePositiveLimit,
+  REGISTRATION_MAX_ACCOUNTS_PER_IP_KEY,
+} from '../../setting/registration-defaults';
 
 const REFRESH_TOKEN_LIFETIME_DAYS = 30;
 const EMAIL_TOKEN_LIFETIME_HOURS = 24;
@@ -55,6 +68,7 @@ export class AuthenticationService {
     private readonly tokenService: TokenService,
     private readonly sessionService: SessionService,
     private readonly mailer: MailerService,
+    private readonly accountAvatars: AccountAvatarsService,
   ) {}
 
   async register(
@@ -84,7 +98,9 @@ export class AuthenticationService {
       } catch (error) {
         const index = duplicateKeyIndex(error);
         if (index === ACCOUNT_EMAIL_INDEX) {
-          throw new ConflictException('An account with that email already exists.');
+          throw new ConflictException(
+            'An account with that email already exists.',
+          );
         }
         if (index === PLAYER_NAME_INDEX) {
           if (attempt < REGISTRATION_PLAYER_NAME_ATTEMPTS) continue;
@@ -124,7 +140,9 @@ export class AuthenticationService {
       });
       await this.mailer.sendVerification(account.email, rawToken);
     }
-    return { message: 'If the account requires verification, an email will be sent.' };
+    return {
+      message: 'If the account requires verification, an email will be sent.',
+    };
   }
 
   async verifyEmail(token: string): Promise<{ message: string }> {
@@ -142,7 +160,10 @@ export class AuthenticationService {
         .andWhere('token.consumed_at IS NULL')
         .andWhere('token.expires_at > :now', { now })
         .getOne();
-      if (!record) throw new BadRequestException('The verification token is invalid or expired.');
+      if (!record)
+        throw new BadRequestException(
+          'The verification token is invalid or expired.',
+        );
 
       record.consumedAt = now;
       await tokens.save(record);
@@ -152,17 +173,25 @@ export class AuthenticationService {
       });
       return record.accountId;
     });
-    if (!accountId) throw new BadRequestException('The verification token is invalid or expired.');
+    if (!accountId)
+      throw new BadRequestException(
+        'The verification token is invalid or expired.',
+      );
     return { message: 'Email address verified.' };
   }
 
   async login(input: LoginDto, metadata: RequestMetadata): Promise<AuthTokens> {
     const account = await this.accounts.findByEmail(input.email, true);
-    if (!account || !(await this.hashService.verify(account.password, input.password))) {
+    if (
+      !account ||
+      !(await this.hashService.verify(account.password, input.password))
+    ) {
       throw new UnauthorizedException('Email or password is incorrect.');
     }
     if (!account.emailVerified) {
-      throw new ForbiddenException('Verify your email address before signing in.');
+      throw new ForbiddenException(
+        'Verify your email address before signing in.',
+      );
     }
     const now = new Date();
     await this.accounts.updateLogin(account.id, metadata.ipAddress, now);
@@ -188,7 +217,9 @@ export class AuthenticationService {
           .createQueryBuilder('token')
           .setLock('pessimistic_write')
           .where('token.token_hash = :oldHash', { oldHash })
-          .andWhere('token.purpose = :purpose', { purpose: AccountTokenPurpose.REFRESH })
+          .andWhere('token.purpose = :purpose', {
+            purpose: AccountTokenPurpose.REFRESH,
+          })
           .getOne();
         if (previous?.consumedAt && previous.sessionId) {
           await sessions.update(
@@ -218,7 +249,10 @@ export class AuthenticationService {
       session.expiresAt = this.addDays(now, REFRESH_TOKEN_LIFETIME_DAYS);
       session.ipAddress = metadata.ipAddress;
       session.userAgent = metadata.userAgent;
-      const accessToken = await this.tokenService.execute(session.accountId, session.id);
+      const accessToken = await this.tokenService.execute(
+        session.accountId,
+        session.id,
+      );
       await sessions.save(session);
       return {
         kind: 'rotated' as const,
@@ -241,24 +275,37 @@ export class AuthenticationService {
     };
   }
 
-  async logout(sessionId: string, accountId: number): Promise<{ message: string }> {
-    await this.sessionService.revoke(sessionId, accountId);
+  async logout(
+    sessionId: string,
+    accountId: number,
+  ): Promise<{ message: string }> {
+    await this.dataSource.transaction(async (manager) => {
+      await manager
+        .getRepository(AccountSession)
+        .createQueryBuilder()
+        .update(AccountSession)
+        .set({ revokedAt: new Date() })
+        .where(
+          'id = :sessionId AND account_id = :accountId AND revoked_at IS NULL',
+          { sessionId, accountId },
+        )
+        .execute();
+      await this.terminatePlayerSessions(manager, accountId);
+    });
     return { message: 'Session revoked.' };
   }
 
-  async accountSummary(accountId: number): Promise<{
-    id: number;
-    email: string;
-    emailVerified: boolean;
-    createdAt: Date;
-  }> {
+  async accountSummary(accountId: number): Promise<AccountSummaryDto> {
     const account = await this.accounts.findById(accountId);
     if (!account) throw new UnauthorizedException();
+    const avatars = await this.accountAvatars.forAccount(accountId);
     return {
       id: account.id,
       email: account.email,
       emailVerified: account.emailVerified,
       createdAt: account.created_at,
+      avatars,
+      activeAvatar: avatars[0] ?? null,
     };
   }
 
@@ -277,7 +324,18 @@ export class AuthenticationService {
   }
 
   async logoutAll(accountId: number): Promise<{ revoked: number }> {
-    return { revoked: await this.sessionService.revokeAll(accountId) };
+    const revoked = await this.dataSource.transaction(async (manager) => {
+      const result = await manager
+        .getRepository(AccountSession)
+        .createQueryBuilder()
+        .update(AccountSession)
+        .set({ revokedAt: new Date() })
+        .where('account_id = :accountId AND revoked_at IS NULL', { accountId })
+        .execute();
+      await this.terminatePlayerSessions(manager, accountId);
+      return result.affected ?? 0;
+    });
+    return { revoked };
   }
 
   async changePassword(
@@ -289,15 +347,22 @@ export class AuthenticationService {
     const account = await this.accounts.findById(accountId);
     if (!account) throw new UnauthorizedException();
     const withPassword = await this.accounts.findByEmail(account.email, true);
-    if (!withPassword || !(await this.hashService.verify(withPassword.password, currentPassword))) {
+    if (
+      !withPassword ||
+      !(await this.hashService.verify(withPassword.password, currentPassword))
+    ) {
       throw new UnauthorizedException('Current password is incorrect.');
     }
     if (await this.hashService.verify(withPassword.password, newPassword)) {
-      throw new BadRequestException('The new password must differ from the current password.');
+      throw new BadRequestException(
+        'The new password must differ from the current password.',
+      );
     }
     const passwordHash = await this.hashService.hash(newPassword);
     await this.dataSource.transaction(async (manager) => {
-      await manager.getRepository(Account).update(accountId, { password: passwordHash });
+      await manager
+        .getRepository(Account)
+        .update(accountId, { password: passwordHash });
       await manager
         .getRepository(AccountSession)
         .createQueryBuilder()
@@ -328,7 +393,9 @@ export class AuthenticationService {
           accountId: account.id,
           purpose: AccountTokenPurpose.PASSWORD_RECOVERY,
           token: rawToken,
-          expiresAt: new Date(now.getTime() + RECOVERY_TOKEN_LIFETIME_MINUTES * 60_000),
+          expiresAt: new Date(
+            now.getTime() + RECOVERY_TOKEN_LIFETIME_MINUTES * 60_000,
+          ),
         });
       });
       await this.mailer.sendPasswordRecovery(account.email, rawToken);
@@ -336,7 +403,10 @@ export class AuthenticationService {
     return { message: 'If the account exists, a recovery email will be sent.' };
   }
 
-  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+  async resetPassword(
+    token: string,
+    newPassword: string,
+  ): Promise<{ message: string }> {
     this.validatePassword(newPassword);
     const passwordHash = await this.hashService.hash(newPassword);
     const now = new Date();
@@ -347,15 +417,22 @@ export class AuthenticationService {
         .createQueryBuilder('token')
         .setLock('pessimistic_write')
         .where('token.token_hash = :tokenHash', { tokenHash })
-        .andWhere('token.purpose = :purpose', { purpose: AccountTokenPurpose.PASSWORD_RECOVERY })
+        .andWhere('token.purpose = :purpose', {
+          purpose: AccountTokenPurpose.PASSWORD_RECOVERY,
+        })
         .andWhere('token.consumed_at IS NULL')
         .andWhere('token.expires_at > :now', { now })
         .getOne();
-      if (!record) throw new BadRequestException('The recovery token is invalid or expired.');
+      if (!record)
+        throw new BadRequestException(
+          'The recovery token is invalid or expired.',
+        );
 
       record.consumedAt = now;
       await tokens.save(record);
-      await manager.getRepository(Account).update(record.accountId, { password: passwordHash });
+      await manager
+        .getRepository(Account)
+        .update(record.accountId, { password: passwordHash });
       await manager
         .getRepository(AccountSession)
         .createQueryBuilder()
@@ -417,7 +494,35 @@ export class AuthenticationService {
       .createQueryBuilder('account')
       .where('account.email = :email', { email: input.email })
       .getOne();
-    if (exists) throw new ConflictException('An account with that email already exists.');
+    if (exists)
+      throw new ConflictException('An account with that email already exists.');
+    if (!input.ipAddress) {
+      throw new BadRequestException(
+        'A client IP address is required to register.',
+      );
+    }
+
+    const ipLimitSetting = await manager
+      .getRepository(XdrSetting)
+      .findOne({ where: { key: REGISTRATION_MAX_ACCOUNTS_PER_IP_KEY } });
+    const maxAccountsPerIp =
+      ipLimitSetting === null
+        ? DEFAULT_REGISTRATION_MAX_ACCOUNTS_PER_IP
+        : parsePositiveLimit(ipLimitSetting.value);
+    if (maxAccountsPerIp === null) {
+      throw new ServiceUnavailableException(
+        'The registration IP limit is misconfigured.',
+      );
+    }
+    const accountsFromIp = await repository.count({
+      where: { ip_register: input.ipAddress },
+    });
+    if (accountsFromIp >= maxAccountsPerIp) {
+      throw new HttpException(
+        'The maximum number of accounts for this IP address has been reached.',
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
+    }
 
     const account = await repository.save(
       repository.create({
@@ -431,6 +536,7 @@ export class AuthenticationService {
       }),
     );
 
+    await this.accountAvatars.assertCanAddAvatar(manager, account.id);
     const playerId = await insertGamePlayer(manager, {
       name: registrationPlayerName(input.email),
       figure: await resolveRegistrationFigure(manager),
@@ -470,12 +576,24 @@ export class AuthenticationService {
     );
   }
 
+  private async terminatePlayerSessions(
+    manager: EntityManager,
+    accountId: number,
+  ): Promise<void> {
+    await manager.query(
+      `UPDATE players AS p
+       INNER JOIN xdr_account_players AS ap ON ap.player_id = p.id
+       SET p.auth_ticket = '', p.status = 0
+       WHERE ap.account_id = ?`,
+      [accountId],
+    );
+  }
+
   private validatePassword(password: string): void {
-    if (
-      typeof password !== 'string' ||
-      password.length < PASSWORD_MIN_LENGTH
-    ) {
-      throw new BadRequestException(`Password must contain at least ${PASSWORD_MIN_LENGTH} characters.`);
+    if (typeof password !== 'string' || password.length < PASSWORD_MIN_LENGTH) {
+      throw new BadRequestException(
+        `Password must contain at least ${PASSWORD_MIN_LENGTH} characters.`,
+      );
     }
   }
 
